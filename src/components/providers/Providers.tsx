@@ -11,13 +11,17 @@ const SolanaProvider = dynamic(() => import("./SolanaProvider"), {
   ssr: false,
 });
 
+import { ThemeProvider } from "next-themes";
+
 export default function Providers({ children }: { children: ReactNode }) {
   return (
-    <AuthProvider>
-      <AxiosInit />
-      <SolanaProvider>
-        <GoogleProvider>{children}</GoogleProvider>
-      </SolanaProvider>
-    </AuthProvider>
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+      <AuthProvider>
+        <AxiosInit />
+        <SolanaProvider>
+          <GoogleProvider>{children}</GoogleProvider>
+        </SolanaProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
