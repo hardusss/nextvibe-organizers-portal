@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import TopNav from "@/src/components/layout/TopNav";
 import { getUserDetail } from "@/src/api/user.detail";
-import { FileText, Radio, Fingerprint, Award, ChevronRight, Activity, Star } from "lucide-react";
+import { getHostedEvents, getEventAnalytics } from "@/src/api/events";
+import { FileText, Radio, Fingerprint, Award, ChevronRight, Activity, Star, ChevronDown } from "lucide-react";
 import { motion } from "framer-motion";
 
 const container = {
@@ -21,25 +22,98 @@ const item = {
 
 export default function AnalyticsPage() {
   const [userProfile, setUserProfile] = useState<any>(null);
+  const [events, setEvents] = useState<any[]>([]);
+  const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
+  const [analytics, setAnalytics] = useState<any>(null);
+  const [isLoadingAnalytics, setIsLoadingAnalytics] = useState<boolean>(false);
 
   useEffect(() => {
-    // Fetch the current user profile on mount
-    const fetchUser = async () => {
+    const initData = async () => {
       try {
-        const data = await getUserDetail(undefined, true);
-        setUserProfile(data);
+        const [profileData, eventsResponse] = await Promise.all([
+          getUserDetail(undefined, true),
+          getHostedEvents()
+        ]);
+        
+        setUserProfile(profileData);
+        
+        const evts = eventsResponse.data || [];
+        // Sort by create_at descending to get the latest first
+        evts.sort((a: any, b: any) => new Date(b.create_at).getTime() - new Date(a.create_at).getTime());
+        
+        setEvents(evts);
+        if (evts.length > 0) {
+          setSelectedEventId(evts[0].post_id);
+        }
       } catch (error) {
-        console.error("Failed to fetch user profile:", error);
+        console.error("Failed to initialize dashboard data:", error);
       }
     };
-    fetchUser();
+    initData();
   }, []);
+
+  useEffect(() => {
+    if (!selectedEventId) return;
+
+    const fetchAnalytics = async () => {
+      setIsLoadingAnalytics(true);
+      try {
+        const data = await getEventAnalytics(selectedEventId);
+        setAnalytics(data);
+      } catch (error) {
+        console.error("Failed to fetch event analytics:", error);
+        setAnalytics(null);
+      } finally {
+        setIsLoadingAnalytics(false);
+      }
+    };
+
+    fetchAnalytics();
+  }, [selectedEventId]);
+
+  const selectedEvent = events.find(e => e.post_id === selectedEventId);
 
   return (
     <div className="flex flex-col h-full overflow-y-auto custom-scrollbar pb-8 transition-colors duration-200">
-      <TopNav title="Event Analytics: NextVibe Summit" userProfile={userProfile} />
+      <TopNav 
+        title={
+          <span className="flex items-center gap-1.5">
+            <span>Event Analytics:</span>
+            {events.length > 0 && (
+              <span className="relative inline-flex items-center group cursor-pointer ml-1">
+                {/* Visible text that sizes perfectly to the current selection */}
+                <span className="text-xl font-semibold text-black dark:text-white tracking-wide border-b-2 border-dashed border-black/20 dark:border-white/20 group-hover:border-black/50 dark:group-hover:border-white/50 transition-colors pb-0.5">
+                  {selectedEvent?.about || 'Select Event'}
+                </span>
+                <ChevronDown className="w-5 h-5 ml-1.5 text-black/40 dark:text-white/40 group-hover:text-black/70 dark:group-hover:text-white/70 transition-colors" />
+                
+                {/* Invisible select covering the visible text */}
+                <select 
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  value={selectedEventId || ''}
+                  onChange={(e) => setSelectedEventId(Number(e.target.value))}
+                >
+                  {events.map(evt => (
+                    <option key={evt.post_id} value={evt.post_id} className="text-base text-black dark:text-white bg-white dark:bg-[#0d0d12]">
+                      {evt.about}
+                    </option>
+                  ))}
+                </select>
+              </span>
+            )}
+          </span>
+        } 
+        userProfile={userProfile} 
+      />
 
       <main className="px-8 flex-1 flex flex-col gap-6 mt-2">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-black dark:text-white">Dashboard Overview</h1>
+            <p className="text-black/50 dark:text-white/50 text-sm mt-1">Real-time statistics for your event.</p>
+          </div>
+        </div>
+
         <motion.div 
           variants={container}
           initial="hidden"
@@ -49,57 +123,104 @@ export default function AnalyticsPage() {
           {/* Top Stat Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Applications Card */}
-            <motion.div variants={item} whileHover={{ y: -5 }} className="bg-white dark:bg-[#0d0d12] border border-black/5 dark:border-white/5 rounded-2xl p-5 flex flex-col justify-between shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-colors duration-200 cursor-default">
+            <motion.div variants={item} whileHover={{ y: -5 }} className="bg-white dark:bg-[#0d0d12] border border-black/5 dark:border-white/5 rounded-2xl p-5 flex flex-col justify-between shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-colors duration-200 cursor-default min-h-[160px]">
               <div className="flex justify-between items-start mb-2">
-                <h3 className="text-black/50 dark:text-white/50 text-xs font-semibold tracking-wider">APPLICATIONS</h3>
+                <h3 className="text-black/50 dark:text-white/50 text-xs font-semibold tracking-wider">EVENT REQUESTS</h3>
                 <div className="p-2 bg-black/5 dark:bg-white/5 rounded-lg"><FileText className="w-4 h-4 text-black/60 dark:text-white/60" /></div>
               </div>
-              <div className="text-3xl font-bold text-black dark:text-white mb-4 tracking-tight">12,450</div>
-              <div className="flex items-center gap-4 text-xs font-medium">
-                <div className="flex items-center gap-1.5 text-[#00bda3] dark:text-[#00e0c2]">
-                  <div className="w-3 h-3 rounded-full border border-[#00bda3] dark:border-[#00e0c2] flex items-center justify-center">
-                    <div className="w-1.5 h-1.5 bg-[#00bda3] dark:bg-[#00e0c2] rounded-full" />
-                  </div>
-                  <span>8.2k Accepted</span>
+              
+              {isLoadingAnalytics ? (
+                <div className="animate-pulse space-y-4 w-full mt-2">
+                  <div className="h-8 bg-black/10 dark:bg-white/10 rounded w-1/3"></div>
+                  <div className="h-4 bg-black/10 dark:bg-white/10 rounded w-full"></div>
                 </div>
-                <div className="flex items-center gap-1.5 text-[#e04545] dark:text-[#ff6b6b]">
-                  <div className="w-3 h-3 rounded-full border border-[#e04545] dark:border-[#ff6b6b] flex items-center justify-center">
-                    <div className="w-1.5 h-1.5 bg-[#e04545] dark:bg-[#ff6b6b] rounded-full" />
+              ) : analytics ? (
+                <>
+                  <div className="text-3xl font-bold text-black dark:text-white mb-3 tracking-tight">{analytics.total_requests}</div>
+                  
+                  {/* Progress Bar Breakdown */}
+                  <div className="w-full flex h-2 rounded-full overflow-hidden mb-3">
+                    <div style={{ width: `${(analytics.accepted_requests / (analytics.total_requests || 1)) * 100}%` }} className="bg-[#00e0c2]"></div>
+                    <div style={{ width: `${(analytics.rejected_requests / (analytics.total_requests || 1)) * 100}%` }} className="bg-[#ff6b6b]"></div>
+                    <div style={{ width: `${((analytics.total_requests - analytics.accepted_requests - analytics.rejected_requests) / (analytics.total_requests || 1)) * 100}%` }} className="bg-black/10 dark:bg-white/20"></div>
                   </div>
-                  <span>4.2k Rejected</span>
-                </div>
-              </div>
+                  
+                  <div className="flex items-center gap-3 text-xs font-medium flex-wrap">
+                    <div className="flex items-center gap-1.5 text-[#00bda3] dark:text-[#00e0c2]">
+                      <div className="w-1.5 h-1.5 bg-[#00bda3] dark:bg-[#00e0c2] rounded-full" />
+                      <span>{analytics.accepted_requests} Accepted</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-[#e04545] dark:text-[#ff6b6b]">
+                      <div className="w-1.5 h-1.5 bg-[#e04545] dark:bg-[#ff6b6b] rounded-full" />
+                      <span>{analytics.rejected_requests} Rejected</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-black/40 dark:text-white/40">
+                      <div className="w-1.5 h-1.5 bg-black/30 dark:bg-white/30 rounded-full" />
+                      <span>{Math.max(0, analytics.total_requests - analytics.accepted_requests - analytics.rejected_requests)} Pending</span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="flex-1 flex items-center justify-center text-sm text-black/40 dark:text-white/40">No data</div>
+              )}
             </motion.div>
 
             {/* NFC Check-ins Card */}
-            <motion.div variants={item} whileHover={{ y: -5 }} className="bg-white dark:bg-[#0d0d12] border border-black/5 dark:border-white/5 rounded-2xl p-5 flex flex-col justify-between shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-colors duration-200 cursor-default">
+            <motion.div variants={item} whileHover={{ y: -5 }} className="bg-white dark:bg-[#0d0d12] border border-black/5 dark:border-white/5 rounded-2xl p-5 flex flex-col justify-between shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-colors duration-200 cursor-default min-h-[160px]">
               <div className="flex justify-between items-start mb-2">
                 <h3 className="text-black/50 dark:text-white/50 text-xs font-semibold tracking-wider">NFC CHECK-INS</h3>
                 <div className="p-2 bg-black/5 dark:bg-white/5 rounded-lg"><Radio className="w-4 h-4 text-black/60 dark:text-white/60" /></div>
               </div>
-              <div className="flex items-baseline gap-3 mb-4">
-                <span className="text-3xl font-bold text-black dark:text-white tracking-tight">7,892</span>
-                <span className="px-2 py-0.5 rounded-full bg-[#00e0c2]/20 dark:bg-[#00e0c2]/10 text-[#00bda3] dark:text-[#00e0c2] text-xs font-semibold flex items-center gap-1">
-                  <Activity className="w-3 h-3" /> +14%
-                </span>
-              </div>
-              <div className="w-full h-1.5 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
-                <motion.div initial={{ width: 0 }} animate={{ width: "65%" }} transition={{ duration: 1, delay: 0.5, ease: "easeOut" }} className="h-full bg-[#00e0c2] shadow-[0_0_10px_rgba(0,224,194,0.3)] dark:shadow-[0_0_10px_rgba(0,224,194,0.5)] rounded-full"></motion.div>
-              </div>
+              
+              {isLoadingAnalytics ? (
+                <div className="animate-pulse space-y-4 w-full mt-2">
+                  <div className="h-8 bg-black/10 dark:bg-white/10 rounded w-1/3"></div>
+                  <div className="h-2 bg-black/10 dark:bg-white/10 rounded w-full mt-4"></div>
+                </div>
+              ) : analytics ? (
+                <>
+                  <div className="flex items-baseline gap-3 mb-4">
+                    <span className="text-3xl font-bold text-black dark:text-white tracking-tight">{analytics.nfc_checkins}</span>
+                    <span className="px-2 py-0.5 rounded-full bg-[#00e0c2]/20 dark:bg-[#00e0c2]/10 text-[#00bda3] dark:text-[#00e0c2] text-xs font-semibold flex items-center gap-1">
+                      <Activity className="w-3 h-3" /> Live
+                    </span>
+                  </div>
+                  <div className="w-full h-1.5 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
+                    <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(100, (analytics.nfc_checkins / (analytics.total_requests || 1)) * 100)}%` }} transition={{ duration: 1, delay: 0.5, ease: "easeOut" }} className="h-full bg-[#00e0c2] shadow-[0_0_10px_rgba(0,224,194,0.3)] dark:shadow-[0_0_10px_rgba(0,224,194,0.5)] rounded-full"></motion.div>
+                  </div>
+                  <div className="text-xs text-black/40 dark:text-white/40 mt-2 font-medium">
+                    {Math.round((analytics.nfc_checkins / (analytics.total_requests || 1)) * 100)}% conversion rate
+                  </div>
+                </>
+              ) : (
+                <div className="flex-1 flex items-center justify-center text-sm text-black/40 dark:text-white/40">No data</div>
+              )}
             </motion.div>
 
             {/* Total IRL Taps Card */}
-            <motion.div variants={item} whileHover={{ y: -5 }} className="bg-white dark:bg-[#0d0d12] border border-black/5 dark:border-white/5 rounded-2xl p-5 flex flex-col justify-between shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-colors duration-200 cursor-default">
+            <motion.div variants={item} whileHover={{ y: -5 }} className="bg-white dark:bg-[#0d0d12] border border-black/5 dark:border-white/5 rounded-2xl p-5 flex flex-col justify-between shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-colors duration-200 cursor-default min-h-[160px]">
               <div className="flex justify-between items-start mb-2">
                 <h3 className="text-black/50 dark:text-white/50 text-xs font-semibold tracking-wider">TOTAL IRL TAPS</h3>
                 <div className="p-2 bg-black/5 dark:bg-white/5 rounded-lg"><Fingerprint className="w-4 h-4 text-black/60 dark:text-white/60" /></div>
               </div>
-              <div className="text-3xl font-bold text-black dark:text-white mb-4 tracking-tight drop-shadow-none dark:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">45,210</div>
-              <div className="text-black/40 dark:text-white/40 text-sm">Social connections forged</div>
+              
+              {isLoadingAnalytics ? (
+                <div className="animate-pulse space-y-4 w-full mt-2">
+                  <div className="h-8 bg-black/10 dark:bg-white/10 rounded w-1/3"></div>
+                  <div className="h-4 bg-black/10 dark:bg-white/10 rounded w-2/3"></div>
+                </div>
+              ) : analytics ? (
+                <>
+                  <div className="text-3xl font-bold text-black dark:text-white mb-2 tracking-tight drop-shadow-none dark:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">{analytics.total_irl_taps.toLocaleString()}</div>
+                  <div className="text-black/50 dark:text-white/50 text-sm">Social connections forged via NFC</div>
+                </>
+              ) : (
+                <div className="flex-1 flex items-center justify-center text-sm text-black/40 dark:text-white/40">No data</div>
+              )}
             </motion.div>
 
             {/* Total Rep Earned Card */}
-            <motion.div variants={item} whileHover={{ y: -5 }} className="bg-white dark:bg-[#0d0d12] border border-black/5 dark:border-white/5 rounded-2xl p-5 flex flex-col justify-between shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] relative overflow-hidden transition-colors duration-200 cursor-default">
+            <motion.div variants={item} whileHover={{ y: -5 }} className="bg-white dark:bg-[#0d0d12] border border-black/5 dark:border-white/5 rounded-2xl p-5 flex flex-col justify-between shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] relative overflow-hidden transition-colors duration-200 cursor-default min-h-[160px]">
               <motion.div 
                 animate={{ rotate: 360 }} 
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
@@ -110,8 +231,24 @@ export default function AnalyticsPage() {
                 <h3 className="text-black/50 dark:text-white/50 text-xs font-semibold tracking-wider">TOTAL REP EARNED</h3>
                 <div className="p-2 bg-purple-500/10 dark:bg-purple-500/20 rounded-lg"><Award className="w-4 h-4 text-purple-600 dark:text-purple-400" /></div>
               </div>
-              <div className="relative z-10 text-3xl font-bold text-black dark:text-white mb-4 tracking-tight">1.2M</div>
-              <div className="relative z-10 text-purple-600 dark:text-purple-400 text-sm font-medium">Network reputation distributed</div>
+              
+              {isLoadingAnalytics ? (
+                <div className="animate-pulse space-y-4 w-full mt-2 relative z-10">
+                  <div className="h-8 bg-purple-500/20 rounded w-1/3"></div>
+                  <div className="h-4 bg-purple-500/20 rounded w-2/3"></div>
+                </div>
+              ) : analytics ? (
+                <>
+                  <div className="relative z-10 text-3xl font-bold text-black dark:text-white mb-2 tracking-tight">
+                    {analytics.total_reputation_earned >= 1000 
+                      ? (analytics.total_reputation_earned / 1000).toFixed(1) + 'k' 
+                      : analytics.total_reputation_earned}
+                  </div>
+                  <div className="relative z-10 text-purple-600 dark:text-purple-400 text-sm font-medium">Network reputation distributed</div>
+                </>
+              ) : (
+                <div className="flex-1 flex items-center justify-center text-sm text-black/40 dark:text-white/40 relative z-10">No data</div>
+              )}
             </motion.div>
           </div>
 

@@ -7,7 +7,7 @@ import { useTheme } from "next-themes";
 import { motion } from "framer-motion";
 
 interface TopNavProps {
-  title: string;
+  title: React.ReactNode;
   userProfile?: any;
 }
 

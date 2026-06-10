@@ -10,7 +10,6 @@ import {
   LayoutDashboard,
   Calendar,
   Users,
-  Star,
   Settings,
   HelpCircle,
   LogOut,
@@ -21,7 +20,6 @@ const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "Events", href: "/events", icon: Calendar },
   { name: "Attendees", href: "/attendees", icon: Users },
-  { name: "Reputation", href: "/reputation", icon: Star },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
@@ -51,7 +49,13 @@ export default function Sidebar() {
 
         <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
           {navigation.map((item) => {
-            const isActive = pathname === item.href;
+            const isOtherActive = navigation
+              .filter((nav) => nav.href !== "/dashboard")
+              .some((nav) => pathname === nav.href || pathname.startsWith(nav.href + "/"));
+            const isActive =
+              item.href === "/dashboard"
+                ? pathname === "/dashboard" || pathname === "/" || !isOtherActive
+                : pathname === item.href || pathname.startsWith(item.href + "/");
             return (
                 <motion.div key={item.name} whileHover={{ x: 4 }} whileTap={{ scale: 0.98 }}>
                   <Link
