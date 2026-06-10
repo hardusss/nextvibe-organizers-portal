@@ -1,10 +1,11 @@
 "use client";
 
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, Menu } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { motion } from "framer-motion";
+import { useMobileMenu } from "@/src/contexts/MobileMenuContext";
 
 interface TopNavProps {
   title: React.ReactNode;
@@ -14,6 +15,7 @@ interface TopNavProps {
 export default function TopNav({ title, userProfile }: TopNavProps) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { toggleMobileMenu } = useMobileMenu();
 
   useEffect(() => {
     setMounted(true);
@@ -24,13 +26,19 @@ export default function TopNav({ title, userProfile }: TopNavProps) {
   };
 
   return (
-    <header className="flex items-center justify-between px-8 py-6">
+    <header className="flex items-center justify-between px-4 md:px-8 py-4 md:py-6 shrink-0">
       <div className="flex items-center gap-3">
-        <div className="w-1 h-6 bg-black dark:bg-white rounded-full"></div>
-        <h2 className="text-xl font-semibold text-black dark:text-white tracking-wide">{title}</h2>
+        <button 
+          onClick={toggleMobileMenu}
+          className="md:hidden p-2 -ml-2 rounded-lg text-black/70 dark:text-white/70 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+        <div className="w-1 h-6 bg-black dark:bg-white rounded-full hidden md:block"></div>
+        <h2 className="text-base sm:text-lg md:text-xl font-semibold text-black dark:text-white tracking-wide flex-1 min-w-0">{title}</h2>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4 shrink-0">
         <motion.button 
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -40,9 +48,9 @@ export default function TopNav({ title, userProfile }: TopNavProps) {
           {mounted ? (theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />) : <div className="w-4 h-4" />}
         </motion.button>
 
-        <div className="w-px h-6 bg-black/10 dark:bg-white/10 mx-2"></div>
+        <div className="w-px h-5 sm:h-6 bg-black/10 dark:bg-white/10 mx-1 sm:mx-2"></div>
 
-        <div className="ml-2 flex items-center gap-3 bg-black/5 dark:bg-white/5 py-1 pl-1 pr-4 rounded-full border border-black/10 dark:border-white/10">
+        <div className="ml-1 flex items-center gap-2 sm:gap-3 bg-black/5 dark:bg-white/5 py-1 pl-1 pr-1 sm:pr-4 rounded-full border border-black/10 dark:border-white/10">
           <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-cyan-500 flex items-center justify-center overflow-hidden border border-black/10 dark:border-white/10">
             {userProfile?.avatar ? (
               <Image src={userProfile.avatar} alt="Avatar" width={32} height={32} className="object-cover w-full h-full" />
@@ -53,7 +61,7 @@ export default function TopNav({ title, userProfile }: TopNavProps) {
               ></div>
             )}
           </div>
-          <span className="text-sm font-medium text-black dark:text-white max-w-[120px] truncate">
+          <span className="hidden sm:block text-sm font-medium text-black dark:text-white max-w-[80px] sm:max-w-[120px] truncate">
             {userProfile?.username || userProfile?.first_name || "Organizer"}
           </span>
         </div>

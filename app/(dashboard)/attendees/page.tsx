@@ -88,7 +88,7 @@ export default function AttendeesPage() {
     <div className="flex flex-col h-full overflow-hidden transition-colors duration-200">
       <TopNav title="Registration Requests" userProfile={userProfile} />
 
-      <main className="flex-1 overflow-hidden flex flex-col mt-2 px-8">
+      <main className="flex-1 overflow-hidden flex flex-col mt-2 px-4 md:px-8">
         <div className="mb-6 flex flex-col gap-1">
           <h2 className="text-lg font-bold text-black dark:text-white flex items-center gap-2">
             <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
@@ -113,9 +113,9 @@ export default function AttendeesPage() {
                 <motion.div 
                   key={request.id} 
                   variants={item}
-                  className="bg-white dark:bg-[#0d0d12] border border-black/5 dark:border-white/5 rounded-2xl p-5 flex items-center justify-between shadow-sm hover:shadow-md transition-all duration-200"
+                  className="bg-white dark:bg-[#0d0d12] border border-black/5 dark:border-white/5 rounded-2xl p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm hover:shadow-md transition-all duration-200"
                 >
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3 md:gap-4 w-full sm:w-auto">
                     <div className="w-12 h-12 rounded-full overflow-hidden border border-black/10 dark:border-white/10 flex items-center justify-center bg-black/5 dark:bg-white/5">
                       {request.avatar ? (
                         <Image src={request.avatar} alt={request.username} width={48} height={48} className="object-cover w-full h-full" />
@@ -135,13 +135,13 @@ export default function AttendeesPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto mt-2 sm:mt-0">
                     {request.status === "pending" ? (
-                      <>
+                      <div className="flex items-center gap-2 w-full sm:w-auto">
                         <button 
                           onClick={() => handleAction(request.id, "reject")}
                           disabled={processingAction === request.id}
-                          className="px-4 py-2 rounded-lg font-medium text-[#ff6b6b] bg-[#ff6b6b]/10 hover:bg-[#ff6b6b]/20 transition-colors text-sm flex items-center gap-2 disabled:opacity-50"
+                          className="flex-1 sm:flex-none justify-center px-3 sm:px-4 py-2 rounded-lg font-medium text-[#ff6b6b] bg-[#ff6b6b]/10 hover:bg-[#ff6b6b]/20 transition-colors text-sm flex items-center gap-2 disabled:opacity-50"
                         >
                           {processingAction === request.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
                           Reject
@@ -149,12 +149,12 @@ export default function AttendeesPage() {
                         <button 
                           onClick={() => handleAction(request.id, "approve")}
                           disabled={processingAction === request.id}
-                          className="px-4 py-2 rounded-lg font-medium text-white bg-[#00e0c2] hover:bg-[#00c5aa] shadow-[0_0_15px_rgba(0,224,194,0.3)] transition-colors text-sm flex items-center gap-2 disabled:opacity-50"
+                          className="flex-1 sm:flex-none justify-center px-3 sm:px-4 py-2 rounded-lg font-medium text-white bg-[#00e0c2] hover:bg-[#00c5aa] shadow-[0_0_15px_rgba(0,224,194,0.3)] transition-colors text-sm flex items-center gap-2 disabled:opacity-50"
                         >
                           {processingAction === request.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
                           Accept
                         </button>
-                      </>
+                      </div>
                     ) : (
                       <div className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 ${
                         request.status === "approved" 

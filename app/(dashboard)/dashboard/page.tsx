@@ -5,7 +5,7 @@ import TopNav from "@/src/components/layout/TopNav";
 import { getUserDetail } from "@/src/api/user.detail";
 import { getHostedEvents, getEventAnalytics } from "@/src/api/events";
 import { FileText, Radio, Fingerprint, Award, ChevronRight, Activity, Star, ChevronDown } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 
 const container = {
   hidden: { opacity: 0 },
@@ -18,6 +18,23 @@ const container = {
 const item = {
   hidden: { opacity: 0, y: 20 },
   show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } }
+};
+
+const CountUp = ({ to, format }: { to: number, format?: "number" | "k" }) => {
+  const count = useMotionValue(0);
+  const display = useTransform(count, (latest) => {
+    if (format === "k" && to >= 1000) {
+      return (latest / 1000).toFixed(1) + "k";
+    }
+    return Math.round(latest).toLocaleString();
+  });
+
+  useEffect(() => {
+    const controls = animate(count, to, { duration: 1.5, ease: "easeOut" });
+    return controls.stop;
+  }, [to, count]);
+
+  return <motion.span>{display}</motion.span>;
 };
 
 export default function AnalyticsPage() {
@@ -76,18 +93,23 @@ export default function AnalyticsPage() {
   return (
     <div className="flex flex-col h-full overflow-y-auto custom-scrollbar pb-8 transition-colors duration-200">
       <TopNav 
-        title={
-          <span className="flex items-center gap-1.5">
-            <span>Event Analytics:</span>
-            {events.length > 0 && (
-              <span className="relative inline-flex items-center group cursor-pointer ml-1">
-                {/* Visible text that sizes perfectly to the current selection */}
-                <span className="text-xl font-semibold text-black dark:text-white tracking-wide border-b-2 border-dashed border-black/20 dark:border-white/20 group-hover:border-black/50 dark:group-hover:border-white/50 transition-colors pb-0.5">
+        title="Dashboard"
+        userProfile={userProfile} 
+      />
+
+      <main className="px-4 md:px-8 flex-1 flex flex-col gap-6 mt-2">
+        <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-4 md:gap-0">
+          <div className="w-full">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-black/50 dark:text-white/50 text-sm font-medium">Event Analytics</span>
+            </div>
+            {events.length > 0 ? (
+              <div className="relative inline-flex items-center group cursor-pointer max-w-full">
+                <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-black dark:text-white tracking-wide border-b-2 border-dashed border-black/20 dark:border-white/20 group-hover:border-black/50 dark:group-hover:border-white/50 transition-colors pb-0.5 truncate">
                   {selectedEvent?.about || 'Select Event'}
-                </span>
-                <ChevronDown className="w-5 h-5 ml-1.5 text-black/40 dark:text-white/40 group-hover:text-black/70 dark:group-hover:text-white/70 transition-colors" />
+                </h1>
+                <ChevronDown className="w-5 h-5 md:w-6 md:h-6 ml-2 shrink-0 text-black/40 dark:text-white/40 group-hover:text-black/70 dark:group-hover:text-white/70 transition-colors" />
                 
-                {/* Invisible select covering the visible text */}
                 <select 
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   value={selectedEventId || ''}
@@ -99,18 +121,11 @@ export default function AnalyticsPage() {
                     </option>
                   ))}
                 </select>
-              </span>
+              </div>
+            ) : (
+              <h1 className="text-xl md:text-2xl font-bold text-black dark:text-white tracking-wide">Dashboard Overview</h1>
             )}
-          </span>
-        } 
-        userProfile={userProfile} 
-      />
-
-      <main className="px-8 flex-1 flex flex-col gap-6 mt-2">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-black dark:text-white">Dashboard Overview</h1>
-            <p className="text-black/50 dark:text-white/50 text-sm mt-1">Real-time statistics for your event.</p>
+            <p className="text-black/50 dark:text-white/50 text-sm mt-2">Real-time statistics for your event.</p>
           </div>
         </div>
 
@@ -136,7 +151,9 @@ export default function AnalyticsPage() {
                 </div>
               ) : analytics ? (
                 <>
-                  <div className="text-3xl font-bold text-black dark:text-white mb-3 tracking-tight">{analytics.total_requests}</div>
+                  <div className="text-3xl font-bold text-black dark:text-white mb-3 tracking-tight">
+                    <CountUp to={analytics.total_requests || 0} />
+                  </div>
                   
                   {/* Progress Bar Breakdown */}
                   <div className="w-full flex h-2 rounded-full overflow-hidden mb-3">
@@ -148,15 +165,15 @@ export default function AnalyticsPage() {
                   <div className="flex items-center gap-3 text-xs font-medium flex-wrap">
                     <div className="flex items-center gap-1.5 text-[#00bda3] dark:text-[#00e0c2]">
                       <div className="w-1.5 h-1.5 bg-[#00bda3] dark:bg-[#00e0c2] rounded-full" />
-                      <span>{analytics.accepted_requests} Accepted</span>
+                      <span><CountUp to={analytics.accepted_requests || 0} /> Accepted</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-[#e04545] dark:text-[#ff6b6b]">
                       <div className="w-1.5 h-1.5 bg-[#e04545] dark:bg-[#ff6b6b] rounded-full" />
-                      <span>{analytics.rejected_requests} Rejected</span>
+                      <span><CountUp to={analytics.rejected_requests || 0} /> Rejected</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-black/40 dark:text-white/40">
                       <div className="w-1.5 h-1.5 bg-black/30 dark:bg-white/30 rounded-full" />
-                      <span>{Math.max(0, analytics.total_requests - analytics.accepted_requests - analytics.rejected_requests)} Pending</span>
+                      <span><CountUp to={Math.max(0, (analytics.total_requests || 0) - (analytics.accepted_requests || 0) - (analytics.rejected_requests || 0))} /> Pending</span>
                     </div>
                   </div>
                 </>
@@ -180,7 +197,9 @@ export default function AnalyticsPage() {
               ) : analytics ? (
                 <>
                   <div className="flex items-baseline gap-3 mb-4">
-                    <span className="text-3xl font-bold text-black dark:text-white tracking-tight">{analytics.nfc_checkins}</span>
+                    <span className="text-3xl font-bold text-black dark:text-white tracking-tight">
+                      <CountUp to={analytics.nfc_checkins || 0} />
+                    </span>
                     <span className="px-2 py-0.5 rounded-full bg-[#00e0c2]/20 dark:bg-[#00e0c2]/10 text-[#00bda3] dark:text-[#00e0c2] text-xs font-semibold flex items-center gap-1">
                       <Activity className="w-3 h-3" /> Live
                     </span>
@@ -211,7 +230,9 @@ export default function AnalyticsPage() {
                 </div>
               ) : analytics ? (
                 <>
-                  <div className="text-3xl font-bold text-black dark:text-white mb-2 tracking-tight drop-shadow-none dark:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">{analytics.total_irl_taps.toLocaleString()}</div>
+                  <div className="text-3xl font-bold text-black dark:text-white mb-2 tracking-tight drop-shadow-none dark:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">
+                    <CountUp to={analytics.total_irl_taps || 0} />
+                  </div>
                   <div className="text-black/50 dark:text-white/50 text-sm">Social connections forged via NFC</div>
                 </>
               ) : (
@@ -240,9 +261,7 @@ export default function AnalyticsPage() {
               ) : analytics ? (
                 <>
                   <div className="relative z-10 text-3xl font-bold text-black dark:text-white mb-2 tracking-tight">
-                    {analytics.total_reputation_earned >= 1000 
-                      ? (analytics.total_reputation_earned / 1000).toFixed(1) + 'k' 
-                      : analytics.total_reputation_earned}
+                    <CountUp to={analytics.total_reputation_earned || 0} format="k" />
                   </div>
                   <div className="relative z-10 text-purple-600 dark:text-purple-400 text-sm font-medium">Network reputation distributed</div>
                 </>
@@ -255,8 +274,8 @@ export default function AnalyticsPage() {
           {/* Bottom Section */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-[400px]">
             {/* Spatial Heatmap */}
-            <motion.div variants={item} className="lg:col-span-2 bg-white dark:bg-[#0d0d12] border border-black/5 dark:border-white/5 rounded-2xl p-6 flex flex-col shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-colors duration-200">
-              <div className="flex justify-between items-start mb-6">
+            <motion.div variants={item} className="lg:col-span-2 bg-white dark:bg-[#0d0d12] border border-black/5 dark:border-white/5 rounded-2xl p-4 md:p-6 flex flex-col shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-colors duration-200">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
                 <div>
                   <h2 className="text-lg font-semibold text-black dark:text-white">Spatial Heatmap</h2>
                   <p className="text-black/40 dark:text-white/40 text-sm">Real-time floorplan activity indexing</p>
@@ -293,7 +312,7 @@ export default function AnalyticsPage() {
             </motion.div>
 
             {/* Top Attendees */}
-            <motion.div variants={item} className="bg-white dark:bg-[#0d0d12] border border-black/5 dark:border-white/5 rounded-2xl p-6 flex flex-col shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-colors duration-200">
+            <motion.div variants={item} className="bg-white dark:bg-[#0d0d12] border border-black/5 dark:border-white/5 rounded-2xl p-4 md:p-6 flex flex-col shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-colors duration-200">
               <div className="mb-6">
                 <h2 className="text-lg font-semibold text-black dark:text-white flex items-center gap-2">
                   <Award className="w-5 h-5 text-purple-600 dark:text-purple-400" />

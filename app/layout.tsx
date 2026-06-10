@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NextVibe — Organizer Portal Login",
-  description: "Sign in to the NextVibe Organizer Portal to manage your events.",
+  title: "NextVibe — Organizer Portal",
+  description: "Manage your events, analyze real-time statistics, and connect with your attendees.",
 };
 
 export default function RootLayout({

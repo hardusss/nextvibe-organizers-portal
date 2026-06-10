@@ -6,6 +6,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/src/components/providers/AuthProvider";
+import { useMobileMenu } from "@/src/contexts/MobileMenuContext";
 import {
   LayoutDashboard,
   Calendar,
@@ -14,6 +15,7 @@ import {
   HelpCircle,
   LogOut,
   Plus,
+  X,
 } from "lucide-react";
 
 const navigation = [
@@ -27,18 +29,40 @@ export default function Sidebar() {
   const pathname = usePathname();
   const { logout } = useAuth();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const { isMobileMenuOpen, closeMobileMenu } = useMobileMenu();
 
   return (
     <>
-      <div className="flex flex-col w-64 bg-white dark:bg-[#0d0d12] border-r border-black/5 dark:border-white/5 h-screen sticky top-0 transition-colors duration-200 z-10">
-        <div className="p-6 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full overflow-hidden">
-            <Image src="/logo.png" alt="NextVibe" width={32} height={32} className="object-cover" />
+      {/* Mobile Backdrop */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeMobileMenu}
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 md:hidden"
+          />
+        )}
+      </AnimatePresence>
+
+      <div className={`fixed inset-y-0 left-0 z-50 flex flex-col w-64 bg-white dark:bg-[#0d0d12] border-r border-black/5 dark:border-white/5 h-[100dvh] transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
+        <div className="p-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+              <Image src="/logo.png" alt="NextVibe" width={32} height={32} className="object-cover" />
+            </div>
+            <div>
+              <h1 className="text-black dark:text-white font-semibold text-lg tracking-wide leading-tight">NextVibe</h1>
+              <p className="text-black/40 dark:text-white/40 text-xs">Organizer Portal</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-black dark:text-white font-semibold text-lg tracking-wide">NextVibe</h1>
-            <p className="text-black/40 dark:text-white/40 text-xs">Organizer Portal</p>
-          </div>
+          <button 
+            onClick={closeMobileMenu}
+            className="md:hidden p-2 rounded-lg text-black/50 dark:text-white/50 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         <div className="px-4 py-2">
@@ -60,6 +84,9 @@ export default function Sidebar() {
                 <motion.div key={item.name} whileHover={{ x: 4 }} whileTap={{ scale: 0.98 }}>
                   <Link
                     href={item.href}
+                    onClick={() => {
+                      if (window.innerWidth < 768) closeMobileMenu();
+                    }}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${
                       isActive
                         ? "bg-black/10 dark:bg-white/10 text-black dark:text-white shadow-[inset_2px_0_0_rgba(139,92,246,1)]"
@@ -78,9 +105,12 @@ export default function Sidebar() {
           })}
         </nav>
 
-        <div className="p-4 space-y-1">
+        <div className="p-4 space-y-1 mb-safe">
           <Link
             href="/help"
+            onClick={() => {
+              if (window.innerWidth < 768) closeMobileMenu();
+            }}
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-black/50 dark:text-white/50 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black/80 dark:hover:text-white/80 transition-colors group"
           >
             <HelpCircle className="w-5 h-5 text-black/40 dark:text-white/40 group-hover:text-black/70 dark:group-hover:text-white/70" />

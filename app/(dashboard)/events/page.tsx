@@ -107,7 +107,7 @@ export default function EventsPage() {
     <div className="flex flex-col h-full overflow-hidden transition-colors duration-200">
       <TopNav title="Event Management" userProfile={userProfile} />
 
-      <main className="flex-1 overflow-hidden flex flex-col mt-2 px-8">
+      <main className="flex-1 overflow-hidden flex flex-col mt-2 px-4 md:px-8">
         <div className="mb-6 flex flex-col gap-1">
           <h2 className="text-lg font-bold text-black dark:text-white flex items-center gap-2">
             <Calendar className="w-5 h-5 text-purple-600 dark:text-purple-400" />
@@ -221,10 +221,10 @@ export default function EventsPage() {
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white dark:bg-[#0d0d12] border border-black/10 dark:border-white/10 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)] max-w-md w-full max-h-[80vh] flex flex-col overflow-hidden"
+              className="bg-white dark:bg-[#0d0d12] border border-black/10 dark:border-white/10 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)] max-w-md w-[95%] md:w-full max-h-[85vh] flex flex-col overflow-hidden"
             >
-              <div className="p-5 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-black/5 dark:bg-white/5">
-                <h3 className="text-lg font-bold text-black dark:text-white flex items-center gap-2">
+              <div className="p-4 md:p-5 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-black/5 dark:bg-white/5">
+                <h3 className="text-base md:text-lg font-bold text-black dark:text-white flex items-center gap-2">
                   <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                   Approved Attendees
                 </h3>
