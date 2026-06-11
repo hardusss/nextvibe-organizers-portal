@@ -7,12 +7,11 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
-import axios from "axios";
 import login from "@/src/api/login";
 import googleLoginApi from "@/src/api/google.login";
 import walletSignIn from "@/src/api/wallet.sign.in";
 import { useAuth } from "@/src/components/providers/AuthProvider";
-import styles from "./login.module.css";
+import { Mail, Lock, Loader2, ArrowRight } from "lucide-react";
 
 /* ─── Inline SVG icons ─── */
 
@@ -58,76 +57,17 @@ function GoogleIcon() {
   );
 }
 
-function MailIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="2" y="4" width="20" height="16" rx="2" />
-      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-    </svg>
-  );
-}
-
-function LockIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-    </svg>
-  );
-}
-
-function SpinnerIcon() {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={styles.spinner}
-    >
-      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-    </svg>
-  );
-}
-
-/* ─── Component ─── */
-
 export default function LoginPage() {
   const router = useRouter();
   const { setAuth } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState<"solana" | "google" | "email" | null>(
-    null
-  );
+  const [loading, setLoading] = useState<"solana" | "google" | "email" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   /* ── Solana Wallet ── */
-  const { publicKey, connected, connecting, signMessage, disconnect } =
-    useWallet();
+  const { publicKey, connected, connecting, signMessage, disconnect } = useWallet();
   const { visible, setVisible } = useWalletModal();
 
   const solanaLoginIntent = useRef(false);
@@ -139,7 +79,7 @@ export default function LoginPage() {
     setVisible(true);
   }, [setVisible]);
 
-  /* React to wallet connection — sign a message then call backend */
+  /* React to wallet connection */
   useEffect(() => {
     if (!connected || !publicKey || !solanaLoginIntent.current) return;
 
@@ -161,7 +101,6 @@ export default function LoginPage() {
           throw new Error("Wallet does not support message signing.");
         }
 
-        /* Call the same backend endpoint as the mobile app */
         const username = `vibe_${pubkeyString.slice(0, 6)}.skr`;
 
         const backendResponse = await walletSignIn({
@@ -183,9 +122,7 @@ export default function LoginPage() {
         } else if (serverError) {
           setError(detail || serverError);
         } else {
-          setError(
-            err.message || "Wallet signature was rejected or failed."
-          );
+          setError(err.message || "Wallet signature was rejected or failed.");
         }
         disconnect();
       } finally {
@@ -197,7 +134,7 @@ export default function LoginPage() {
     authenticate();
   }, [connected, publicKey, signMessage, disconnect, setAuth, router]);
 
-  /* Clear loading when the wallet modal closes without a connection */
+  /* Clear loading when the wallet modal closes without connection */
   useEffect(() => {
     if (!visible && solanaLoginIntent.current && !connected && !connecting) {
       solanaLoginIntent.current = false;
@@ -269,8 +206,7 @@ export default function LoginPage() {
       router.push("/");
     } catch (err: any) {
       console.error("Email login error:", err);
-      const detail =
-        err?.response?.data?.detail ?? "Login failed. Please check your credentials.";
+      const detail = err?.response?.data?.detail ?? "Login failed. Please check your credentials.";
       setError(detail);
     } finally {
       setLoading(null);
@@ -278,143 +214,207 @@ export default function LoginPage() {
   };
 
   return (
-    <div className={styles.pageWrapper}>
-      <div className={styles.card}>
-        {/* Logo */}
-        <div className={styles.logoWrapper}>
-          <Image
-            className={styles.logo}
-            src="/logo.png"
-            alt="NextVibe logo"
-            width={88}
-            height={88}
-            priority
-          />
+    <div className="min-h-screen flex bg-[#080c10] text-[#ededed] font-sans antialiased overflow-hidden selection:bg-[#00e0c2]/30 selection:text-white">
+      
+      {/* LEFT: Dynamic Branding Panel (hidden on mobile) */}
+      <div className="hidden md:flex md:w-1/2 relative bg-[#040608] border-r border-white/5 flex-col justify-between p-12 overflow-hidden">
+        {/* Subtle grid pattern background */}
+        <div className="absolute inset-0 opacity-15" style={{
+          backgroundImage: "radial-gradient(rgba(255,255,255,0.15) 1.5px, transparent 1.5px)",
+          backgroundSize: "24px 24px"
+        }} />
+        
+        {/* Top left mini title */}
+        <div className="z-10 flex items-center gap-2.5">
+          <div className="w-6 h-6 rounded-full overflow-hidden">
+            <Image src="/logo.png" alt="NextVibe" width={24} height={24} className="object-cover" />
+          </div>
+          <span className="font-display font-extrabold text-xs uppercase tracking-widest text-[#00e0c2]">NextVibe Protocol</span>
         </div>
 
-        {/* Title */}
-        <h1 className={styles.title}>Organizer Portal Login</h1>
-
-        {/* Error message */}
-        {error && <div className={styles.errorMsg}>{error}</div>}
-
-        {/* Connected wallet indicator */}
-        {publicKey && (
-          <div className={styles.walletConnected}>
-            <span className={styles.walletDot} />
-            Connected: {publicKey.toBase58().slice(0, 4)}…
-            {publicKey.toBase58().slice(-4)}
+        {/* Center: Hero Branding / Huge Mascot Image */}
+        <div className="z-10 my-auto space-y-8 max-w-md">
+          <div className="relative w-44 h-44 mx-auto md:mx-0">
+            {/* Spinning/pulsing neon glow behind logo */}
+            <div className="absolute inset-0 bg-[#00e0c2]/20 rounded-full blur-[40px] animate-pulse" />
+            <Image
+              src="/logo.png"
+              alt="NextVibe mascot logo"
+              fill
+              priority
+              className="object-contain drop-shadow-[0_0_35px_rgba(0,224,192,0.4)] animate-[bounce_4s_infinite_ease-in-out]"
+            />
           </div>
-        )}
+          
+          <div className="space-y-4">
+            <h2 className="text-4xl md:text-5xl font-display font-extrabold leading-tight tracking-tight uppercase">
+              The Spatial Web3 <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e0c2] to-[#a855f7]">Organizer Hub.</span>
+            </h2>
+            <p className="text-sm text-white/50 leading-relaxed max-w-sm">
+              Verify real-life NFC check-ins, manage attendee connection heatmaps, and issue cryptographic certificates instantly.
+            </p>
+          </div>
+        </div>
 
-        {/* Social buttons */}
-        <div className={styles.socialButtons}>
-          <button
-            type="button"
-            className={styles.btnSolana}
-            id="btn-solana"
-            onClick={handleSolanaLogin}
-            disabled={loading !== null}
-          >
-            <span className={styles.btnIcon}>
+        {/* Bottom copyright */}
+        <div className="z-10 flex items-center justify-between text-[10px] text-white/30 tracking-wider font-mono uppercase">
+          <span>Version 2.4.0 (Stable)</span>
+          <span>© NextVibe 2026</span>
+        </div>
+      </div>
+
+      {/* RIGHT: Edge-Anchored Sleek Sign In Panel */}
+      <div className="w-full md:w-1/2 flex flex-col justify-center p-8 sm:p-16 md:p-24 relative overflow-y-auto custom-scrollbar">
+        {/* Subtle background glow */}
+        <div className="absolute top-[-20%] right-[-20%] w-[60%] h-[60%] rounded-full bg-[#00e0c2]/5 blur-[120px] pointer-events-none" />
+        
+        <div className="max-w-md w-full mx-auto space-y-8 z-10">
+          
+          {/* Header */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 md:hidden">
+              <Image src="/logo.png" alt="NextVibe" width={32} height={32} className="object-contain" />
+              <span className="font-display font-extrabold text-sm uppercase tracking-widest text-[#00e0c2]">NextVibe</span>
+            </div>
+            <h1 className="text-3xl font-display font-extrabold tracking-tight uppercase">
+              Organizer Login
+            </h1>
+            <p className="text-sm text-white/50">
+              Access your events database and real-time attendees logs.
+            </p>
+          </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold flex items-center gap-3 animate-[fadeIn_0.2s_ease]">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
+              {error}
+            </div>
+          )}
+
+          {/* Connected wallet info */}
+          {publicKey && (
+            <div className="p-4 rounded-xl bg-[#00e0c2]/5 border border-[#00e0c2]/20 text-[#00e0c2] text-xs font-mono flex items-center justify-between animate-[fadeIn_0.2s_ease]">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#00e0c2] shadow-[0_0_8px_rgba(0,224,192,0.8)] animate-pulse" />
+                <span>Connected: {publicKey.toBase58().slice(0, 6)}…{publicKey.toBase58().slice(-6)}</span>
+              </div>
+              <button onClick={() => disconnect()} className="text-[10px] uppercase font-bold text-white/40 hover:text-white transition-colors">
+                Disconnect
+              </button>
+            </div>
+          )}
+
+          {/* Social Sign In Buttons */}
+          <div className="grid grid-cols-1 gap-3.5">
+            {/* Solana button */}
+            <button
+              onClick={handleSolanaLogin}
+              disabled={loading !== null}
+              className="group flex items-center justify-center gap-3 w-full h-12 rounded-xl border border-[#00e0c2]/30 text-[#00e0c2] bg-transparent hover:bg-[#00e0c2]/5 hover:border-[#00e0c2]/60 font-semibold text-sm transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               {loading === "solana" || connecting ? (
-                <SpinnerIcon />
+                <Loader2 className="w-4 h-4 animate-spin text-[#00e0c2]" />
               ) : (
                 <SolanaIcon />
               )}
-            </span>
-            {publicKey ? "Wallet Connected" : "Connect with Solana MWA"}
-          </button>
-
-          <div style={{ position: "relative", overflow: "hidden", borderRadius: "10px" }}>
-            {/* Visually custom button */}
-            <button
-              type="button"
-              className={styles.btnGoogle}
-              id="btn-google"
-              disabled={loading !== null}
-            >
-              <span className={styles.btnIcon}>
-                {loading === "google" ? <SpinnerIcon /> : <GoogleIcon />}
-              </span>
-              Continue with Google
+              <span>{publicKey ? "Wallet Signed In" : "Sign In with Solana"}</span>
             </button>
-            
-            {/* Invisible official Google button overlay to capture clicks and get idToken */}
-            <div style={{ position: "absolute", top: "-5px", left: "-5px", right: 0, bottom: 0, opacity: 0.001, zIndex: 10, transform: "scale(1.2)", transformOrigin: "center" }}>
-              <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={() => setError("Google sign-in was cancelled or failed.")}
-                useOneTap
-                width="400"
-              />
-            </div>
-          </div>
-        </div>
 
-        {/* Divider */}
-        <div className={styles.divider}>
-          <span className={styles.dividerLine} />
-          <span className={styles.dividerText}>or continue with email</span>
-          <span className={styles.dividerLine} />
-        </div>
-
-        {/* Form */}
-        <form className={styles.form} onSubmit={handleSubmit}>
-          {/* Email */}
-          <div className={styles.fieldGroup}>
-            <label className={styles.label} htmlFor="login-email">
-              Email Address
-            </label>
-            <div className={styles.inputWrapper}>
-              <span className={styles.inputIcon}>
-                <MailIcon />
-              </span>
-              <input
-                id="login-email"
-                className={styles.input}
-                type="email"
-                placeholder="admin@nextvibe.io"
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+            {/* Google button wrapper */}
+            <div className="relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] transition-all">
+              <button
                 disabled={loading !== null}
-              />
+                className="flex items-center justify-center gap-3 w-full h-12 font-semibold text-sm text-white/80 cursor-pointer disabled:opacity-50"
+              >
+                {loading === "google" ? <Loader2 className="w-4 h-4 animate-spin" /> : <GoogleIcon />}
+                <span>Continue with Google</span>
+              </button>
+              
+              {/* Invisible OAuth Overlay */}
+              <div className="absolute inset-0 opacity-[0.001] z-10 scale-[1.3] origin-center cursor-pointer">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={() => setError("Google sign-in was cancelled or failed.")}
+                  useOneTap
+                  width="400"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Password */}
-          <div className={styles.fieldGroup}>
-            <label className={styles.label} htmlFor="login-password">
-              Password
-            </label>
-            <div className={styles.inputWrapper}>
-              <span className={styles.inputIcon}>
-                <LockIcon />
-              </span>
-              <input
-                id="login-password"
-                className={styles.input}
-                type="password"
-                placeholder="••••••••"
-                autoComplete="current-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={loading !== null}
-              />
-            </div>
+          {/* Divider */}
+          <div className="flex items-center gap-4 py-2">
+            <div className="h-[1px] flex-1 bg-white/5" />
+            <span className="text-[10px] font-bold tracking-widest text-white/30 uppercase">or use admin credentials</span>
+            <div className="h-[1px] flex-1 bg-white/5" />
           </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            className={styles.submitBtn}
-            id="btn-sign-in"
-            disabled={loading !== null}
-          >
-            {loading === "email" ? <SpinnerIcon /> : "Sign In"}
-          </button>
-        </form>
+          {/* Form */}
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            {/* Email Input */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-white/60 tracking-wide uppercase" htmlFor="login-email">
+                Email Address
+              </label>
+              <div className="relative flex items-center">
+                <span className="absolute left-4 text-white/30 pointer-events-none group-focus-within:text-[#00e0c2] transition-colors">
+                  <Mail className="w-4 h-4" />
+                </span>
+                <input
+                  id="login-email"
+                  type="email"
+                  placeholder="name@nextvibe.io"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading !== null}
+                  className="w-full h-12 pl-12 pr-4 bg-white/[0.02] border border-white/10 rounded-xl text-white placeholder-white/20 outline-none text-sm transition-all focus:border-[#00e0c2]/50 focus:bg-[#00e0c2]/[0.01]"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Password Input */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-white/60 tracking-wide uppercase" htmlFor="login-password">
+                Password
+              </label>
+              <div className="relative flex items-center">
+                <span className="absolute left-4 text-white/30 pointer-events-none transition-colors">
+                  <Lock className="w-4 h-4" />
+                </span>
+                <input
+                  id="login-password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading !== null}
+                  className="w-full h-12 pl-12 pr-4 bg-white/[0.02] border border-white/10 rounded-xl text-white placeholder-white/20 outline-none text-sm transition-all focus:border-[#00e0c2]/50 focus:bg-[#00e0c2]/[0.01]"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Submit CTA */}
+            <button
+              type="submit"
+              disabled={loading !== null}
+              className="w-full h-12 rounded-xl bg-gradient-to-r from-[#00e0c2] to-[#a855f7] text-black font-extrabold text-sm uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#00e0c2]/10 hover:shadow-[#00e0c2]/20 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading === "email" ? (
+                <Loader2 className="w-4 h-4 animate-spin text-black" />
+              ) : (
+                <>
+                  <span>Sign In to Portal</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </button>
+          </form>
+          
+        </div>
       </div>
     </div>
   );

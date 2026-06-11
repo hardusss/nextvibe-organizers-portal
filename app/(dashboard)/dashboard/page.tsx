@@ -58,7 +58,6 @@ export default function AnalyticsPage() {
         setUserProfile(profileData);
         
         const evts = eventsResponse.data || [];
-        // Sort by create_at descending to get the latest first
         evts.sort((a: any, b: any) => new Date(b.create_at).getTime() - new Date(a.create_at).getTime());
         
         setEvents(evts);
@@ -98,7 +97,6 @@ export default function AnalyticsPage() {
       setIsLoadingTopUsers(true);
       try {
         const data = await getEventTopUsers(selectedEventId);
-        console.log(data)
         setTopUsers(data);
       } catch (error) {
         console.error("Failed to fetch top users:", error);
@@ -120,18 +118,18 @@ export default function AnalyticsPage() {
         userProfile={userProfile} 
       />
 
-      <main className="px-4 md:px-8 flex-1 flex flex-col gap-6 mt-2">
-        <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-4 md:gap-0">
-          <div className="w-full">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-black/50 dark:text-white/50 text-sm font-medium">Event Analytics</span>
-            </div>
+      <main className="px-4 md:px-8 flex-1 flex flex-col gap-8 mt-2">
+        
+        {/* Editorial Event Selector Header */}
+        <div className="flex flex-col gap-2">
+          <span className="text-[10px] tracking-widest text-[#00e0c2] font-mono font-bold uppercase">active session telemetry</span>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             {events.length > 0 ? (
-              <div className="relative inline-flex items-center group cursor-pointer max-w-full">
-                <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-black dark:text-white tracking-wide border-b-2 border-dashed border-black/20 dark:border-white/20 group-hover:border-black/50 dark:group-hover:border-white/50 transition-colors pb-0.5 truncate">
+              <div className="relative inline-flex items-center group cursor-pointer">
+                <h1 className="text-2xl md:text-3xl font-display font-extrabold uppercase text-black dark:text-white tracking-tight hover:text-white/80 transition-colors flex items-center gap-3">
                   {selectedEvent?.about || 'Select Event'}
+                  <ChevronDown className="w-5 h-5 text-black/35 dark:text-white/35 group-hover:text-black/70 dark:group-hover:text-white/70 transition-colors" />
                 </h1>
-                <ChevronDown className="w-5 h-5 md:w-6 md:h-6 ml-2 shrink-0 text-black/40 dark:text-white/40 group-hover:text-black/70 dark:group-hover:text-white/70 transition-colors" />
                 
                 <select 
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
@@ -139,16 +137,19 @@ export default function AnalyticsPage() {
                   onChange={(e) => setSelectedEventId(Number(e.target.value))}
                 >
                   {events.map(evt => (
-                    <option key={evt.post_id} value={evt.post_id} className="text-base text-black dark:text-white bg-white dark:bg-[#0d0d12]">
+                    <option key={evt.post_id} value={evt.post_id} className="text-base text-black bg-white dark:bg-[#0c0c0f]">
                       {evt.about}
                     </option>
                   ))}
                 </select>
               </div>
             ) : (
-              <h1 className="text-xl md:text-2xl font-bold text-black dark:text-white tracking-wide">Dashboard Overview</h1>
+              <h1 className="text-2xl md:text-3xl font-display font-extrabold uppercase text-black dark:text-white tracking-tight">Overview</h1>
             )}
-            <p className="text-black/50 dark:text-white/50 text-sm mt-2">Real-time statistics for your event.</p>
+            
+            <p className="text-black/50 dark:text-white/50 text-xs font-medium max-w-xs sm:text-right">
+              Live statistics and connection heatmaps synced with the Solana ledger.
+            </p>
           </div>
         </div>
 
@@ -156,214 +157,213 @@ export default function AnalyticsPage() {
           variants={container}
           initial="hidden"
           animate="show"
-          className="flex flex-col gap-6"
+          className="flex flex-col gap-8"
         >
-          {/* Top Stat Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Applications Card */}
-            <motion.div variants={item} whileHover={{ y: -5 }} className="bg-white dark:bg-[#0d0d12] border border-black/5 dark:border-white/5 rounded-2xl p-5 flex flex-col justify-between shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-colors duration-200 cursor-default min-h-[160px]">
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="text-black/50 dark:text-white/50 text-xs font-semibold tracking-wider">EVENT REQUESTS</h3>
-                <div className="p-2 bg-black/5 dark:bg-white/5 rounded-lg"><FileText className="w-4 h-4 text-black/60 dark:text-white/60" /></div>
+          {/* ASYMMETRICAL STAT CARDS GRID */}
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-12 gap-6">
+            
+            {/* Card 1: Applications (Wide - col-span-4) */}
+            <motion.div 
+              variants={item} 
+              whileHover={{ y: -4 }} 
+              className="lg:col-span-4 bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-6 flex flex-col justify-between shadow-sm backdrop-blur-md transition-all duration-250 cursor-default min-h-[180px]"
+            >
+              <div className="flex justify-between items-start">
+                <h3 className="text-black/40 dark:text-white/40 text-[10px] font-mono tracking-widest font-bold uppercase">event requests</h3>
+                <div className="p-2 bg-black/5 dark:bg-white/5 rounded-lg border border-black/5 dark:border-white/5"><FileText className="w-4 h-4 text-black/60 dark:text-white/60" /></div>
               </div>
               
               {isLoadingAnalytics ? (
-                <div className="animate-pulse space-y-4 w-full mt-2">
+                <div className="animate-pulse space-y-4 w-full mt-4">
                   <div className="h-8 bg-black/10 dark:bg-white/10 rounded w-1/3"></div>
                   <div className="h-4 bg-black/10 dark:bg-white/10 rounded w-full"></div>
                 </div>
               ) : analytics ? (
-                <>
-                  <div className="text-3xl font-bold text-black dark:text-white mb-3 tracking-tight">
+                <div className="mt-4 space-y-4">
+                  <div className="text-4xl font-mono font-bold text-black dark:text-white tracking-tight">
                     <CountUp to={analytics.total_requests || 0} />
                   </div>
                   
-                  {/* Progress Bar Breakdown */}
-                  <div className="w-full flex h-2 rounded-full overflow-hidden mb-3">
+                  {/* Progress Bar */}
+                  <div className="w-full flex h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
                     <div style={{ width: `${(analytics.accepted_requests / (analytics.total_requests || 1)) * 100}%` }} className="bg-[#00e0c2]"></div>
-                    <div style={{ width: `${(analytics.rejected_requests / (analytics.total_requests || 1)) * 100}%` }} className="bg-[#ff6b6b]"></div>
-                    <div style={{ width: `${((analytics.total_requests - analytics.accepted_requests - analytics.rejected_requests) / (analytics.total_requests || 1)) * 100}%` }} className="bg-black/10 dark:bg-white/20"></div>
+                    <div style={{ width: `${(analytics.rejected_requests / (analytics.total_requests || 1)) * 100}%` }} className="bg-red-500"></div>
                   </div>
                   
-                  <div className="flex items-center gap-3 text-xs font-medium flex-wrap">
-                    <div className="flex items-center gap-1.5 text-[#00bda3] dark:text-[#00e0c2]">
-                      <div className="w-1.5 h-1.5 bg-[#00bda3] dark:bg-[#00e0c2] rounded-full" />
-                      <span><CountUp to={analytics.accepted_requests || 0} /> Accepted</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-[#e04545] dark:text-[#ff6b6b]">
-                      <div className="w-1.5 h-1.5 bg-[#e04545] dark:bg-[#ff6b6b] rounded-full" />
-                      <span><CountUp to={analytics.rejected_requests || 0} /> Rejected</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-black/40 dark:text-white/40">
-                      <div className="w-1.5 h-1.5 bg-black/30 dark:bg-white/30 rounded-full" />
-                      <span><CountUp to={Math.max(0, (analytics.total_requests || 0) - (analytics.accepted_requests || 0) - (analytics.rejected_requests || 0))} /> Pending</span>
-                    </div>
+                  <div className="flex items-center gap-3 text-[10px] font-mono font-bold uppercase flex-wrap">
+                    <span className="text-[#00e0c2]"><CountUp to={analytics.accepted_requests || 0} /> Accepted</span>
+                    <span className="text-red-500"><CountUp to={analytics.rejected_requests || 0} /> Rejected</span>
+                    <span className="text-white/30"><CountUp to={Math.max(0, (analytics.total_requests || 0) - (analytics.accepted_requests || 0) - (analytics.rejected_requests || 0))} /> Pending</span>
                   </div>
-                </>
+                </div>
               ) : (
-                <div className="flex-1 flex items-center justify-center text-sm text-black/40 dark:text-white/40">No data</div>
+                <div className="flex-1 flex items-center justify-center text-xs text-white/30">No data</div>
               )}
             </motion.div>
 
-            {/* NFC Check-ins Card */}
-            <motion.div variants={item} whileHover={{ y: -5 }} className="bg-white dark:bg-[#0d0d12] border border-black/5 dark:border-white/5 rounded-2xl p-5 flex flex-col justify-between shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-colors duration-200 cursor-default min-h-[160px]">
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="text-black/50 dark:text-white/50 text-xs font-semibold tracking-wider">NFC CHECK-INS</h3>
-                <div className="p-2 bg-black/5 dark:bg-white/5 rounded-lg"><Radio className="w-4 h-4 text-black/60 dark:text-white/60" /></div>
+            {/* Card 2: NFC Check-ins (Standard - col-span-3) */}
+            <motion.div 
+              variants={item} 
+              whileHover={{ y: -4 }} 
+              className="lg:col-span-3 bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-6 flex flex-col justify-between shadow-sm backdrop-blur-md transition-all duration-250 cursor-default min-h-[180px]"
+            >
+              <div className="flex justify-between items-start">
+                <h3 className="text-black/40 dark:text-white/40 text-[10px] font-mono tracking-widest font-bold uppercase">nfc check-ins</h3>
+                <div className="p-2 bg-black/5 dark:bg-white/5 rounded-lg border border-black/5 dark:border-white/5"><Radio className="w-4 h-4 text-black/60 dark:text-white/60" /></div>
               </div>
               
               {isLoadingAnalytics ? (
-                <div className="animate-pulse space-y-4 w-full mt-2">
+                <div className="animate-pulse space-y-4 w-full mt-4">
                   <div className="h-8 bg-black/10 dark:bg-white/10 rounded w-1/3"></div>
-                  <div className="h-2 bg-black/10 dark:bg-white/10 rounded w-full mt-4"></div>
+                  <div className="h-4 bg-black/10 dark:bg-white/10 rounded w-full"></div>
                 </div>
               ) : analytics ? (
-                <>
-                  <div className="flex items-baseline gap-3 mb-4">
-                    <span className="text-3xl font-bold text-black dark:text-white tracking-tight">
+                <div className="mt-4 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <span className="text-4xl font-mono font-bold text-black dark:text-white tracking-tight">
                       <CountUp to={analytics.nfc_checkins || 0} />
                     </span>
-                    <span className="px-2 py-0.5 rounded-full bg-[#00e0c2]/20 dark:bg-[#00e0c2]/10 text-[#00bda3] dark:text-[#00e0c2] text-xs font-semibold flex items-center gap-1">
-                      <Activity className="w-3 h-3" /> Live
+                    
+                    {/* Glowing pulsating badge */}
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00e0c2] opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00e0c2]"></span>
                     </span>
                   </div>
-                  <div className="w-full h-1.5 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
-                    <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(100, (analytics.nfc_checkins / (analytics.total_requests || 1)) * 100)}%` }} transition={{ duration: 1, delay: 0.5, ease: "easeOut" }} className="h-full bg-[#00e0c2] shadow-[0_0_10px_rgba(0,224,194,0.3)] dark:shadow-[0_0_10px_rgba(0,224,194,0.5)] rounded-full"></motion.div>
+                  
+                  <div className="w-full h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
+                    <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(100, (analytics.nfc_checkins / (analytics.total_requests || 1)) * 100)}%` }} transition={{ duration: 1, delay: 0.5 }} className="h-full bg-[#00e0c2] rounded-full"></motion.div>
                   </div>
-                  <div className="text-xs text-black/40 dark:text-white/40 mt-2 font-medium">
-                    {Math.round((analytics.nfc_checkins / (analytics.total_requests || 1)) * 100)}% conversion rate
+                  <div className="text-[10px] font-mono text-white/40 uppercase font-bold">
+                    {Math.round((analytics.nfc_checkins / (analytics.total_requests || 1)) * 100)}% Conversion Rate
                   </div>
-                </>
+                </div>
               ) : (
-                <div className="flex-1 flex items-center justify-center text-sm text-black/40 dark:text-white/40">No data</div>
+                <div className="flex-1 flex items-center justify-center text-xs text-white/30">No data</div>
               )}
             </motion.div>
 
-            {/* Total IRL Taps Card */}
-            <motion.div variants={item} whileHover={{ y: -5 }} className="bg-white dark:bg-[#0d0d12] border border-black/5 dark:border-white/5 rounded-2xl p-5 flex flex-col justify-between shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-colors duration-200 cursor-default min-h-[160px]">
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="text-black/50 dark:text-white/50 text-xs font-semibold tracking-wider">TOTAL IRL TAPS</h3>
-                <div className="p-2 bg-black/5 dark:bg-white/5 rounded-lg"><Fingerprint className="w-4 h-4 text-black/60 dark:text-white/60" /></div>
+            {/* Card 3: Total IRL Taps (Compact - col-span-2) */}
+            <motion.div 
+              variants={item} 
+              whileHover={{ y: -4 }} 
+              className="lg:col-span-2 bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-6 flex flex-col justify-between shadow-sm backdrop-blur-md transition-all duration-250 cursor-default min-h-[180px]"
+            >
+              <div className="flex justify-between items-start">
+                <h3 className="text-black/40 dark:text-white/40 text-[10px] font-mono tracking-widest font-bold uppercase">irl taps</h3>
+                <div className="p-2 bg-black/5 dark:bg-white/5 rounded-lg border border-black/5 dark:border-white/5"><Fingerprint className="w-4 h-4 text-black/60 dark:text-white/60" /></div>
               </div>
               
               {isLoadingAnalytics ? (
-                <div className="animate-pulse space-y-4 w-full mt-2">
-                  <div className="h-8 bg-black/10 dark:bg-white/10 rounded w-1/3"></div>
-                  <div className="h-4 bg-black/10 dark:bg-white/10 rounded w-2/3"></div>
+                <div className="animate-pulse space-y-4 w-full mt-4">
+                  <div className="h-8 bg-black/10 dark:bg-white/10 rounded w-2/3"></div>
                 </div>
               ) : analytics ? (
-                <>
-                  <div className="text-3xl font-bold text-black dark:text-white mb-2 tracking-tight drop-shadow-none dark:drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]">
+                <div className="mt-4 space-y-2">
+                  <div className="text-4xl font-mono font-bold text-black dark:text-white tracking-tight">
                     <CountUp to={analytics.total_irl_taps || 0} />
                   </div>
-                  <div className="text-black/50 dark:text-white/50 text-sm">Social connections forged via NFC</div>
-                </>
+                  <p className="text-[10px] font-mono uppercase font-bold text-white/30">Total Connections</p>
+                </div>
               ) : (
-                <div className="flex-1 flex items-center justify-center text-sm text-black/40 dark:text-white/40">No data</div>
+                <div className="flex-1 flex items-center justify-center text-xs text-white/30">No data</div>
               )}
             </motion.div>
 
-            {/* Total Rep Earned Card */}
-            <motion.div variants={item} whileHover={{ y: -5 }} className="bg-white dark:bg-[#0d0d12] border border-black/5 dark:border-white/5 rounded-2xl p-5 flex flex-col justify-between shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] relative overflow-hidden transition-colors duration-200 cursor-default min-h-[160px]">
-              <motion.div 
-                animate={{ rotate: 360 }} 
-                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                className="absolute -top-24 -right-24 w-48 h-48 bg-purple-500/10 dark:bg-purple-500/20 rounded-full blur-3xl z-0"
-              />
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent z-0"></div>
-              <div className="relative z-10 flex justify-between items-start mb-2">
-                <h3 className="text-black/50 dark:text-white/50 text-xs font-semibold tracking-wider">TOTAL REP EARNED</h3>
-                <div className="p-2 bg-purple-500/10 dark:bg-purple-500/20 rounded-lg"><Award className="w-4 h-4 text-purple-600 dark:text-purple-400" /></div>
+            {/* Card 4: Total Rep Earned (Standard - col-span-3) */}
+            <motion.div 
+              variants={item} 
+              whileHover={{ y: -4 }} 
+              className="lg:col-span-3 bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-6 flex flex-col justify-between shadow-sm backdrop-blur-md relative overflow-hidden transition-all duration-250 cursor-default min-h-[180px]"
+            >
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[var(--accent-glow)] rounded-full blur-[40px]" />
+              <div className="flex justify-between items-start relative z-10">
+                <h3 className="text-black/40 dark:text-white/40 text-[10px] font-mono tracking-widest font-bold uppercase">rep earned</h3>
+                <div className="p-2 bg-black/5 dark:bg-white/5 rounded-lg border border-black/5 dark:border-white/5"><Award className="w-4 h-4 text-[var(--accent-primary)]" /></div>
               </div>
               
               {isLoadingAnalytics ? (
-                <div className="animate-pulse space-y-4 w-full mt-2 relative z-10">
-                  <div className="h-8 bg-purple-500/20 rounded w-1/3"></div>
-                  <div className="h-4 bg-purple-500/20 rounded w-2/3"></div>
+                <div className="animate-pulse space-y-4 w-full mt-4 relative z-10">
+                  <div className="h-8 bg-black/10 dark:bg-white/10 rounded w-1/3"></div>
                 </div>
               ) : analytics ? (
-                <>
-                  <div className="relative z-10 text-3xl font-bold text-black dark:text-white mb-2 tracking-tight">
+                <div className="mt-4 space-y-2 relative z-10">
+                  <div className="text-4xl font-mono font-bold text-black dark:text-white tracking-tight">
                     <CountUp to={analytics.total_reputation_earned || 0} format="k" />
                   </div>
-                  <div className="relative z-10 text-purple-600 dark:text-purple-400 text-sm font-medium">Network reputation distributed</div>
-                </>
+                  <p className="text-[10px] font-mono uppercase font-bold text-[var(--accent-primary)]">Points Issued</p>
+                </div>
               ) : (
-                <div className="flex-1 flex items-center justify-center text-sm text-black/40 dark:text-white/40 relative z-10">No data</div>
+                <div className="flex-1 flex items-center justify-center text-xs text-white/30 relative z-10">No data</div>
               )}
             </motion.div>
           </div>
 
-          {/* Bottom Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-[400px]">
-            {/* Spatial Heatmap */}
-            <motion.div variants={item} className="lg:col-span-2 bg-white dark:bg-[#0d0d12] border border-black/5 dark:border-white/5 rounded-2xl p-4 md:p-6 flex flex-col shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-colors duration-200">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 sm:gap-0">
+          {/* SECTION 2: MAP & LEADERBOARD SPLIT */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            {/* Spatial Heatmap Box (col-span-8) */}
+            <motion.div 
+              variants={item} 
+              className="lg:col-span-8 bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-5 md:p-6 flex flex-col shadow-sm backdrop-blur-md"
+            >
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <div>
-                  <h2 className="text-lg font-semibold text-black dark:text-white">Spatial Heatmap</h2>
-                  <p className="text-black/40 dark:text-white/40 text-sm">Real-time floorplan activity indexing</p>
+                  <h2 className="text-lg font-display font-extrabold uppercase text-black dark:text-white tracking-tight">Spatial Heatmap</h2>
+                  <p className="text-black/40 dark:text-white/40 text-xs">Real-time coordinates density visualizer</p>
                 </div>
-                <div className="flex bg-black/5 dark:bg-white/5 rounded-lg p-1 border border-black/10 dark:border-white/10">
-                  <button className="px-3 py-1 rounded-md bg-white dark:bg-white/10 text-black dark:text-white text-xs font-medium shadow-sm dark:shadow-none flex items-center gap-1.5">
-                    <motion.div animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.5, repeat: Infinity }} className="w-1.5 h-1.5 rounded-full bg-red-500" /> Live
-                  </button>
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
+                  <motion.div animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.5, repeat: Infinity }} className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                  <span className="text-[10px] font-mono uppercase tracking-wider font-bold text-red-500">Telemetry Feed</span>
                 </div>
               </div>
               
               {selectedEventId ? (
                 <TapHeatmap postId={selectedEventId} />
               ) : (
-                <div className="flex-1 min-h-[350px] rounded-xl bg-gray-100 dark:bg-black border border-black/5 dark:border-white/5 flex items-center justify-center text-sm text-black/40 dark:text-white/40">
-                  Select an event to view heatmap
+                <div className="flex-1 min-h-[350px] rounded-xl bg-black/10 border border-white/5 flex items-center justify-center text-xs text-white/30">
+                  Select an event to view telemetry heatmap
                 </div>
               )}
             </motion.div>
 
-            {/* Top Attendees */}
-            <motion.div variants={item} className="bg-white dark:bg-[#0d0d12] border border-black/5 dark:border-white/5 rounded-2xl p-4 md:p-6 flex flex-col shadow-[0_4px_24px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-colors duration-200">
+            {/* Top Attendees Box (col-span-4) */}
+            <motion.div 
+              variants={item} 
+              className="lg:col-span-4 bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-5 md:p-6 flex flex-col shadow-sm backdrop-blur-md"
+            >
               <div className="mb-6">
-                <h2 className="text-lg font-semibold text-black dark:text-white flex items-center gap-2">
-                  <Award className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                <h2 className="text-lg font-display font-extrabold uppercase text-black dark:text-white tracking-tight flex items-center gap-2">
+                  <Award className="w-5 h-5 text-[#00e0c2]" />
                   Top Attendees
                 </h2>
-                <p className="text-black/40 dark:text-white/40 text-sm mt-1">Ranked by reputation & NFC taps</p>
+                <p className="text-black/40 dark:text-white/40 text-xs">Ranked leaderboard by connection volume</p>
               </div>
 
-              <div className="flex-1 flex flex-col gap-5">
+              <div className="flex-1 flex flex-col gap-4">
                 {isLoadingTopUsers ? (
                   Array.from({ length: 5 }).map((_, i) => (
-                    <div key={i} className="flex items-center justify-between p-2 animate-pulse">
-                      <div className="flex items-center gap-4">
-                        <div className="w-4 h-4 bg-black/10 dark:bg-white/10 rounded" />
-                        <div className="w-10 h-10 rounded-full bg-black/10 dark:bg-white/10" />
-                        <div className="space-y-2">
-                          <div className="h-3 w-20 bg-black/10 dark:bg-white/10 rounded" />
-                          <div className="h-2 w-16 bg-black/10 dark:bg-white/10 rounded" />
+                    <div key={i} className="flex items-center justify-between p-2 animate-pulse border-b border-white/5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-4 h-4 bg-white/5 rounded" />
+                        <div className="w-9 h-9 rounded-full bg-white/5" />
+                        <div className="space-y-1">
+                          <div className="h-3 w-16 bg-white/5 rounded" />
+                          <div className="h-2 w-12 bg-white/5 rounded" />
                         </div>
                       </div>
-                      <div className="space-y-2 text-right">
-                        <div className="h-3 w-14 bg-black/10 dark:bg-white/10 rounded ml-auto" />
-                        <div className="h-2 w-12 bg-black/10 dark:bg-white/10 rounded ml-auto" />
-                      </div>
+                      <div className="h-3 w-10 bg-white/5 rounded" />
                     </div>
                   ))
                 ) : topUsers.length === 0 ? (
-                  <div className="flex-1 flex flex-col items-center justify-center text-black/40 dark:text-white/40 py-10">
-                    <Users className="w-10 h-10 mb-3 opacity-40" />
-                    <p className="text-sm">No attendee data yet</p>
+                  <div className="flex-1 flex flex-col items-center justify-center text-white/30 py-10">
+                    <Users className="w-8 h-8 mb-2 opacity-30" />
+                    <p className="text-xs">No scan activity recorded</p>
                   </div>
                 ) : (
                   topUsers.slice(0, 5).map((user, i) => {
                     const rank = i + 1;
-                    const colorClass = rank <= 3 ? "text-[#00bda3] dark:text-[#00e0c2]" : "text-black/70 dark:text-white/70";
-                    const avatarGradients = [
-                      "bg-gradient-to-tr from-green-500 to-emerald-900",
-                      "bg-gradient-to-tr from-cyan-500 to-blue-900",
-                      "bg-gradient-to-tr from-orange-500 to-red-900",
-                      "bg-gradient-to-tr from-blue-400 to-indigo-900",
-                      "bg-gradient-to-tr from-purple-500 to-pink-900",
-                    ];
-                    const formatRep = (val: number) => val >= 1000 ? (val / 1000).toFixed(1) + "k" : val.toString();
+                    const isTop3 = rank <= 3;
                     const walletShort = user.wallet_address
                       ? `${user.wallet_address.slice(0, 4)}...${user.wallet_address.slice(-4)}`
                       : "—";
@@ -371,32 +371,40 @@ export default function AnalyticsPage() {
                     return (
                       <motion.div
                         key={user.user_id}
-                        whileHover={{ scale: 1.02, x: 5 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                        className="flex items-center justify-between group cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 p-2 -mx-2 rounded-lg transition-colors"
+                        whileHover={{ x: 4 }}
+                        className="flex items-center justify-between p-2 rounded-xl transition-all border border-transparent hover:border-white/5 hover:bg-white/[0.02] cursor-pointer"
                       >
-                        <div className="flex items-center gap-4">
-                          <span className={`font-bold w-4 text-center ${rank <= 3 ? "text-yellow-500" : "text-black/40 dark:text-white/40"}`}>{rank}</span>
-                          <div className={`w-10 h-10 rounded-full ${avatarGradients[i % avatarGradients.length]} relative border border-black/10 dark:border-white/10 flex items-center justify-center overflow-hidden`}>
+                        <div className="flex items-center gap-3">
+                          <span className={`font-mono text-xs font-bold w-4 text-center ${isTop3 ? "text-[#00e0c2]" : "text-white/35"}`}>
+                            {rank}
+                          </span>
+                          
+                          <div className="w-9 h-9 rounded-full relative border border-white/10 flex items-center justify-center overflow-hidden bg-white/5">
                             {user.avatar ? (
                               <img src={user.avatar} alt={user.username} className="w-full h-full object-cover" />
                             ) : (
-                              <div className="w-full h-full opacity-50 bg-cover" style={{ backgroundImage: `url('https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}')` }} />
+                              <div className="w-full h-full opacity-60 bg-cover" style={{ backgroundImage: `url('https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}')` }} />
                             )}
                             {rank === 1 && (
-                              <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full border-2 border-white dark:border-[#0d0d12] flex items-center justify-center">
-                                <Star className="w-2 h-2 text-white dark:text-[#0d0d12] fill-white dark:fill-[#0d0d12]" />
+                              <div className="absolute top-0 right-0 w-3.5 h-3.5 bg-yellow-500 rounded-full border border-black flex items-center justify-center">
+                                <Star className="w-1.5 h-1.5 text-black fill-black" />
                               </div>
                             )}
                           </div>
+                          
                           <div>
-                            <div className="text-black dark:text-white font-medium text-sm">{user.username}</div>
-                            <div className="text-black/40 dark:text-white/40 text-xs font-mono">{walletShort}</div>
+                            <div className="text-black dark:text-white font-semibold text-xs tracking-tight">{user.username}</div>
+                            <div className="text-black/35 dark:text-white/35 text-[10px] font-mono">{walletShort}</div>
                           </div>
                         </div>
+                        
                         <div className="text-right">
-                          <div className={`font-bold text-sm ${colorClass}`}>{user.total_taps} Taps</div>
-                          <div className="text-black/50 dark:text-white/50 text-xs">{formatRep(user.total_reputation)} Rep</div>
+                          <div className={`font-mono text-xs font-bold ${isTop3 ? "text-[#00e0c2]" : "text-white/80"}`}>
+                            {user.total_taps} T
+                          </div>
+                          <div className="text-black/40 dark:text-white/40 text-[10px] font-mono">
+                            {user.total_reputation >= 1000 ? (user.total_reputation / 1000).toFixed(1) + "k" : user.total_reputation} R
+                          </div>
                         </div>
                       </motion.div>
                     );
@@ -405,9 +413,9 @@ export default function AnalyticsPage() {
               </div>
 
               {topUsers.length > 5 && (
-                <motion.button whileHover={{ backgroundColor: "rgba(139, 92, 246, 0.1)" }} className="w-full mt-6 py-3 rounded-lg text-sm font-medium text-black/60 dark:text-white/60 hover:text-purple-600 dark:hover:text-purple-400 flex items-center justify-center gap-1 transition-colors border-t border-black/5 dark:border-white/5 pt-4">
-                  View Full Leaderboard <ChevronRight className="w-4 h-4" />
-                </motion.button>
+                <button className="w-full mt-6 py-3 border-t border-black/5 dark:border-white/5 text-xs font-display font-extrabold uppercase tracking-wider text-black/60 dark:text-white/60 hover:text-[#00e0c2] flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+                  View Full Leaderboard <ChevronRight className="w-3.5 h-3.5" />
+                </button>
               )}
             </motion.div>
           </div>

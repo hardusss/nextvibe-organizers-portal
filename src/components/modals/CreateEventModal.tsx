@@ -28,19 +28,26 @@ const STEPS = ["Paste URL", "Verify", "Customize", "Submit"];
 
 function StepIndicator({ current }: { current: Step }) {
   return (
-    <div className="flex items-center gap-1 px-5 pt-4">
+    <div className="flex items-center justify-between border-b border-white/5 bg-white/[0.01] px-5 py-4 flex-wrap gap-2">
       {STEPS.map((label, i) => {
         const step = (i + 1) as Step;
         const done = step < current;
         const active = step === current;
         return (
-          <div key={label} className="flex-1 flex flex-col items-center gap-1.5">
-            <div className={`h-1.5 w-full rounded-full transition-all duration-500 ${
-              done ? "bg-[#00e0c2]" : active ? "bg-purple-500" : "bg-black/10 dark:bg-white/10"
-            }`} />
-            <span className={`text-[10px] font-medium transition-colors ${
-              active ? "text-purple-500 dark:text-purple-400" : done ? "text-[#00bda3]" : "text-black/30 dark:text-white/30"
-            }`}>{label}</span>
+          <div key={label} className="flex items-center gap-2">
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center font-mono text-[10px] font-bold border transition-all duration-300 ${
+              done ? "bg-[#00e0c2] border-[#00e0c2] text-black" : active ? "border-[#00e0c2] text-[#00e0c2]" : "border-white/10 text-white/35"
+            }`}>
+              {step}
+            </span>
+            <span className={`text-[10px] font-display font-extrabold uppercase tracking-wider transition-colors duration-300 ${
+              active ? "text-[#00e0c2]" : "text-white/35"
+            }`}>
+              {label}
+            </span>
+            {i < STEPS.length - 1 && (
+              <span className="text-white/10 text-xs font-mono ml-1 hidden sm:inline">/</span>
+            )}
           </div>
         );
       })}
@@ -53,9 +60,9 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={() => { navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
-      className="p-2 rounded-lg bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-colors cursor-pointer"
     >
-      {copied ? <Check className="w-4 h-4 text-[#00e0c2]" /> : <Copy className="w-4 h-4 text-black/50 dark:text-white/50" />}
+      {copied ? <Check className="w-4 h-4 text-[#00e0c2]" /> : <Copy className="w-4 h-4 text-white/55" />}
     </button>
   );
 }
@@ -170,7 +177,6 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
       const lat = ev?.location?.lat ?? 0;
       const lng = ev?.location?.lng ?? 0;
 
-      // If cover is from Luma URL (not local file), download it as a File
       let fileToUpload = mediaFile;
       if (!fileToUpload && mediaPreview && !mediaPreview.startsWith("blob:")) {
         try {
@@ -209,7 +215,7 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
   const code = previewData?.code || "";
   const ev = previewData?.event;
 
-  const inputCls = "w-full px-4 py-3 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-black dark:text-white placeholder-black/30 dark:placeholder-white/30 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all";
+  const inputCls = "w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-white/20 text-sm focus:outline-none focus:border-[#00e0c2]/50 focus:bg-[#00e0c2]/[0.01] transition-all";
 
   /* ──────────────────── JSX ──────────────────── */
 
@@ -217,20 +223,20 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
     <AnimatePresence>
       {isOpen && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={handleClose}>
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-sm p-4" onClick={handleClose}>
           <motion.div initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 20 }} transition={{ type: "spring", stiffness: 300, damping: 25 }}
             onClick={(e) => e.stopPropagation()}
-            className="bg-white dark:bg-[#0d0d12] border border-black/10 dark:border-white/10 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)] max-w-lg w-[95%] md:w-full max-h-[90vh] flex flex-col overflow-hidden">
+            className="bg-[#0c0c0f] border border-white/10 rounded-xl shadow-2xl max-w-lg w-[95%] md:w-full max-h-[90vh] flex flex-col overflow-hidden text-white">
 
             {/* Header */}
-            <div className="p-4 md:p-5 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-gradient-to-r from-purple-500/5 to-cyan-500/5 dark:from-purple-500/10 dark:to-cyan-500/10">
-              <h3 className="text-base md:text-lg font-bold text-black dark:text-white flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            <div className="p-4 md:p-5 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+              <h3 className="text-sm md:text-base font-display font-extrabold uppercase tracking-tight text-white flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-[#00e0c2]" />
                 Create New Event
               </h3>
               <button onClick={handleClose} disabled={submitPhase !== null && submitPhase !== "done"}
-                className="p-1.5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 text-black/50 dark:text-white/50 transition-colors disabled:opacity-50">
+                className="p-1.5 rounded-full hover:bg-white/10 text-white/50 transition-colors disabled:opacity-50 cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -238,15 +244,15 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
             <StepIndicator current={step} />
 
             {/* Body */}
-            <div className="flex-1 overflow-y-auto p-4 md:p-5 space-y-4 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-4 md:p-5 space-y-4 custom-scrollbar bg-black/20">
               <AnimatePresence mode="wait">
 
                 {/* ═══ STEP 1: Paste Luma URL ═══ */}
                 {step === 1 && (
-                  <motion.div key="s1" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} className="space-y-4">
-                    <div className="flex items-center gap-2 text-sm text-black/60 dark:text-white/60">
-                      <Link2 className="w-4 h-4 text-purple-500" />
-                      Paste your <span className="font-semibold text-purple-500">luma.com</span> event URL to get started
+                  <motion.div key="s1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+                    <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-white/55">
+                      <Link2 className="w-4 h-4 text-[#00e0c2]" />
+                      Paste your <span className="font-semibold text-[#00e0c2]">luma.com</span> event URL
                     </div>
                     <input type="url" value={lumaUrl} onChange={(e) => setLumaUrl(e.target.value)}
                       placeholder="https://luma.com/your-event" className={inputCls}
@@ -254,7 +260,7 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
 
                     {/* Error */}
                     {error && (
-                      <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[#ff6b6b]/10 border border-[#ff6b6b]/20 text-[#e04545] dark:text-[#ff6b6b] text-sm">
+                      <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold">
                         <AlertCircle className="w-4 h-4 shrink-0" />{error}
                       </div>
                     )}
@@ -263,23 +269,25 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
 
                 {/* ═══ STEP 2: Verify Code ═══ */}
                 {step === 2 && (
-                  <motion.div key="s2" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} className="space-y-4">
+                  <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                     {/* Event preview card */}
                     {ev && (
-                      <div className="rounded-xl border border-black/10 dark:border-white/10 overflow-hidden">
+                      <div className="rounded-xl border border-white/10 bg-white/[0.01] overflow-hidden">
                         {ev.cover_image && (
-                          <img src={ev.cover_image} alt={ev.title || "Event"} className="w-full h-32 object-cover" />
+                          <div className="relative h-32 w-full border-b border-white/5">
+                            <img src={ev.cover_image} alt={ev.title || "Event"} className="w-full h-full object-cover" />
+                          </div>
                         )}
-                        <div className="p-3 space-y-1">
-                          <p className="font-semibold text-sm text-black dark:text-white">{ev.title}</p>
+                        <div className="p-3.5 space-y-1.5">
+                          <p className="font-display font-extrabold uppercase text-sm tracking-tight text-white">{ev.title}</p>
                           {ev.location?.name && (
-                            <p className="text-xs text-black/50 dark:text-white/50 flex items-center gap-1">
-                              <MapPin className="w-3 h-3" />{ev.location.name}{ev.location.address ? ` — ${ev.location.address}` : ""}
+                            <p className="text-xs text-white/45 flex items-center gap-1.5 font-mono">
+                              <MapPin className="w-3.5 h-3.5" />{ev.location.name}{ev.location.address ? ` — ${ev.location.address}` : ""}
                             </p>
                           )}
                           {ev.start_time && (
-                            <p className="text-xs text-black/50 dark:text-white/50 flex items-center gap-1">
-                              <Clock className="w-3 h-3" />{new Date(ev.start_time).toLocaleString()}
+                            <p className="text-xs text-white/45 flex items-center gap-1.5 font-mono">
+                              <Clock className="w-3.5 h-3.5" />{new Date(ev.start_time).toLocaleString()}
                             </p>
                           )}
                         </div>
@@ -287,25 +295,25 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
                     )}
 
                     {/* Code display */}
-                    <div className="rounded-xl bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border border-purple-500/20 p-4 space-y-2">
-                      <div className="flex items-center gap-2 text-xs font-semibold text-purple-600 dark:text-purple-400">
+                    <div className="rounded-xl bg-[#00e0c2]/5 border border-[#00e0c2]/20 p-5 space-y-3">
+                      <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider font-bold text-[#00e0c2]">
                         <Shield className="w-4 h-4" />
                         Verification Code
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-2xl font-black tracking-wider bg-gradient-to-r from-purple-500 to-cyan-400 bg-clip-text text-transparent">
+                        <span className="text-3xl font-mono font-black tracking-widest text-[#00e0c2]">
                           {code}
                         </span>
                         <CopyButton text={code} />
                       </div>
-                      <p className="text-xs text-black/50 dark:text-white/40">
+                      <p className="text-[10px] font-mono uppercase tracking-wider text-white/40 leading-relaxed">
                         Add this code to your Luma event description, save it, then click <strong>Verify</strong>.
-                        Code expires in 15 minutes.
+                        Expires in 15 mins.
                       </p>
                     </div>
 
                     {error && (
-                      <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[#ff6b6b]/10 border border-[#ff6b6b]/20 text-[#e04545] dark:text-[#ff6b6b] text-sm">
+                      <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold">
                         <AlertCircle className="w-4 h-4 shrink-0" />{error}
                       </div>
                     )}
@@ -314,54 +322,54 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
 
                 {/* ═══ STEP 3: Customize ═══ */}
                 {step === 3 && (
-                  <motion.div key="s3" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }} className="space-y-4">
+                  <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                     {/* About */}
-                    <div className="space-y-2">
-                      <label className="flex items-center gap-2 text-sm font-semibold text-black/70 dark:text-white/70">
-                        <FileText className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                    <div className="space-y-1.5">
+                      <label className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider font-bold text-white/55">
+                        <FileText className="w-4 h-4 text-[#00e0c2]" />
                         Description <span className="text-red-500">*</span>
                       </label>
                       <textarea value={about} onChange={(e) => setAbout(e.target.value.slice(0, 255))}
                         placeholder="Describe your event..." rows={3} className={`${inputCls} resize-none`} />
-                      <p className="text-xs text-right text-black/30 dark:text-white/30">{about.length}/255</p>
+                      <p className="text-[10px] text-right font-mono text-white/30">{about.length}/255</p>
                     </div>
                     {/* Location */}
-                    <div className="space-y-2">
-                      <label className="flex items-center gap-2 text-sm font-semibold text-black/70 dark:text-white/70">
-                        <MapPin className="w-4 h-4 text-purple-600 dark:text-purple-400" /> Location
+                    <div className="space-y-1.5">
+                      <label className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider font-bold text-white/55">
+                        <MapPin className="w-4 h-4 text-[#00e0c2]" /> Location
                       </label>
                       <input type="text" value={location} onChange={(e) => setLocation(e.target.value)}
                         placeholder="Event location" className={inputCls} />
                     </div>
                     {/* Dates */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="flex items-center gap-2 text-sm font-semibold text-black/70 dark:text-white/70">
-                          <Clock className="w-4 h-4 text-[#00bda3]" /> Start <span className="text-red-500">*</span>
+                      <div className="space-y-1.5">
+                        <label className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider font-bold text-white/55">
+                          <Clock className="w-4 h-4 text-[#00e0c2]" /> Start <span className="text-red-500">*</span>
                         </label>
                         <input type="datetime-local" value={startTime} onChange={(e) => setStartTime(e.target.value)}
-                          className={`${inputCls} [color-scheme:light] dark:[color-scheme:dark]`} />
+                          className={`${inputCls} [color-scheme:dark]`} />
                       </div>
-                      <div className="space-y-2">
-                        <label className="flex items-center gap-2 text-sm font-semibold text-black/70 dark:text-white/70">
-                          <Clock className="w-4 h-4 text-[#e04545]" /> End <span className="text-red-500">*</span>
+                      <div className="space-y-1.5">
+                        <label className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider font-bold text-white/55">
+                          <Clock className="w-4 h-4 text-[#00e0c2]" /> End <span className="text-red-500">*</span>
                         </label>
                         <input type="datetime-local" value={endTime} onChange={(e) => setEndTime(e.target.value)}
-                          min={startTime} className={`${inputCls} [color-scheme:light] dark:[color-scheme:dark]`} />
+                          min={startTime} className={`${inputCls} [color-scheme:dark]`} />
                       </div>
                     </div>
                     {/* Media */}
-                    <div className="space-y-2">
-                      <label className="flex items-center gap-2 text-sm font-semibold text-black/70 dark:text-white/70">
-                        <ImageIcon className="w-4 h-4 text-purple-600 dark:text-purple-400" /> Cover
+                    <div className="space-y-1.5">
+                      <label className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider font-bold text-white/55">
+                        <ImageIcon className="w-4 h-4 text-[#00e0c2]" /> Cover Banner
                         <span className="text-red-500">*</span>
                       </label>
                       {mediaPreview ? (
-                        <div className="relative rounded-xl overflow-hidden border border-black/10 dark:border-white/10 group">
-                          <img src={mediaPreview} alt="Cover" className="w-full h-36 object-cover" />
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                        <div className="relative rounded-xl overflow-hidden border border-white/10 group aspect-video">
+                          <img src={mediaPreview} alt="Cover" className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
                             <button onClick={removeMedia}
-                              className="opacity-0 group-hover:opacity-100 transition-opacity p-2 bg-red-500/90 rounded-full text-white shadow-lg">
+                              className="opacity-0 group-hover:opacity-100 transition-opacity p-2 bg-red-500 rounded-full text-white shadow-lg cursor-pointer">
                               <Trash2 className="w-5 h-5" />
                             </button>
                           </div>
@@ -372,11 +380,11 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
                           onDragLeave={(e) => { e.preventDefault(); setIsDragging(false); }}
                           onClick={() => fileInputRef.current?.click()}
                           className={`w-full h-28 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-2 cursor-pointer transition-all ${
-                            isDragging ? "border-purple-500 bg-purple-500/10" : "border-black/15 dark:border-white/15 hover:border-purple-500/50 hover:bg-black/5 dark:hover:bg-white/5"
+                            isDragging ? "border-[#00e0c2] bg-[#00e0c2]/5" : "border-white/15 hover:border-[#00e0c2]/50 hover:bg-white/5"
                           }`}>
-                          <Upload className={`w-6 h-6 ${isDragging ? "text-purple-500" : "text-black/30 dark:text-white/30"}`} />
-                          <span className="text-xs text-black/40 dark:text-white/40">
-                            {isDragging ? "Drop here" : "Drag & drop or click"}
+                          <Upload className={`w-5 h-5 ${isDragging ? "text-[#00e0c2]" : "text-white/30"}`} />
+                          <span className="text-xs text-white/40 font-mono uppercase tracking-wider font-bold">
+                            {isDragging ? "Drop cover image" : "Drag cover image or click"}
                           </span>
                         </div>
                       )}
@@ -385,7 +393,7 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
                     </div>
 
                     {error && (
-                      <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[#ff6b6b]/10 border border-[#ff6b6b]/20 text-[#e04545] dark:text-[#ff6b6b] text-sm">
+                      <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-semibold">
                         <AlertCircle className="w-4 h-4 shrink-0" />{error}
                       </div>
                     )}
@@ -394,7 +402,7 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
 
                 {/* ═══ STEP 4: Submitting ═══ */}
                 {step === 4 && (
-                  <motion.div key="s4" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -40 }}
+                  <motion.div key="s4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
                     className="space-y-3 py-6">
                     {(["creating", "uploading", "finalizing", "minting", "done"] as const).map((phase) => {
                       const labels = {
@@ -410,13 +418,13 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
                       const isDone = pi < ci || submitPhase === "done";
                       const isActive = pi === ci && submitPhase !== "done";
                       return (
-                        <div key={phase} className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                          isDone ? "bg-[#00e0c2]/10 border border-[#00e0c2]/20" : isActive ? "bg-purple-500/10 border border-purple-500/20" : "bg-black/5 dark:bg-white/5 border border-transparent opacity-40"
+                        <div key={phase} className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${
+                          isDone ? "bg-[#00e0c2]/5 border-[#00e0c2]/20" : isActive ? "bg-[#00e0c2]/5 border-[#00e0c2]/40" : "bg-white/[0.01] border-transparent opacity-30"
                         }`}>
                           {isDone ? <CheckCircle className="w-5 h-5 text-[#00e0c2]" />
-                            : isActive ? <Loader2 className="w-5 h-5 text-purple-500 animate-spin" />
-                            : <div className="w-5 h-5 rounded-full border-2 border-black/20 dark:border-white/20" />}
-                          <span className={`text-sm font-medium ${isDone ? "text-[#00bda3]" : isActive ? "text-purple-500" : "text-black/40 dark:text-white/40"}`}>
+                            : isActive ? <Loader2 className="w-5 h-5 text-[#00e0c2] animate-spin" />
+                            : <div className="w-5 h-5 rounded-full border border-white/25" />}
+                          <span className={`text-xs font-mono uppercase tracking-wider font-bold ${isDone ? "text-[#00e0c2]" : isActive ? "text-white" : "text-white/30"}`}>
                             {labels[phase]}
                           </span>
                         </div>
@@ -424,8 +432,8 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
                     })}
                     {submitPhase === "done" && (
                       <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-                        className="flex items-center justify-center gap-2 pt-4 text-[#00bda3] font-semibold">
-                        <Sparkles className="w-5 h-5" /> Your event is live with cNFT!
+                        className="flex items-center justify-center gap-2 pt-4 text-[#00e0c2] font-semibold text-sm font-display uppercase tracking-wider">
+                        <Sparkles className="w-5 h-5" /> Live cNFT Event registered!
                       </motion.div>
                     )}
                   </motion.div>
@@ -435,49 +443,49 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
 
             {/* Footer */}
             {step !== 4 && (
-              <div className="p-4 md:p-5 border-t border-black/5 dark:border-white/5 flex items-center justify-between gap-3">
+              <div className="p-4 md:p-5 border-t border-white/5 flex items-center justify-between gap-3 bg-white/[0.02]">
                 <div>
                   {step > 1 && (
                     <button onClick={() => { setError(""); setStep((s) => (s - 1) as Step); }}
-                      className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium text-black/70 dark:text-white/70 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                      <ArrowLeft className="w-4 h-4" /> Back
+                      className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-display font-extrabold uppercase tracking-wider text-white/70 hover:bg-white/5 transition-all cursor-pointer">
+                      <ArrowLeft className="w-3.5 h-3.5" /> Back
                     </button>
                   )}
                 </div>
                 <div className="flex items-center gap-3">
                   <button onClick={handleClose}
-                    className="px-4 py-2.5 rounded-xl font-medium text-sm text-black/70 dark:text-white/70 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                    className="px-4 py-2.5 rounded-xl font-display font-extrabold uppercase tracking-wider text-xs text-white/50 hover:bg-white/5 transition-all cursor-pointer">
                     Cancel
                   </button>
 
                   {step === 1 && (
-                    <motion.button whileHover={lumaUrl.trim() ? { scale: 1.02 } : {}} whileTap={lumaUrl.trim() ? { scale: 0.98 } : {}}
+                    <button
                       onClick={handlePreview} disabled={!lumaUrl.trim() || isPreviewing}
-                      className={`px-6 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 transition-all shadow-lg ${
-                        lumaUrl.trim() && !isPreviewing ? "bg-purple-600 hover:bg-purple-700 text-white shadow-purple-600/20" : "bg-black/10 dark:bg-white/10 text-black/30 dark:text-white/30 cursor-not-allowed shadow-none"
+                      className={`px-5 py-2.5 rounded-xl font-display font-extrabold uppercase tracking-wider text-xs flex items-center gap-2 transition-all border border-white/10 ${
+                        lumaUrl.trim() && !isPreviewing ? "hover:border-[#00e0c2] hover:bg-white/5 text-white cursor-pointer" : "text-white/30 cursor-not-allowed opacity-50"
                       }`}>
-                      {isPreviewing ? <><Loader2 className="w-4 h-4 animate-spin" /> Loading…</> : <><ArrowRight className="w-4 h-4" /> Preview</>}
-                    </motion.button>
+                      {isPreviewing ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Loading…</> : <><ArrowRight className="w-3.5 h-3.5" /> Preview</>}
+                    </button>
                   )}
 
                   {step === 2 && (
-                    <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+                    <button
                       onClick={handleVerify} disabled={isVerifying}
-                      className={`px-6 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 transition-all shadow-lg ${
-                        !isVerifying ? "bg-[#00bda3] hover:bg-[#00a88f] text-white shadow-[#00bda3]/20" : "bg-black/10 dark:bg-white/10 text-black/30 dark:text-white/30 cursor-not-allowed shadow-none"
+                      className={`px-5 py-2.5 rounded-xl font-display font-extrabold uppercase tracking-wider text-xs flex items-center gap-2 transition-all border border-white/10 ${
+                        !isVerifying ? "hover:border-[#00e0c2] hover:bg-[#00e0c2]/5 text-[#00e0c2] cursor-pointer" : "text-white/35 cursor-not-allowed opacity-50"
                       }`}>
-                      {isVerifying ? <><Loader2 className="w-4 h-4 animate-spin" /> Verifying…</> : <><Shield className="w-4 h-4" /> Verify</>}
-                    </motion.button>
+                      {isVerifying ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Verifying…</> : <><Shield className="w-3.5 h-3.5" /> Verify</>}
+                    </button>
                   )}
 
                   {step === 3 && (
-                    <motion.button whileHover={isStep3Valid ? { scale: 1.02 } : {}} whileTap={isStep3Valid ? { scale: 0.98 } : {}}
+                    <button
                       onClick={handleSubmit} disabled={!isStep3Valid}
-                      className={`px-6 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 transition-all shadow-lg ${
-                        isStep3Valid ? "bg-purple-600 hover:bg-purple-700 text-white shadow-purple-600/20" : "bg-black/10 dark:bg-white/10 text-black/30 dark:text-white/30 cursor-not-allowed shadow-none"
+                      className={`px-5 py-2.5 rounded-xl font-display font-extrabold uppercase tracking-wider text-xs flex items-center gap-2 transition-all border border-white/10 ${
+                        isStep3Valid ? "hover:border-[#00e0c2] hover:bg-white/5 text-[#00e0c2] cursor-pointer" : "text-white/30 cursor-not-allowed opacity-50"
                       }`}>
-                      <Calendar className="w-4 h-4" /> Create Event
-                    </motion.button>
+                      <Calendar className="w-3.5 h-3.5" /> Create Event
+                    </button>
                   )}
                 </div>
               </div>
