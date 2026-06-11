@@ -424,6 +424,143 @@ DELETE /posts/delete-post/?postId={id}
 
 ---
 
+## Event Taps Coordinates API
+
+Retrieves coordinates of all check-ins and networking taps for a specific event. Used for rendering a map and a heatmap.
+
+```
+GET /posts/event-taps/{post_id}/
+```
+
+### Response `200` (success)
+
+```json
+{
+  "event_id": 12,
+  "title": "NextVibe Meetup",
+  "center": {
+    "lat": 50.4501,
+    "lng": 30.5234
+  },
+  "taps": [
+    {
+      "lat": 50.4501,
+      "lng": 30.5234,
+      "type": "checkin"
+    },
+    {
+      "lat": 50.4505,
+      "lng": 30.5239,
+      "type": "networking"
+    }
+  ]
+}
+```
+
+> [!NOTE]
+> - `center` is calculated by decoding the event's `h3_geo` using resolution 11. If the event does not have coordinates, `center` is `null`.
+> - Check-ins without a specific geo-index fallback to the event's `center` coordinates.
+> - Networking duplicate entries (scanner and scanned pairs) are automatically deduplicated.
+
+### Errors
+
+| Status | Error | Description |
+|--------|-------|-------------|
+| `404` | `Event not found` | The event post doesn't exist, or is not a Luma event |
+
+---
+
+## Web Map & Heatmap Integration Guide
+
+For displaying the tap heatmap on the web interface, we recommend using **Leaflet.js** with the **Leaflet.heat** plugin.
+
+### Why Leaflet.js?
+1. **Free & Open-Source:** No API keys, billing accounts, or monthly usage limits (unlike Google Maps or Mapbox).
+2. **Lightweight & High Performance:** Fast load times and smooth rendering of maps.
+3. **Simple Heatmap Integration:** Direct support for client-side canvas-based heatmaps using the `Leaflet.heat` plugin.
+
+### Implementation Code Example
+
+Here is how to load Leaflet, center the map directly at the event location, and draw a heatmap of taps:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Event Tap Heatmap</title>
+  
+  <!-- 1. Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    #map {
+      height: 500px;
+      width: 100%;
+      border-radius: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <h3>Event Tap Heatmap</h3>
+  <div id="map"></div>
+
+  <!-- 2. Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <!-- 3. Leaflet Heatmap Plugin -->
+  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+
+  <script>
+    // Fetch data from the endpoint GET /posts/event-taps/{post_id}/
+    const eventData = {
+      "center": { "lat": 50.4501, "lng": 30.5234 },
+      "taps": [
+        { "lat": 50.4501, "lng": 30.5234, "type": "checkin" },
+        { "lat": 50.4505, "lng": 30.5239, "type": "networking" },
+        { "lat": 50.4506, "lng": 30.5238, "type": "networking" }
+      ]
+    };
+
+    // Initialize map centered directly on the event location
+    const map = L.map('map').setView([eventData.center.lat, eventData.center.lng], 16);
+
+    // Add OpenStreetMap tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Map coordinates to Leaflet.heat format: [lat, lng, intensity]
+    const heatPoints = eventData.taps.map(tap => {
+      // We can give different weight/intensity to different tap types
+      const intensity = tap.type === 'checkin' ? 1.0 : 0.8;
+      return [tap.lat, tap.lng, intensity];
+    });
+
+    // Add Heatmap Layer
+    const heat = L.heatLayer(heatPoints, {
+      radius: 25,
+      blur: 15,
+      maxZoom: 17,
+      max: 1.0,
+      gradient: {
+        0.4: 'blue',
+        0.65: 'lime',
+        1.0: 'red'
+      }
+    }).addTo(map);
+
+    // Optionally, add a marker at the exact event center
+    L.marker([eventData.center.lat, eventData.center.lng])
+      .bindPopup("<b>Event Location</b>")
+      .addTo(map);
+  </script>
+</body>
+</html>
+```
+
+---
+
 ## Complete Endpoint List (creation flow)
 
 | Step | Method | Endpoint | Description |
@@ -436,6 +573,7 @@ DELETE /posts/delete-post/?postId={id}
 | 6 | `POST` | `/posts/cnft-mint/` | Mint cNFT (with polling) |
 | - | `PATCH`| `/posts/event-update/{post_id}/` | Update event metadata |
 | - | `DELETE`| `/posts/delete-post/?postId={id}` | Delete (hide) event |
+| - | `GET`   | `/posts/event-taps/{post_id}/` | Get check-in and tap coordinates |
 
 ---
 
@@ -476,6 +614,8 @@ The `AddLumaEventSheet` component uses these process states:
 | [post_create.py](file:///home/hard/NextVibe/backend/NextVibeAPI/posts/view_pac/post_create.py) | `PostViewSet` — post creation + finalize |
 | [event_update.py](file:///home/hard/NextVibe/backend/NextVibeAPI/posts/view_pac/event_update.py) | `EventUpdateView` — update event metadata |
 | [delete_post.py](file:///home/hard/NextVibe/backend/NextVibeAPI/posts/view_pac/delete_post.py) | `DeletePostView` — soft delete posts and events |
+| [event_taps.py](file:///home/hard/NextVibe/backend/NextVibeAPI/posts/view_pac/event_taps.py) | `EventTapsView` — coordinate list for check-ins and networking |
 | [mint_nft.py](file:///home/hard/NextVibe/backend/NextVibeAPI/posts/view_pac/mint_nft.py) | `MintNftView` — cNFT minting via microservice |
 | [models.py](file:///home/hard/NextVibe/backend/NextVibeAPI/posts/models.py) | `Post`, `UserCollection` — data models |
+
 
