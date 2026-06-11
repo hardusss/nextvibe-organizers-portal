@@ -57,6 +57,60 @@ export interface TopUser {
   total_reputation: number;
 }
 
+export interface EcosystemStats {
+  total_users: number;
+  mwa_wallet_users: number;
+  web2_users: number;
+  mwa_percentage: number;
+  web2_percentage: number;
+}
+
+export interface HourlyActivityItem {
+  hour: string;
+  checkins: number;
+  networking: number;
+  total: number;
+}
+
+export interface EventAnalyticsData {
+  total_requests: number;
+  accepted_requests: number;
+  rejected_requests: number;
+  nfc_checkins: number;
+  total_irl_taps: number;
+  total_reputation_earned: number;
+  cnft_claims_count: number;
+  cnft_claim_rate: number;
+  ecosystem_stats: EcosystemStats;
+  hourly_activity: HourlyActivityItem[];
+}
+
+export interface SocialNode {
+  id: number;
+  label: string;
+  avatar: string | null;
+  connections_count: number;
+  reputation_earned: number;
+  is_super_connector: boolean;
+}
+
+export interface SocialEdge {
+  source: number;
+  target: number;
+  weight: number;
+}
+
+export interface SocialGraphData {
+  nodes: SocialNode[];
+  edges: SocialEdge[];
+}
+
+export interface BroadcastResult {
+  success: boolean;
+  message: string;
+  recipients_count: number;
+}
+
 // ─── Error Extraction ────────────────────────────────────────────────────────
 
 export function extractBackendError(e: unknown): string {
@@ -332,7 +386,7 @@ export const getEventTopUsers = async (postId: number): Promise<TopUser[]> => {
 };
 
 // Get Event Analytics
-export const getEventAnalytics = async (postId: number) => {
+export const getEventAnalytics = async (postId: number): Promise<EventAnalyticsData> => {
   const token = storage.getItem("access");
 
   if (!token) {
@@ -344,6 +398,45 @@ export const getEventAnalytics = async (postId: number) => {
       Authorization: `Bearer ${token}`,
     },
   });
+
+  return response.data;
+};
+
+// Get Event Social Graph
+export const getEventSocialGraph = async (postId: number): Promise<SocialGraphData> => {
+  const token = storage.getItem("access");
+
+  if (!token) {
+    throw new Error("No access token found");
+  }
+
+  const response = await axios.get(`${getApiUrl()}/posts/event-social-graph/${postId}/`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+};
+
+// Send Event Broadcast
+export const sendEventBroadcast = async (postId: number, message: string): Promise<BroadcastResult> => {
+  const token = storage.getItem("access");
+
+  if (!token) {
+    throw new Error("No access token found");
+  }
+
+  const response = await axios.post(
+    `${getApiUrl()}/posts/event-broadcast/${postId}/`,
+    { message },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
 
   return response.data;
 };
