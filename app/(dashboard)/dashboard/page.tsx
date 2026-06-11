@@ -3,10 +3,22 @@
 import { useEffect, useState } from "react";
 import TopNav from "@/src/components/layout/TopNav";
 import { getUserDetail } from "@/src/api/user.detail";
-import { getHostedEvents, getEventAnalytics, getEventTopUsers, type TopUser } from "@/src/api/events";
+import { 
+  getHostedEvents, 
+  getEventAnalytics, 
+  getEventTopUsers, 
+  getEventSocialGraph, 
+  type TopUser, 
+  type EventAnalyticsData, 
+  type SocialGraphData 
+} from "@/src/api/events";
 import { FileText, Radio, Fingerprint, Award, ChevronRight, Activity, Star, ChevronDown, Users } from "lucide-react";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import TapHeatmap from "@/src/components/analytics/TapHeatmap";
+import EcosystemDonutChart from "@/src/components/analytics/EcosystemDonutChart";
+import ActivityTimelineChart from "@/src/components/analytics/ActivityTimelineChart";
+import SocialForceGraph from "@/src/components/analytics/SocialForceGraph";
+import BroadcastPanel from "@/src/components/analytics/BroadcastPanel";
 
 const container = {
   hidden: { opacity: 0 },
@@ -42,10 +54,12 @@ export default function AnalyticsPage() {
   const [userProfile, setUserProfile] = useState<any>(null);
   const [events, setEvents] = useState<any[]>([]);
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
-  const [analytics, setAnalytics] = useState<any>(null);
+  const [analytics, setAnalytics] = useState<EventAnalyticsData | null>(null);
   const [isLoadingAnalytics, setIsLoadingAnalytics] = useState<boolean>(false);
   const [topUsers, setTopUsers] = useState<TopUser[]>([]);
   const [isLoadingTopUsers, setIsLoadingTopUsers] = useState<boolean>(false);
+  const [socialGraph, setSocialGraph] = useState<SocialGraphData>({ nodes: [], edges: [] });
+  const [isLoadingSocialGraph, setIsLoadingSocialGraph] = useState<boolean>(false);
 
   useEffect(() => {
     const initData = async () => {
@@ -109,6 +123,44 @@ export default function AnalyticsPage() {
     fetchTopUsers();
   }, [selectedEventId]);
 
+  useEffect(() => {
+    if (!selectedEventId) return;
+
+    const fetchSocialGraph = async () => {
+      setIsLoadingSocialGraph(true);
+      try {
+        const data = await getEventSocialGraph(selectedEventId);
+        setSocialGraph(data);
+      } catch (error) {
+        console.error("Failed to fetch event social graph:", error);
+        setSocialGraph({ nodes: [], edges: [] });
+      } finally {
+        setIsLoadingSocialGraph(false);
+      }
+    };
+
+    fetchSocialGraph();
+  }, [selectedEventId]);
+
+  useEffect(() => {
+    if (!selectedEventId) return;
+
+    const fetchSocialGraph = async () => {
+      setIsLoadingSocialGraph(true);
+      try {
+        const data = await getEventSocialGraph(selectedEventId);
+        setSocialGraph(data);
+      } catch (error) {
+        console.error("Failed to fetch event social graph:", error);
+        setSocialGraph({ nodes: [], edges: [] });
+      } finally {
+        setIsLoadingSocialGraph(false);
+      }
+    };
+
+    fetchSocialGraph();
+  }, [selectedEventId]);
+
   const selectedEvent = events.find(e => e.post_id === selectedEventId);
 
   return (
@@ -162,11 +214,11 @@ export default function AnalyticsPage() {
           {/* ASYMMETRICAL STAT CARDS GRID */}
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-12 gap-6">
             
-            {/* Card 1: Applications (Wide - col-span-4) */}
+            {/* Card 1: Applications (Wide - col-span-3) */}
             <motion.div 
-              variants={item} 
-              whileHover={{ y: -4 }} 
-              className="lg:col-span-4 bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-6 flex flex-col justify-between shadow-sm backdrop-blur-md transition-all duration-250 cursor-default min-h-[180px]"
+               variants={item} 
+               whileHover={{ y: -4 }} 
+               className="lg:col-span-3 bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-6 flex flex-col justify-between shadow-sm backdrop-blur-md transition-all duration-250 cursor-default min-h-[180px]"
             >
               <div className="flex justify-between items-start">
                 <h3 className="text-black/40 dark:text-white/40 text-[10px] font-mono tracking-widest font-bold uppercase">event requests</h3>
@@ -201,11 +253,11 @@ export default function AnalyticsPage() {
               )}
             </motion.div>
 
-            {/* Card 2: NFC Check-ins (Standard - col-span-3) */}
+            {/* Card 2: NFC Check-ins (Standard - col-span-2) */}
             <motion.div 
               variants={item} 
               whileHover={{ y: -4 }} 
-              className="lg:col-span-3 bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-6 flex flex-col justify-between shadow-sm backdrop-blur-md transition-all duration-250 cursor-default min-h-[180px]"
+              className="lg:col-span-2 bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-6 flex flex-col justify-between shadow-sm backdrop-blur-md transition-all duration-250 cursor-default min-h-[180px]"
             >
               <div className="flex justify-between items-start">
                 <h3 className="text-black/40 dark:text-white/40 text-[10px] font-mono tracking-widest font-bold uppercase">nfc check-ins</h3>
@@ -220,15 +272,15 @@ export default function AnalyticsPage() {
               ) : analytics ? (
                 <div className="mt-4 space-y-4">
                   <div className="flex items-center gap-3">
-                    <span className="text-4xl font-mono font-bold text-black dark:text-white tracking-tight">
-                      <CountUp to={analytics.nfc_checkins || 0} />
-                    </span>
-                    
-                    {/* Glowing pulsating badge */}
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00e0c2] opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00e0c2]"></span>
-                    </span>
+                     <span className="text-4xl font-mono font-bold text-black dark:text-white tracking-tight">
+                       <CountUp to={analytics.nfc_checkins || 0} />
+                     </span>
+                     
+                     {/* Glowing pulsating badge */}
+                     <span className="relative flex h-2 w-2">
+                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00e0c2] opacity-75"></span>
+                       <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00e0c2]"></span>
+                     </span>
                   </div>
                   
                   <div className="w-full h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
@@ -270,11 +322,11 @@ export default function AnalyticsPage() {
               )}
             </motion.div>
 
-            {/* Card 4: Total Rep Earned (Standard - col-span-3) */}
+            {/* Card 4: Total Rep Earned (Standard - col-span-2) */}
             <motion.div 
               variants={item} 
               whileHover={{ y: -4 }} 
-              className="lg:col-span-3 bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-6 flex flex-col justify-between shadow-sm backdrop-blur-md relative overflow-hidden transition-all duration-250 cursor-default min-h-[180px]"
+              className="lg:col-span-2 bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-6 flex flex-col justify-between shadow-sm backdrop-blur-md relative overflow-hidden transition-all duration-250 cursor-default min-h-[180px]"
             >
               <div className="absolute top-0 right-0 w-24 h-24 bg-[var(--accent-glow)] rounded-full blur-[40px]" />
               <div className="flex justify-between items-start relative z-10">
@@ -295,6 +347,65 @@ export default function AnalyticsPage() {
                 </div>
               ) : (
                 <div className="flex-1 flex items-center justify-center text-xs text-white/30 relative z-10">No data</div>
+              )}
+            </motion.div>
+
+            {/* Card 5: cNFT Claim Rate (col-span-3) */}
+            <motion.div 
+              variants={item} 
+              whileHover={{ y: -4 }} 
+              className="lg:col-span-3 bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-6 flex flex-col justify-between shadow-sm backdrop-blur-md transition-all duration-250 cursor-default min-h-[180px]"
+            >
+              <div className="flex justify-between items-start">
+                <h3 className="text-black/40 dark:text-white/40 text-[10px] font-mono tracking-widest font-bold uppercase">cnft claims</h3>
+                <div className="p-2 bg-black/5 dark:bg-white/5 rounded-lg border border-black/5 dark:border-white/5"><Award className="w-4 h-4 text-cyan-400" /></div>
+              </div>
+              
+              {isLoadingAnalytics ? (
+                <div className="animate-pulse space-y-4 w-full mt-4">
+                  <div className="h-8 bg-black/10 dark:bg-white/10 rounded w-1/3"></div>
+                </div>
+              ) : analytics ? (
+                <div className="mt-4 flex items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="text-3xl font-mono font-bold text-black dark:text-white tracking-tight">
+                      {analytics.cnft_claim_rate ? `${Math.round(analytics.cnft_claim_rate)}%` : "0%"}
+                    </div>
+                    <p className="text-[10px] font-mono uppercase font-bold text-black/30 dark:text-white/30">
+                      {analytics.cnft_claims_count || 0} of {analytics.nfc_checkins || 0} claimed
+                    </p>
+                  </div>
+
+                  {/* Circular progress SVG */}
+                  <div className="relative w-14 h-14 shrink-0">
+                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                      <path
+                        className="text-black/5 dark:text-white/5"
+                        strokeWidth="3.5"
+                        stroke="currentColor"
+                        fill="none"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                      <defs>
+                        <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="#9945FF" />
+                          <stop offset="100%" stopColor="#00e0c2" />
+                        </linearGradient>
+                      </defs>
+                      <path
+                        className="transition-all duration-500 ease-out"
+                        strokeWidth="3.5"
+                        strokeDasharray={`${analytics.cnft_claim_rate || 0}, 100`}
+                        strokeLinecap="round"
+                        stroke="url(#gaugeGradient)"
+                        fill="none"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex-1 flex items-center justify-center text-xs text-white/30">No data</div>
               )}
             </motion.div>
           </div>
@@ -419,6 +530,45 @@ export default function AnalyticsPage() {
               )}
             </motion.div>
           </div>
+
+          {/* SECTION 3: ECOSYSTEM & TIMELINE SPLIT */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Ecosystem Split (col-span-4) */}
+            <div className="lg:col-span-4">
+              <EcosystemDonutChart
+                mwaPercentage={analytics?.ecosystem_stats?.mwa_percentage ?? 0}
+                web2Percentage={analytics?.ecosystem_stats?.web2_percentage ?? 0}
+                mwaUsers={analytics?.ecosystem_stats?.mwa_wallet_users ?? 0}
+                web2Users={analytics?.ecosystem_stats?.web2_users ?? 0}
+              />
+            </div>
+            
+            {/* Peak Activity Timeline (col-span-8) */}
+            <div className="lg:col-span-8">
+              <ActivityTimelineChart
+                hourlyActivity={analytics?.hourly_activity ?? []}
+              />
+            </div>
+          </div>
+
+          {/* SECTION 4: SOCIAL GRAPH & BROADCAST SPLIT */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Social Force Graph (col-span-8) */}
+            <div className="lg:col-span-8">
+              <SocialForceGraph
+                nodes={socialGraph.nodes}
+                edges={socialGraph.edges}
+              />
+            </div>
+
+            {/* Broadcast Panel (col-span-4) */}
+            <div className="lg:col-span-4">
+              <BroadcastPanel
+                eventId={selectedEventId}
+              />
+            </div>
+          </div>
+
         </motion.div>
       </main>
     </div>
