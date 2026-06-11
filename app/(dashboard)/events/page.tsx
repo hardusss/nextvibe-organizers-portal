@@ -139,13 +139,13 @@ export default function EventsPage() {
       <main className="flex-1 overflow-hidden flex flex-col mt-2 px-4 md:px-8">
         <div className="mb-6 flex flex-col gap-1">
           <h2 className="text-lg font-bold text-black dark:text-white flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            <Calendar className="w-5 h-5 dynamic-accent-text" />
             My Hosted Events
           </h2>
           <p className="text-black/50 dark:text-white/50 text-sm">View and manage all the events you have created.</p>
           <button
             onClick={() => setShowCreateEvent(true)}
-            className="mt-3 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold transition-colors shadow-lg shadow-purple-600/20 dark:shadow-purple-600/30 w-fit"
+            className="mt-3 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-white text-sm font-semibold transition-colors shadow-lg dynamic-accent-btn dynamic-accent-shadow w-fit"
           >
             <Plus className="w-4 h-4" />
             Create Event
@@ -226,7 +226,7 @@ export default function EventsPage() {
                         <div className="mt-auto pt-4 border-t border-black/5 dark:border-white/5 flex gap-2">
                           <button 
                             onClick={() => openAttendeesModal(evt.post_id)}
-                            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-purple-600/10 hover:bg-purple-600/20 dark:bg-purple-400/10 dark:hover:bg-purple-400/20 text-purple-700 dark:text-purple-300 text-xs font-semibold transition-colors"
+                            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl dynamic-accent-bg-glow dynamic-accent-text text-xs font-semibold transition-colors"
                           >
                             <Users className="w-3.5 h-3.5" /> Attendees
                           </button>

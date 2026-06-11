@@ -446,12 +446,35 @@ GET /posts/event-taps/{post_id}/
     {
       "lat": 50.4501,
       "lng": 30.5234,
-      "type": "checkin"
+      "type": "checkin",
+      "user": {
+        "user_id": 1,
+        "username": "alex",
+        "avatar": "https://nextvibe-s3.s3.amazonaws.com/avatars/alex.png"
+      },
+      "given_by": {
+        "user_id": 2,
+        "username": "organizer_host",
+        "avatar": "https://nextvibe-s3.s3.amazonaws.com/avatars/host.png"
+      },
+      "points": 5
     },
     {
       "lat": 50.4505,
       "lng": 30.5239,
-      "type": "networking"
+      "type": "networking",
+      "user": {
+        "user_id": 3,
+        "username": "bob",
+        "avatar": "https://nextvibe-s3.s3.amazonaws.com/avatars/bob.png"
+      },
+      "given_by": {
+        "user_id": 4,
+        "username": "charlie",
+        "avatar": null
+      },
+      "points": 10,
+      "points_given_by": 2
     }
   ]
 }

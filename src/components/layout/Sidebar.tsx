@@ -96,13 +96,13 @@ export default function Sidebar() {
                     }}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${
                       isActive
-                        ? "bg-black/10 dark:bg-white/10 text-black dark:text-white shadow-[inset_2px_0_0_rgba(139,92,246,1)]"
+                        ? "bg-black/10 dark:bg-white/10 text-black dark:text-white shadow-[inset_2px_0_0_var(--accent-primary,#8b5cf6)]"
                         : "text-black/50 dark:text-white/50 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black/80 dark:hover:text-white/80"
                     }`}
                   >
                     <item.icon
                       className={`w-5 h-5 ${
-                        isActive ? "text-purple-600 dark:text-purple-400" : "text-black/40 dark:text-white/40 group-hover:text-black/70 dark:group-hover:text-white/70"
+                        isActive ? "text-[var(--accent-primary,#8b5cf6)]" : "text-black/40 dark:text-white/40 group-hover:text-black/70 dark:group-hover:text-white/70"
                       }`}
                     />
                     <span className="text-sm font-medium">{item.name}</span>

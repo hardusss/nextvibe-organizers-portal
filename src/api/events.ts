@@ -410,10 +410,20 @@ export async function deleteEventPost(postId: number): Promise<{ data: string }>
 
 // ─── Event Taps Coordinates (Heatmap) Endpoint ───────────────────────────────
 
+export interface EventTapUser {
+  user_id: number;
+  username: string;
+  avatar: string | null;
+}
+
 export interface EventTap {
   lat: number;
   lng: number;
   type: "checkin" | "networking";
+  user?: EventTapUser;
+  given_by?: EventTapUser;
+  points?: number;
+  points_given_by?: number;
 }
 
 export interface EventTapsResult {

@@ -5,6 +5,33 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --accent-primary: #8b5cf6;
+  --accent-hover: #7c3aed;
+  --accent-glow: rgba(139, 92, 246, 0.15);
+}
+
+/* Dynamic Accent Helper Classes */
+.dynamic-accent-btn {
+  background-color: var(--accent-primary) !important;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+.dynamic-accent-btn:hover {
+  background-color: var(--accent-hover) !important;
+}
+.dynamic-accent-text {
+  color: var(--accent-primary) !important;
+}
+.dynamic-accent-border {
+  border-color: var(--accent-primary) !important;
+}
+.dynamic-accent-bg-glow {
+  background-color: var(--accent-glow) !important;
+}
+.dynamic-accent-ring {
+  box-shadow: 0 0 0 2px var(--accent-glow) !important;
+}
+.dynamic-accent-shadow {
+  box-shadow: 0 4px 12px var(--accent-glow) !important;
 }
 
 .dark {
