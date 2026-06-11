@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import TopNav from "@/src/components/layout/TopNav";
 import { getUserDetail } from "@/src/api/user.detail";
-import { getHostedEvents, getEventAnalytics } from "@/src/api/events";
-import { FileText, Radio, Fingerprint, Award, ChevronRight, Activity, Star, ChevronDown } from "lucide-react";
+import { getHostedEvents, getEventAnalytics, getEventTopUsers, type TopUser } from "@/src/api/events";
+import { FileText, Radio, Fingerprint, Award, ChevronRight, Activity, Star, ChevronDown, Users } from "lucide-react";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 
 const container = {
@@ -43,6 +43,8 @@ export default function AnalyticsPage() {
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
   const [analytics, setAnalytics] = useState<any>(null);
   const [isLoadingAnalytics, setIsLoadingAnalytics] = useState<boolean>(false);
+  const [topUsers, setTopUsers] = useState<TopUser[]>([]);
+  const [isLoadingTopUsers, setIsLoadingTopUsers] = useState<boolean>(false);
 
   useEffect(() => {
     const initData = async () => {
@@ -86,6 +88,26 @@ export default function AnalyticsPage() {
     };
 
     fetchAnalytics();
+  }, [selectedEventId]);
+
+  useEffect(() => {
+    if (!selectedEventId) return;
+
+    const fetchTopUsers = async () => {
+      setIsLoadingTopUsers(true);
+      try {
+        const data = await getEventTopUsers(selectedEventId);
+        console.log(data)
+        setTopUsers(data);
+      } catch (error) {
+        console.error("Failed to fetch top users:", error);
+        setTopUsers([]);
+      } finally {
+        setIsLoadingTopUsers(false);
+      }
+    };
+
+    fetchTopUsers();
   }, [selectedEventId]);
 
   const selectedEvent = events.find(e => e.post_id === selectedEventId);
@@ -318,49 +340,89 @@ export default function AnalyticsPage() {
                   <Award className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                   Top Attendees
                 </h2>
-                <p className="text-black/40 dark:text-white/40 text-sm mt-1">Ranked by overall ecosystem engagement</p>
+                <p className="text-black/40 dark:text-white/40 text-sm mt-1">Ranked by reputation & NFC taps</p>
               </div>
 
               <div className="flex-1 flex flex-col gap-5">
-                {[
-                  { rank: 1, name: "Crypt...", address: "7xKp...9qZy", taps: "842 Taps", rep: "12.4k Rep", color: "text-[#00bda3] dark:text-[#00e0c2]", avatar: "bg-gradient-to-tr from-green-500 to-emerald-900" },
-                  { rank: 2, name: "VibeM...", address: "3aJm...2xPw", taps: "710 Taps", rep: "9.8k Rep", color: "text-[#00bda3] dark:text-[#00e0c2]", avatar: "bg-gradient-to-tr from-cyan-500 to-blue-900" },
-                  { rank: 3, name: "Alice...", address: "9vBc...1rLk", taps: "654 Taps", rep: "8.1k Rep", color: "text-[#00bda3] dark:text-[#00e0c2]", avatar: "bg-gradient-to-tr from-orange-500 to-red-900" },
-                  { rank: 4, name: "Bob.sol", address: "5kTr...8nMo", taps: "512 Taps", rep: "6.5k Rep", color: "text-black/70 dark:text-white/70", avatar: "bg-gradient-to-tr from-blue-400 to-indigo-900" },
-                  { rank: 5, name: "DeFi_...", address: "2pQw...7yUi", taps: "489 Taps", rep: "5.9k Rep", color: "text-black/70 dark:text-white/70", avatar: "bg-gradient-to-tr from-purple-500 to-pink-900" },
-                ].map((user, i) => (
-                  <motion.div 
-                    key={user.rank} 
-                    whileHover={{ scale: 1.02, x: 5 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                    className="flex items-center justify-between group cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 p-2 -mx-2 rounded-lg transition-colors"
-                  >
-                    <div className="flex items-center gap-4">
-                      <span className={`font-bold w-4 text-center ${user.rank <= 3 ? "text-yellow-500" : "text-black/40 dark:text-white/40"}`}>{user.rank}</span>
-                      <div className={`w-10 h-10 rounded-full ${user.avatar} relative border border-black/10 dark:border-white/10 flex items-center justify-center overflow-hidden`}>
-                        <div className="w-full h-full opacity-50 bg-cover" style={{ backgroundImage: `url('https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}')` }}></div>
-                        {user.rank === 1 && (
-                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full border-2 border-white dark:border-[#0d0d12] flex items-center justify-center">
-                            <Star className="w-2 h-2 text-white dark:text-[#0d0d12] fill-white dark:fill-[#0d0d12]" />
+                {isLoadingTopUsers ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="flex items-center justify-between p-2 animate-pulse">
+                      <div className="flex items-center gap-4">
+                        <div className="w-4 h-4 bg-black/10 dark:bg-white/10 rounded" />
+                        <div className="w-10 h-10 rounded-full bg-black/10 dark:bg-white/10" />
+                        <div className="space-y-2">
+                          <div className="h-3 w-20 bg-black/10 dark:bg-white/10 rounded" />
+                          <div className="h-2 w-16 bg-black/10 dark:bg-white/10 rounded" />
+                        </div>
+                      </div>
+                      <div className="space-y-2 text-right">
+                        <div className="h-3 w-14 bg-black/10 dark:bg-white/10 rounded ml-auto" />
+                        <div className="h-2 w-12 bg-black/10 dark:bg-white/10 rounded ml-auto" />
+                      </div>
+                    </div>
+                  ))
+                ) : topUsers.length === 0 ? (
+                  <div className="flex-1 flex flex-col items-center justify-center text-black/40 dark:text-white/40 py-10">
+                    <Users className="w-10 h-10 mb-3 opacity-40" />
+                    <p className="text-sm">No attendee data yet</p>
+                  </div>
+                ) : (
+                  topUsers.slice(0, 5).map((user, i) => {
+                    const rank = i + 1;
+                    const colorClass = rank <= 3 ? "text-[#00bda3] dark:text-[#00e0c2]" : "text-black/70 dark:text-white/70";
+                    const avatarGradients = [
+                      "bg-gradient-to-tr from-green-500 to-emerald-900",
+                      "bg-gradient-to-tr from-cyan-500 to-blue-900",
+                      "bg-gradient-to-tr from-orange-500 to-red-900",
+                      "bg-gradient-to-tr from-blue-400 to-indigo-900",
+                      "bg-gradient-to-tr from-purple-500 to-pink-900",
+                    ];
+                    const formatRep = (val: number) => val >= 1000 ? (val / 1000).toFixed(1) + "k" : val.toString();
+                    const walletShort = user.wallet_address
+                      ? `${user.wallet_address.slice(0, 4)}...${user.wallet_address.slice(-4)}`
+                      : "—";
+
+                    return (
+                      <motion.div
+                        key={user.user_id}
+                        whileHover={{ scale: 1.02, x: 5 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                        className="flex items-center justify-between group cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 p-2 -mx-2 rounded-lg transition-colors"
+                      >
+                        <div className="flex items-center gap-4">
+                          <span className={`font-bold w-4 text-center ${rank <= 3 ? "text-yellow-500" : "text-black/40 dark:text-white/40"}`}>{rank}</span>
+                          <div className={`w-10 h-10 rounded-full ${avatarGradients[i % avatarGradients.length]} relative border border-black/10 dark:border-white/10 flex items-center justify-center overflow-hidden`}>
+                            {user.avatar ? (
+                              <img src={user.avatar} alt={user.username} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full opacity-50 bg-cover" style={{ backgroundImage: `url('https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}')` }} />
+                            )}
+                            {rank === 1 && (
+                              <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full border-2 border-white dark:border-[#0d0d12] flex items-center justify-center">
+                                <Star className="w-2 h-2 text-white dark:text-[#0d0d12] fill-white dark:fill-[#0d0d12]" />
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
-                      <div>
-                        <div className="text-black dark:text-white font-medium text-sm">{user.name}</div>
-                        <div className="text-black/40 dark:text-white/40 text-xs font-mono">{user.address}</div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className={`font-bold text-sm ${user.color}`}>{user.taps}</div>
-                      <div className="text-black/50 dark:text-white/50 text-xs">{user.rep}</div>
-                    </div>
-                  </motion.div>
-                ))}
+                          <div>
+                            <div className="text-black dark:text-white font-medium text-sm">{user.username}</div>
+                            <div className="text-black/40 dark:text-white/40 text-xs font-mono">{walletShort}</div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className={`font-bold text-sm ${colorClass}`}>{user.total_taps} Taps</div>
+                          <div className="text-black/50 dark:text-white/50 text-xs">{formatRep(user.total_reputation)} Rep</div>
+                        </div>
+                      </motion.div>
+                    );
+                  })
+                )}
               </div>
 
-              <motion.button whileHover={{ backgroundColor: "rgba(139, 92, 246, 0.1)" }} className="w-full mt-6 py-3 rounded-lg text-sm font-medium text-black/60 dark:text-white/60 hover:text-purple-600 dark:hover:text-purple-400 flex items-center justify-center gap-1 transition-colors border-t border-black/5 dark:border-white/5 pt-4">
-                View Full Leaderboard <ChevronRight className="w-4 h-4" />
-              </motion.button>
+              {topUsers.length > 5 && (
+                <motion.button whileHover={{ backgroundColor: "rgba(139, 92, 246, 0.1)" }} className="w-full mt-6 py-3 rounded-lg text-sm font-medium text-black/60 dark:text-white/60 hover:text-purple-600 dark:hover:text-purple-400 flex items-center justify-center gap-1 transition-colors border-t border-black/5 dark:border-white/5 pt-4">
+                  View Full Leaderboard <ChevronRight className="w-4 h-4" />
+                </motion.button>
+              )}
             </motion.div>
           </div>
         </motion.div>

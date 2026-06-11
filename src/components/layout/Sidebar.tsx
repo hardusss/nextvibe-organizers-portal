@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
@@ -17,6 +18,7 @@ import {
   Plus,
   X,
 } from "lucide-react";
+import CreateEventModal from "@/src/components/modals/CreateEventModal";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -28,7 +30,9 @@ const navigation = [
 export default function Sidebar() {
   const pathname = usePathname();
   const { logout } = useAuth();
+  const router = useRouter();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showCreateEvent, setShowCreateEvent] = useState(false);
   const { isMobileMenuOpen, closeMobileMenu } = useMobileMenu();
 
   return (
@@ -66,7 +70,10 @@ export default function Sidebar() {
         </div>
 
         <div className="px-4 py-2">
-          <button className="w-full flex items-center justify-center gap-2 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-black/80 dark:text-white/80 transition-colors py-2.5 rounded-xl border border-black/10 dark:border-white/10 text-sm font-medium">
+          <button
+            onClick={() => setShowCreateEvent(true)}
+            className="w-full flex items-center justify-center gap-2 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-black/80 dark:text-white/80 transition-colors py-2.5 rounded-xl border border-black/10 dark:border-white/10 text-sm font-medium"
+          >
             <Plus className="w-4 h-4" /> Create Event
           </button>
         </div>
@@ -162,6 +169,12 @@ export default function Sidebar() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <CreateEventModal
+        isOpen={showCreateEvent}
+        onClose={() => setShowCreateEvent(false)}
+        onEventCreated={() => router.refresh()}
+      />
     </>
   );
 }
