@@ -229,7 +229,7 @@ export default function LoginPage() {
           <div className="w-6 h-6 rounded-full overflow-hidden">
             <Image src="/logo.png" alt="NextVibe" width={24} height={24} className="object-cover" />
           </div>
-          <span className="font-display font-extrabold text-xs uppercase tracking-widest text-[#00e0c2]">NextVibe Protocol</span>
+          <span className="font-display font-extrabold text-xs uppercase tracking-widest text-[#00e0c2]">NextVibe - IRL Networking Layer on Solana</span>
         </div>
 
         {/* Center: Hero Branding / Huge Mascot Image */}
@@ -259,7 +259,7 @@ export default function LoginPage() {
 
         {/* Bottom copyright */}
         <div className="z-10 flex items-center justify-between text-[10px] text-white/30 tracking-wider font-mono uppercase">
-          <span>Version 2.4.0 (Stable)</span>
+          <span>Version 1.0.1 (BETA)</span>
           <span>© NextVibe 2026</span>
         </div>
       </div>
