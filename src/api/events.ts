@@ -408,3 +408,34 @@ export async function deleteEventPost(postId: number): Promise<{ data: string }>
   return response.data;
 }
 
+// ─── Event Taps Coordinates (Heatmap) Endpoint ───────────────────────────────
+
+export interface EventTap {
+  lat: number;
+  lng: number;
+  type: "checkin" | "networking";
+}
+
+export interface EventTapsResult {
+  event_id: number;
+  title: string;
+  center: { lat: number; lng: number } | null;
+  taps: EventTap[];
+}
+
+export async function getEventTaps(postId: number): Promise<EventTapsResult> {
+  const token = storage.getItem("access");
+  if (!token) throw new Error("No access token found");
+
+  const response = await axios.get(
+    `${getApiUrl()}/posts/event-taps/${postId}/`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+}
+
+

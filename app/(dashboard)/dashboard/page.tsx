@@ -6,6 +6,7 @@ import { getUserDetail } from "@/src/api/user.detail";
 import { getHostedEvents, getEventAnalytics, getEventTopUsers, type TopUser } from "@/src/api/events";
 import { FileText, Radio, Fingerprint, Award, ChevronRight, Activity, Star, ChevronDown, Users } from "lucide-react";
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
+import TapHeatmap from "@/src/components/analytics/TapHeatmap";
 
 const container = {
   hidden: { opacity: 0 },
@@ -306,31 +307,16 @@ export default function AnalyticsPage() {
                   <button className="px-3 py-1 rounded-md bg-white dark:bg-white/10 text-black dark:text-white text-xs font-medium shadow-sm dark:shadow-none flex items-center gap-1.5">
                     <motion.div animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.5, repeat: Infinity }} className="w-1.5 h-1.5 rounded-full bg-red-500" /> Live
                   </button>
-                  <button className="px-3 py-1 rounded-md text-black/50 dark:text-white/50 text-xs font-medium hover:text-black dark:hover:text-white">24h</button>
                 </div>
               </div>
               
-              <div className="flex-1 bg-gray-100 dark:bg-black rounded-xl border border-black/5 dark:border-white/5 relative flex items-center justify-center overflow-hidden min-h-[300px]">
-                <div className="absolute inset-0 opacity-10 dark:opacity-20 bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:40px_40px]"></div>
-                
-                {/* Animated Heatmap Nodes */}
-                <motion.div animate={{ scale: [1, 1.1, 1], opacity: [0.7, 0.9, 0.7] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} className="absolute top-[60%] left-[30%] w-16 h-16" style={{ clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)", background: "linear-gradient(135deg, rgba(0,224,194,0.1), rgba(0,224,194,0.4))", boxShadow: "inset 0 0 10px rgba(0,224,194,1)" }}>
-                  <div className="absolute inset-0 m-auto w-1 h-1 bg-white rounded-full shadow-[0_0_10px_#00e0c2,0_0_20px_#00e0c2]"></div>
-                </motion.div>
-                <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 4, repeat: Infinity, delay: 1 }} className="absolute top-[40%] left-[45%] w-10 h-10 opacity-30" style={{ clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)", background: "rgba(139,92,246,0.5)" }}></motion.div>
-                <motion.div animate={{ scale: [1, 1.15, 1], opacity: [0.1, 0.3, 0.1] }} transition={{ duration: 2.5, repeat: Infinity, delay: 0.5 }} className="absolute top-[45%] left-[50%] w-10 h-10" style={{ clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)", background: "rgba(139,92,246,0.5)" }}></motion.div>
-                <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 3.5, repeat: Infinity, delay: 0.2 }} className="absolute top-[60%] left-[60%] w-12 h-12 opacity-50" style={{ clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)", background: "linear-gradient(135deg, rgba(168,85,247,0.2), rgba(168,85,247,0.6))" }}></motion.div>
-                
-                {/* Animated Paths */}
-                <motion.div initial={{ opacity: 0, width: 0 }} animate={{ opacity: 0.6, width: "3rem" }} transition={{ duration: 1.5, delay: 1 }} className="absolute top-[50%] left-[75%] h-2 rounded-full" style={{ background: "linear-gradient(90deg, rgba(217,70,239,0.2), rgba(217,70,239,0.8), rgba(217,70,239,0.2))", boxShadow: "0 0 15px rgba(217,70,239,0.6)" }}></motion.div>
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 0.4 }} transition={{ duration: 2, delay: 1.5 }} className="absolute top-[65%] left-[55%] w-12 h-[1px] bg-purple-500"></motion.div>
-
-                <div className="absolute bottom-4 left-4 bg-white/80 dark:bg-[#0d0d12]/80 backdrop-blur-md border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 flex gap-4 shadow-sm">
-                  <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-sm bg-black/30 dark:bg-white/30" style={{ clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" }}></div><span className="text-black/60 dark:text-white/60 text-xs">Low</span></div>
-                  <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-sm bg-purple-500" style={{ clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" }}></div><span className="text-black/60 dark:text-white/60 text-xs">Mid</span></div>
-                  <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-sm bg-[#00e0c2]" style={{ clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" }}></div><span className="text-black/60 dark:text-white/60 text-xs">High</span></div>
+              {selectedEventId ? (
+                <TapHeatmap postId={selectedEventId} />
+              ) : (
+                <div className="flex-1 min-h-[350px] rounded-xl bg-gray-100 dark:bg-black border border-black/5 dark:border-white/5 flex items-center justify-center text-sm text-black/40 dark:text-white/40">
+                  Select an event to view heatmap
                 </div>
-              </div>
+              )}
             </motion.div>
 
             {/* Top Attendees */}
