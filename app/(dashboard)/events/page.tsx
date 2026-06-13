@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import TopNav from "@/src/components/layout/TopNav";
 import { getUserDetail } from "@/src/api/user.detail";
 import { getHostedEvents, getEventAttendees, deleteEventPost } from "@/src/api/events";
-import { 
-  Calendar, Users, CheckCircle, XCircle, Clock, 
+import {
+  Calendar, Users, CheckCircle, XCircle, Clock,
   MapPin, Loader2, User, ShieldCheck, Plus, Edit3, Trash2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -44,7 +44,7 @@ const item = {
 
 export default function EventsPage() {
   const [userProfile, setUserProfile] = useState<any>(null);
-  
+
   // Data states
   const [events, setEvents] = useState<HostedEvent[]>([]);
   const [isLoadingEvents, setIsLoadingEvents] = useState(true);
@@ -136,7 +136,7 @@ export default function EventsPage() {
       <TopNav title="Event Management" userProfile={userProfile} />
 
       <main className="flex-1 overflow-hidden flex flex-col mt-2 px-4 md:px-8">
-        
+
         {/* Header Section */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
@@ -145,7 +145,7 @@ export default function EventsPage() {
               Hosted Campaigns
             </h2>
           </div>
-          
+
           <button
             onClick={() => setShowCreateEvent(true)}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-black/10 dark:border-white/10 hover:border-[var(--accent-primary)] hover:bg-white/5 text-black dark:text-white transition-all text-xs font-display font-extrabold uppercase tracking-wider cursor-pointer"
@@ -177,8 +177,8 @@ export default function EventsPage() {
               ) : (
                 <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {events.map((evt) => (
-                    <motion.div 
-                      key={evt.post_id} 
+                    <motion.div
+                      key={evt.post_id}
                       variants={item}
                       whileHover={{ y: -4 }}
                       className="bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl overflow-hidden flex flex-col shadow-sm backdrop-blur-md transition-all duration-250 group"
@@ -186,42 +186,42 @@ export default function EventsPage() {
                       {/* Image section with 16:9 scale and hover zoom */}
                       <div className="aspect-video bg-black/40 relative flex items-center justify-center overflow-hidden border-b border-white/5">
                         {(() => {
-                          const imgSrc = evt.media && evt.media.length > 0 
+                          const imgSrc = evt.media && evt.media.length > 0
                             ? (typeof evt.media[0] === 'string' ? evt.media[0] : (evt.media[0]?.media_url || evt.media[0]?.file_url || evt.media[0]?.url))
                             : null;
-                          
+
                           if (imgSrc) {
                             return (
                               <>
-                                <Image 
-                                  src={imgSrc} 
-                                  alt="Background blur" 
+                                <Image
+                                  src={imgSrc}
+                                  alt="Background blur"
                                   fill
-                                  className="object-cover blur-xl opacity-20 scale-110" 
+                                  className="object-cover blur-xl opacity-20 scale-110"
                                 />
-                                <Image 
-                                  src={imgSrc} 
-                                  alt={evt.about || "Event"} 
+                                <Image
+                                  src={imgSrc}
+                                  alt={evt.about || "Event"}
                                   fill
-                                  className="object-cover z-10 p-0 transition-transform duration-500 group-hover:scale-105" 
+                                  className="object-cover z-10 p-0 transition-transform duration-500 group-hover:scale-105"
                                 />
                               </>
                             );
                           }
                           return <Calendar className="w-10 h-10 text-white/10 relative z-10" />;
                         })()}
-                        
+
                         {/* Static Host Tag */}
                         <div className="absolute top-3 right-3 bg-black/80 backdrop-blur-md text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg border border-white/10 text-white flex items-center gap-1.5 shadow-md z-20">
                           <ShieldCheck className="w-3.5 h-3.5 text-[#00e0c2]" /> Host
                         </div>
                       </div>
-                      
+
                       <div className="p-5 flex-1 flex flex-col justify-between">
                         <div>
                           {/* Title in display font */}
                           <h3 className="font-display font-extrabold text-lg uppercase tracking-tight text-black dark:text-white mb-3 line-clamp-1">{evt.about}</h3>
-                          
+
                           <div className="space-y-2 mb-6">
                             <div className="flex items-center gap-2.5 text-black/50 dark:text-white/50 text-xs font-mono">
                               <Clock className="w-3.5 h-3.5 text-white/30" />
@@ -235,22 +235,22 @@ export default function EventsPage() {
                         </div>
 
                         <div className="pt-4 border-t border-black/5 dark:border-white/5 flex gap-2">
-                          <button 
+                          <button
                             onClick={() => openAttendeesModal(evt.post_id)}
                             className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-transparent border border-black/10 dark:border-white/10 hover:border-[#00e0c2] hover:bg-[#00e0c2]/5 text-[#00e0c2] text-xs font-display font-extrabold uppercase tracking-wider transition-colors cursor-pointer"
                           >
                             <Users className="w-3.5 h-3.5" /> Attendees
                           </button>
-                          
-                          <button 
+
+                          <button
                             onClick={() => { setEditingEvent(evt); setShowEditModal(true); }}
                             className="flex items-center justify-center p-2.5 rounded-xl border border-black/10 dark:border-white/10 hover:bg-white/5 text-black/60 dark:text-white/60 hover:text-[#00e0c2] transition-colors cursor-pointer"
                             title="Edit Event"
                           >
                             <Edit3 className="w-4 h-4" />
                           </button>
-                          
-                          <button 
+
+                          <button
                             onClick={() => setEventToDeleteId(evt.post_id)}
                             className="flex items-center justify-center p-2.5 rounded-xl border border-red-500/20 hover:bg-red-500/10 text-red-500 transition-colors cursor-pointer"
                             title="Delete Event"
@@ -291,14 +291,14 @@ export default function EventsPage() {
                   <Users className="w-5 h-5 text-[#00e0c2]" />
                   Approved Attendees
                 </h3>
-                <button 
+                <button
                   onClick={closeAttendeesModal}
                   className="p-1 rounded-full hover:bg-white/10 text-white/50 transition-colors"
                 >
                   <XCircle className="w-5 h-5" />
                 </button>
               </div>
-              
+
               <div className="flex-1 overflow-y-auto p-2 custom-scrollbar">
                 {isLoadingAttendees ? (
                   <div className="flex items-center justify-center h-40">
@@ -376,7 +376,7 @@ export default function EventsPage() {
                   Are you sure you want to delete this event? This action will permanently remove it from the NextVibe registry.
                 </p>
               </div>
-              
+
               {deleteError && (
                 <div className="text-xs text-red-500 bg-red-500/10 border border-red-500/20 px-3 py-2 rounded-xl">
                   {deleteError}

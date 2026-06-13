@@ -15,21 +15,27 @@
   background-color: var(--accent-primary) !important;
   transition: background-color 0.2s ease, transform 0.1s ease;
 }
+
 .dynamic-accent-btn:hover {
   background-color: var(--accent-hover) !important;
 }
+
 .dynamic-accent-text {
   color: var(--accent-primary) !important;
 }
+
 .dynamic-accent-border {
   border-color: var(--accent-primary) !important;
 }
+
 .dynamic-accent-bg-glow {
   background-color: var(--accent-glow) !important;
 }
+
 .dynamic-accent-ring {
   box-shadow: 0 0 0 2px var(--accent-glow) !important;
 }
+
 .dynamic-accent-shadow {
   box-shadow: 0 4px 12px var(--accent-glow) !important;
 }
@@ -43,7 +49,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-dm-sans);
-  --font-display: var(--font-syne);
+  --font-display: var(--font-outfit);
   --font-mono: var(--font-space-mono);
 }
 
@@ -54,7 +60,12 @@ body {
   transition: background-color 0.2s, color 0.2s;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-display), sans-serif;
 }
 
@@ -69,13 +80,16 @@ h1, h2, h3, h4, h5, h6 {
   width: 6px;
   height: 6px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 99px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
 }

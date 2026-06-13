@@ -38,11 +38,22 @@ export default function HelpPage() {
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   useEffect(() => {
     getUserDetail(undefined, true)
       .then((data) => setUserProfile(data))
       .catch(() => {});
+  }, []);
+
+  // Load Forminit SDK
+  useEffect(() => {
+    if (!document.querySelector('script[src="https://forminit.com/sdk/v1/forminit.js"]')) {
+      const script = document.createElement("script");
+      script.src = "https://forminit.com/sdk/v1/forminit.js";
+      script.async = true;
+      document.head.appendChild(script);
+    }
   }, []);
 
   const faqs: FAQItem[] = [
@@ -131,19 +142,45 @@ export default function HelpPage() {
     }
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !message) return;
 
+    const ForminitSDK = (window as any).Forminit;
+    if (!ForminitSDK) {
+      setSubmitError("Form SDK is still loading. Please try again in a moment.");
+      return;
+    }
+
     setIsSubmitting(true);
-    setTimeout(() => {
+    setSubmitError("");
+
+    try {
+      const forminit = new ForminitSDK();
+      const FORM_ID = "0g3q0bitemw";
+      const formData = new FormData();
+
+      formData.append("fi-text-name", name.trim());
+      formData.append("fi-text-email", email.trim());
+      formData.append("fi-text-message", message.trim());
+
+      const { error } = await forminit.submit(FORM_ID, formData);
+
+      if (error) {
+        console.error("Forminit API Error:", error);
+        setSubmitError(error.message || "Submission failed.");
+      } else {
+        setIsSubmitted(true);
+        setName("");
+        setEmail("");
+        setMessage("");
+      }
+    } catch (err: any) {
+      console.error("Form submission error:", err);
+      setSubmitError(err.message || "An unexpected error occurred.");
+    } finally {
       setIsSubmitting(false);
-      setIsSubmitted(true);
-      setName("");
-      setEmail("");
-      setMessage("");
-      setTimeout(() => setIsSubmitted(false), 5000);
-    }, 1500);
+    }
   };
 
   return (
@@ -368,6 +405,12 @@ export default function HelpPage() {
                         </>
                       )}
                     </button>
+
+                    {submitError && (
+                      <p className="text-xs text-red-400 text-center mt-2">
+                        {submitError}
+                      </p>
+                    )}
                   </form>
                 )}
               </div>

@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import GoogleProvider from "./GoogleProvider";
 import AuthProvider from "./AuthProvider";
 import AxiosInit from "./AxiosInit";
+import DemoModeProvider from "@/src/contexts/DemoModeContext";
 
 // Динамічно імпортуємо SolanaProvider, жорстко вимикаючи серверний рендеринг
 const SolanaProvider = dynamic(() => import("./SolanaProvider"), {
@@ -50,12 +51,14 @@ export default function Providers({ children }: { children: ReactNode }) {
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
       <AuthProvider>
         <AxiosInit />
-        <SolanaProvider>
-          <GoogleProvider>
-            <AccentLoader />
-            {children}
-          </GoogleProvider>
-        </SolanaProvider>
+        <DemoModeProvider>
+          <SolanaProvider>
+            <GoogleProvider>
+              <AccentLoader />
+              {children}
+            </GoogleProvider>
+          </SolanaProvider>
+        </DemoModeProvider>
       </AuthProvider>
     </ThemeProvider>
   );

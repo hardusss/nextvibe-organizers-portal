@@ -1,10 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  devIndicators: {
-    position: 'bottom-right',
-  },
+  devIndicators: false,
   trailingSlash: true,
+  
   images: {
     remotePatterns: [
       {

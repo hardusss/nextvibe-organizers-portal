@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Syne, DM_Sans, Space_Mono } from "next/font/google";
+import { Outfit, DM_Sans, Space_Mono } from "next/font/google";
 import Providers from "@/src/components/providers/Providers";
 import "./globals.css";
 
-const syne = Syne({
-  variable: "--font-syne",
+const outfit = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin"],
-  weight: ["400", "700", "800"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 const dmSans = DM_Sans({
@@ -34,7 +34,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${syne.variable} ${dmSans.variable} ${spaceMono.variable} h-full antialiased`}
+      className={`${outfit.variable} ${dmSans.variable} ${spaceMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>

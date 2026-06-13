@@ -28,7 +28,7 @@ export default function TopNav({ title, userProfile }: TopNavProps) {
   return (
     <header className="flex items-center justify-between px-4 md:px-8 py-4 md:py-6 shrink-0">
       <div className="flex items-center gap-3">
-        <button 
+        <button
           onClick={toggleMobileMenu}
           className="md:hidden p-2 -ml-2 rounded-lg text-black/70 dark:text-white/70 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
         >
@@ -39,7 +39,7 @@ export default function TopNav({ title, userProfile }: TopNavProps) {
       </div>
 
       <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-        <motion.button 
+        <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={toggleTheme}
@@ -55,8 +55,8 @@ export default function TopNav({ title, userProfile }: TopNavProps) {
             {userProfile?.avatar ? (
               <Image src={userProfile.avatar} alt="Avatar" width={32} height={32} className="object-cover w-full h-full" />
             ) : (
-              <div 
-                className="w-full h-full opacity-90 bg-cover bg-white" 
+              <div
+                className="w-full h-full opacity-90 bg-cover bg-white"
                 style={{ backgroundImage: `url('https://api.dicebear.com/7.x/avataaars/svg?seed=${userProfile?.username || userProfile?.email || 'organizer'}')` }}
               ></div>
             )}

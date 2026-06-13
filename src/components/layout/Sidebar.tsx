@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/src/components/providers/AuthProvider";
 import { useMobileMenu } from "@/src/contexts/MobileMenuContext";
+import { useDemoMode } from "@/src/contexts/DemoModeContext";
 import {
   LayoutDashboard,
   Calendar,
@@ -17,6 +18,7 @@ import {
   LogOut,
   Plus,
   X,
+  FlaskConical,
 } from "lucide-react";
 import CreateEventModal from "@/src/components/modals/CreateEventModal";
 
@@ -34,6 +36,7 @@ export default function Sidebar() {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showCreateEvent, setShowCreateEvent] = useState(false);
   const { isMobileMenuOpen, closeMobileMenu } = useMobileMenu();
+  const { isDemoMode, canAccessDemo, toggleDemoMode } = useDemoMode();
 
   return (
     <>
@@ -141,6 +144,35 @@ export default function Sidebar() {
             <LogOut className="w-5 h-5 text-[#ff6b6b]/60 group-hover:text-[#ff6b6b]" />
             <span className="text-sm font-medium tracking-tight">Logout</span>
           </button>
+
+          {canAccessDemo && (
+            <div className="mt-3 pt-3 border-t border-black/5 dark:border-white/5">
+              <button
+                onClick={toggleDemoMode}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors group cursor-pointer hover:bg-black/5 dark:hover:bg-white/5"
+              >
+                <div className="flex items-center gap-3">
+                  <FlaskConical className={`w-5 h-5 transition-colors ${
+                    isDemoMode ? "text-[var(--accent-primary,#8b5cf6)]" : "text-black/40 dark:text-white/40"
+                  }`} />
+                  <span className={`text-sm font-medium tracking-tight transition-colors ${
+                    isDemoMode ? "text-black dark:text-white" : "text-black/50 dark:text-white/50"
+                  }`}>Demo Mode</span>
+                </div>
+                <div className={`relative w-10 h-[22px] rounded-full transition-colors duration-300 ${
+                  isDemoMode
+                    ? "bg-[var(--accent-primary,#8b5cf6)]"
+                    : "bg-black/10 dark:bg-white/10"
+                }`}>
+                  <motion.div
+                    className="absolute top-[3px] w-4 h-4 rounded-full bg-white shadow-sm"
+                    animate={{ left: isDemoMode ? 21 : 3 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  />
+                </div>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
