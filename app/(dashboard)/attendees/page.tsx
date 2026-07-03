@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import TopNav from "@/src/components/layout/TopNav";
 import { getUserDetail } from "@/src/api/user.detail";
 import { getEventRequests, actOnEventRequest } from "@/src/api/events";
-import { Calendar, Users, CheckCircle, XCircle, Loader2, User } from "lucide-react";
+import { Calendar, Users, CheckCircle, XCircle, Loader2, User, ShieldAlert } from "lucide-react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useRole } from "@/src/contexts/RoleContext";
 
 interface EventRequest {
   id: number;
@@ -34,8 +35,10 @@ export default function AttendeesPage() {
   const [requests, setRequests] = useState<EventRequest[]>([]);
   const [isLoadingRequests, setIsLoadingRequests] = useState(true);
   const [processingAction, setProcessingAction] = useState<number | null>(null);
+  const { role } = useRole();
 
   useEffect(() => {
+    if (role === "sponsor") return; // Skip fetching if role is sponsor
     const token = typeof window !== "undefined" ? localStorage.getItem("nextvibe_access") : null;
     if (!token) return;
 
@@ -49,7 +52,29 @@ export default function AttendeesPage() {
     };
     fetchUser();
     fetchRequests();
-  }, []);
+  }, [role]);
+
+  if (role === "sponsor") {
+    return (
+      <div className="flex flex-col h-full overflow-hidden transition-colors duration-200">
+        <TopNav title="Registration Requests" userProfile={userProfile} />
+        <main className="flex-1 flex flex-col items-center justify-center p-4">
+          <div className="max-w-md w-full bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-8 shadow-sm backdrop-blur-md text-center space-y-6">
+            <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto text-red-500">
+              <ShieldAlert className="w-8 h-8" />
+            </div>
+            <div className="space-y-2">
+              <span className="text-[10px] tracking-widest text-red-500 font-mono font-bold uppercase">access restricted</span>
+              <h2 className="text-xl font-display font-extrabold uppercase text-black dark:text-white tracking-tight">Organizer Role Required</h2>
+              <p className="text-xs text-black/50 dark:text-white/40 leading-relaxed font-mono">
+                Sponsors do not have access to the global Registration Queue or other organizers' attendees lists.
+              </p>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   const fetchRequests = async () => {
     setIsLoadingRequests(true);

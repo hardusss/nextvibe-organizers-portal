@@ -13,14 +13,17 @@ import {
   Moon, 
   Sparkles,
   VolumeX,
-  Volume1
+  Volume1,
+  ShieldAlert
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
+import { useRole } from "@/src/contexts/RoleContext";
 
 export default function SettingsPage() {
   const [userProfile, setUserProfile] = useState<any>(null);
   const { theme, setTheme } = useTheme();
+  const { role } = useRole();
   
   // Wallet states
   const [walletAddress, setWalletAddress] = useState("4k3DyjzvzpEs41D6y289as71bM4rD8z9zKk27a819b10");
@@ -135,6 +138,28 @@ export default function SettingsPage() {
     { id: "cyan", name: "Cyan", bg: "bg-[#00E5CC]" },
     { id: "orange", name: "Amber", bg: "bg-orange-500" },
   ];
+
+  if (role === "sponsor") {
+    return (
+      <div className="flex flex-col h-full overflow-hidden transition-colors duration-200">
+        <TopNav title="Settings" userProfile={userProfile} />
+        <main className="flex-1 flex flex-col items-center justify-center p-4">
+          <div className="max-w-md w-full bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-8 shadow-sm backdrop-blur-md text-center space-y-6">
+            <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto text-red-500">
+              <ShieldAlert className="w-8 h-8" />
+            </div>
+            <div className="space-y-2">
+              <span className="text-[10px] tracking-widest text-red-500 font-mono font-bold uppercase">access restricted</span>
+              <h2 className="text-xl font-display font-extrabold uppercase text-black dark:text-white tracking-tight">Organizer Role Required</h2>
+              <p className="text-xs text-black/50 dark:text-white/40 leading-relaxed font-mono">
+                Sponsors do not have access to global Portal Settings.
+              </p>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full overflow-y-auto custom-scrollbar pb-8 transition-colors duration-200 relative">
