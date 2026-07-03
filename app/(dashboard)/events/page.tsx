@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import CreateEventModal from "@/src/components/modals/CreateEventModal";
 import EditEventModal from "@/src/components/modals/EditEventModal";
+import { useRole } from "@/src/contexts/RoleContext";
 
 interface HostedEvent {
   user_id: number;
@@ -65,6 +66,7 @@ export default function EventsPage() {
   const [eventToDeleteId, setEventToDeleteId] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const { role, isSponsorEvent } = useRole();
 
   useEffect(() => {
     const token = typeof window !== "undefined" ? localStorage.getItem("nextvibe_access") : null;
@@ -80,13 +82,18 @@ export default function EventsPage() {
     };
     fetchUser();
     fetchEvents();
-  }, []);
+  }, [role]);
 
   const fetchEvents = async () => {
     setIsLoadingEvents(true);
     try {
       const data = await getHostedEvents();
-      setEvents(data.data || []);
+      const allEvents = data.data || [];
+      if (role === "sponsor") {
+        setEvents(allEvents.filter((evt: any) => isSponsorEvent(evt.post_id)));
+      } else {
+        setEvents(allEvents);
+      }
     } catch (error) {
       console.error("Failed to fetch events:", error);
     } finally {

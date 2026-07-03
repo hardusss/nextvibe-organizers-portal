@@ -12,6 +12,7 @@ import {
   extractBackendError,
   type LumaEventPreview, type PreviewResult,
 } from "@/src/api/events";
+import { useRole } from "@/src/contexts/RoleContext";
 
 interface Props {
   isOpen: boolean;
@@ -71,6 +72,7 @@ function CopyButton({ text }: { text: string }) {
 
 export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Props) {
   const [step, setStep] = useState<Step>(1);
+  const { role, addSponsorEventId } = useRole();
 
   // Step 1
   const [lumaUrl, setLumaUrl] = useState("");
@@ -192,7 +194,7 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
         throw new Error("Event cover image (banner) is required.");
       }
 
-      await createEventFull({
+      const newEventId = await createEventFull({
         lumaUrl: lumaUrl.trim(),
         about: about.trim(),
         location: location.trim() || undefined,
@@ -202,6 +204,10 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
         mediaFile: fileToUpload,
         onStep: (s) => setSubmitPhase(s),
       });
+
+      if (role === "sponsor" && newEventId) {
+        addSponsorEventId(newEventId);
+      }
 
       setTimeout(() => { resetAll(); onClose(); onEventCreated?.(); }, 1500);
     } catch (e) {
