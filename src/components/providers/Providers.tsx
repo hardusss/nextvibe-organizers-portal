@@ -6,6 +6,7 @@ import GoogleProvider from "./GoogleProvider";
 import AuthProvider from "./AuthProvider";
 import AxiosInit from "./AxiosInit";
 import DemoModeProvider from "@/src/contexts/DemoModeContext";
+import RoleProvider from "@/src/contexts/RoleContext";
 
 // Динамічно імпортуємо SolanaProvider, жорстко вимикаючи серверний рендеринг
 const SolanaProvider = dynamic(() => import("./SolanaProvider"), {
@@ -52,12 +53,14 @@ export default function Providers({ children }: { children: ReactNode }) {
       <AuthProvider>
         <AxiosInit />
         <DemoModeProvider>
-          <SolanaProvider>
-            <GoogleProvider>
-              <AccentLoader />
-              {children}
-            </GoogleProvider>
-          </SolanaProvider>
+          <RoleProvider>
+            <SolanaProvider>
+              <GoogleProvider>
+                <AccentLoader />
+                {children}
+              </GoogleProvider>
+            </SolanaProvider>
+          </RoleProvider>
         </DemoModeProvider>
       </AuthProvider>
     </ThemeProvider>

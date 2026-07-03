@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/src/components/providers/AuthProvider";
 import { useMobileMenu } from "@/src/contexts/MobileMenuContext";
 import { useDemoMode } from "@/src/contexts/DemoModeContext";
+import { useRole } from "@/src/contexts/RoleContext";
 import {
   LayoutDashboard,
   Calendar,
@@ -37,6 +38,14 @@ export default function Sidebar() {
   const [showCreateEvent, setShowCreateEvent] = useState(false);
   const { isMobileMenuOpen, closeMobileMenu } = useMobileMenu();
   const { isDemoMode, canAccessDemo, toggleDemoMode } = useDemoMode();
+  const { role, setRole } = useRole();
+
+  const visibleNavigation = navigation.filter((item) => {
+    if (role === "sponsor") {
+      return item.name !== "Attendees" && item.name !== "Settings";
+    }
+    return true;
+  });
 
   return (
     <>
@@ -54,22 +63,50 @@ export default function Sidebar() {
       </AnimatePresence>
 
       <div className={`fixed inset-y-0 left-0 z-50 flex flex-col w-64 bg-white dark:bg-[#05070a] border-r border-black/5 dark:border-white/5 h-[100dvh] transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
-        <div className="p-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-              <Image src="/logo.png" alt="NextVibe" width={32} height={32} className="object-cover" />
+        <div className="p-6 pb-4 flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                <Image src="/logo.png" alt="NextVibe" width={32} height={32} className="object-cover" />
+              </div>
+              <div>
+                <h1 className="text-black dark:text-white font-display font-extrabold text-xl tracking-tight leading-tight uppercase">NextVibe</h1>
+                <p className="text-black/40 dark:text-white/40 font-sans text-[10px] uppercase tracking-widest font-bold">
+                  {role === "sponsor" ? "Sponsor Portal" : "Organizer Portal"}
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-black dark:text-white font-display font-extrabold text-xl tracking-tight leading-tight uppercase">NextVibe</h1>
-              <p className="text-black/40 dark:text-white/40 font-sans text-[10px] uppercase tracking-widest font-bold">Organizer Portal</p>
-            </div>
+            <button 
+              onClick={closeMobileMenu}
+              className="md:hidden p-2 rounded-lg text-black/50 dark:text-white/50 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
-          <button 
-            onClick={closeMobileMenu}
-            className="md:hidden p-2 rounded-lg text-black/50 dark:text-white/50 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+
+          {/* Role Toggle Switcher */}
+          <div className="flex rounded-xl bg-black/5 dark:bg-white/5 p-1 border border-black/10 dark:border-white/5 font-mono text-[9px] font-bold uppercase tracking-wider relative overflow-hidden">
+            <button
+              onClick={() => setRole("organizer")}
+              className={`flex-1 py-1.5 rounded-lg text-center transition-all relative z-10 cursor-pointer ${
+                role === "organizer"
+                  ? "text-white bg-[var(--accent-primary,#8b5cf6)] shadow-sm font-extrabold"
+                  : "text-black/50 dark:text-white/35 hover:text-black/80 dark:hover:text-white/70"
+              }`}
+            >
+              Organizer
+            </button>
+            <button
+              onClick={() => setRole("sponsor")}
+              className={`flex-1 py-1.5 rounded-lg text-center transition-all relative z-10 cursor-pointer ${
+                role === "sponsor"
+                  ? "text-white bg-[var(--accent-primary,#8b5cf6)] shadow-sm font-extrabold"
+                  : "text-black/50 dark:text-white/35 hover:text-black/80 dark:hover:text-white/70"
+              }`}
+            >
+              Sponsor
+            </button>
+          </div>
         </div>
 
         <div className="px-4 py-2">
@@ -81,9 +118,9 @@ export default function Sidebar() {
           </button>
         </div>
 
-        <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-          {navigation.map((item) => {
-            const isOtherActive = navigation
+        <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
+          {visibleNavigation.map((item) => {
+            const isOtherActive = visibleNavigation
               .filter((nav) => nav.href !== "/dashboard")
               .some((nav) => pathname === nav.href || pathname.startsWith(nav.href + "/"));
             const isActive =
