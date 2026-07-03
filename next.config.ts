@@ -1,10 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "export",
   devIndicators: false,
   trailingSlash: true,
   
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
@@ -19,14 +21,6 @@ const nextConfig: NextConfig = {
         hostname: "images.lumacdn.com",
       },
     ],
-  },
-  async rewrites() {
-    return [
-      {
-        source: "/api/v1/:path*",
-        destination: "https://api.nextvibe.io/api/v1/:path*/",
-      },
-    ];
   },
 };
 

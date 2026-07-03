@@ -62,6 +62,9 @@ export default function AnalyticsPage() {
   const [isLoadingSocialGraph, setIsLoadingSocialGraph] = useState<boolean>(false);
 
   useEffect(() => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("nextvibe_access") : null;
+    if (!token) return;
+
     const initData = async () => {
       try {
         const [profileData, eventsResponse] = await Promise.all([

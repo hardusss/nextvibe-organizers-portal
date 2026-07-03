@@ -41,9 +41,12 @@ export default function HelpPage() {
   const [submitError, setSubmitError] = useState("");
 
   useEffect(() => {
-    getUserDetail(undefined, true)
-      .then((data) => setUserProfile(data))
-      .catch(() => {});
+    const token = typeof window !== "undefined" ? localStorage.getItem("nextvibe_access") : null;
+    if (token) {
+      getUserDetail(undefined, true)
+        .then((data) => setUserProfile(data))
+        .catch(() => {});
+    }
   }, []);
 
   // Load Forminit SDK

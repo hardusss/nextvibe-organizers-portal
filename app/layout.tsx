@@ -35,6 +35,7 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${outfit.variable} ${dmSans.variable} ${spaceMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>

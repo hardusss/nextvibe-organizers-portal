@@ -40,9 +40,12 @@ export default function SettingsPage() {
 
   // Initialize data
   useEffect(() => {
-    getUserDetail(undefined, true)
-      .then((data) => setUserProfile(data))
-      .catch(() => {});
+    const token = typeof window !== "undefined" ? localStorage.getItem("nextvibe_access") : null;
+    if (token) {
+      getUserDetail(undefined, true)
+        .then((data) => setUserProfile(data))
+        .catch(() => {});
+    }
 
     setWalletAddress(localStorage.getItem("nextvibe_wallet") || "4k3DyjzvzpEs41D6y289as71bM4rD8z9zKk27a819b10");
     setMapZoom(localStorage.getItem("nextvibe_map_zoom") || "19");

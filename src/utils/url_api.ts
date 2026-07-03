@@ -1,4 +1,4 @@
-/** Base API URL — uses Next.js proxy to bypass CORS. */
+/** Base API URL — defaults to the production endpoint if no environment variable is specified. */
 export default function getApiUrl(): string {
-  return process.env.NEXT_PUBLIC_API_URL ?? "/api/v1";
+  return process.env.NEXT_PUBLIC_API_URL ?? "https://api.nextvibe.io/api/v1";
 }

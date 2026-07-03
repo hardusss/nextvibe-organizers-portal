@@ -29,6 +29,7 @@ export const useAuth = () => useContext(AuthContext);
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
   const [userId, setUserId] = useState<string | null>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -41,6 +42,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     if (storedId && storedAccess) {
       setUserId(storedId);
     }
+    setIsHydrated(true);
 
     const isAuthRoute = pathname === "/login" || pathname === "/login/";
 
@@ -61,6 +63,15 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     setUserId(null);
     router.replace("/login");
   }, [router]);
+
+  if (!isHydrated) {
+    return null;
+  }
+
+  const isAuthRoute = pathname === "/login" || pathname === "/login/";
+  if (!userId && !isAuthRoute) {
+    return null;
+  }
 
   return (
     <AuthContext.Provider

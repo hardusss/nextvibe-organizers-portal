@@ -67,6 +67,9 @@ export default function EventsPage() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("nextvibe_access") : null;
+    if (!token) return;
+
     const fetchUser = async () => {
       try {
         const data = await getUserDetail(undefined, true);

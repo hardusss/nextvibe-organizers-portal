@@ -36,6 +36,9 @@ export default function AttendeesPage() {
   const [processingAction, setProcessingAction] = useState<number | null>(null);
 
   useEffect(() => {
+    const token = typeof window !== "undefined" ? localStorage.getItem("nextvibe_access") : null;
+    if (!token) return;
+
     const fetchUser = async () => {
       try {
         const data = await getUserDetail(undefined, true);
