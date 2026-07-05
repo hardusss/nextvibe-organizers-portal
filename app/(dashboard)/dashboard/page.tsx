@@ -415,7 +415,7 @@ export default function AnalyticsPage() {
               <div className="flex justify-between items-start relative z-10">
                 <div className="space-y-0.5">
                   <h3 className="text-black/40 dark:text-white/40 text-[10px] font-mono tracking-widest font-bold uppercase">
-                    {role === "sponsor" ? "what happened next" : "peer connections"}
+                    {role === "sponsor" ? "what happened next" : "networking between people"}
                   </h3>
                   <p className="text-[9px] text-black/50 dark:text-white/40 font-mono uppercase tracking-wide leading-normal">
                     {role === "sponsor"
@@ -573,14 +573,14 @@ export default function AnalyticsPage() {
                 )}
               </motion.div>
 
-              {/* Card 4: cNFT Claims (Compact) */}
+              {/* Card 4: POAP Claims (Compact) */}
               <motion.div
                 variants={item}
                 whileHover={{ y: -4 }}
                 className="bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-5 flex flex-col justify-between shadow-sm backdrop-blur-md transition-all duration-250 cursor-default min-h-[160px]"
               >
                 <div className="flex justify-between items-start">
-                  <h3 className="text-black/40 dark:text-white/40 text-[10px] font-mono tracking-widest font-bold uppercase">cnft claims</h3>
+                  <h3 className="text-black/40 dark:text-white/40 text-[10px] font-mono tracking-widest font-bold uppercase">poap claims</h3>
                   <div className="p-1.5 bg-black/5 dark:bg-white/5 rounded-lg border border-black/5 dark:border-white/5"><Award className="w-3.5 h-3.5 text-cyan-400" /></div>
                 </div>
 

@@ -415,8 +415,8 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
                         creating: "Creating event post…",
                         uploading: "Uploading media…",
                         finalizing: "Submitting for moderation…",
-                        minting: "Minting event cNFT…",
-                        done: "Event created & cNFT minted!"
+                        minting: "Minting event POAP…",
+                        done: "Event created & POAP minted!"
                       };
                       const order = ["creating", "uploading", "finalizing", "minting", "done"];
                       const ci = order.indexOf(submitPhase || "creating");
@@ -439,7 +439,7 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
                     {submitPhase === "done" && (
                       <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
                         className="flex items-center justify-center gap-2 pt-4 text-[#00e0c2] font-semibold text-sm font-display uppercase tracking-wider">
-                        <Sparkles className="w-5 h-5" /> Live cNFT Event registered!
+                        <Sparkles className="w-5 h-5" /> Live POAP Event registered!
                       </motion.div>
                     )}
                   </motion.div>

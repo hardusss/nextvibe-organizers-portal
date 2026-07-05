@@ -69,8 +69,8 @@ export default function HelpPage() {
       a: "We use Uber's H3 spatial index at resolution level 7. Taps that occur outside the geofence area or are spoofed are caught by this filter. This ensures only genuine, physical check-ins and attendee exchanges receive reputation points."
     },
     {
-      q: "How does automated Solana cNFT minting execute?",
-      a: "When an attendee is successfully checked in at the door, the backend triggers an automated transaction using nextvibe nft-service. A compressed NFT (cNFT) is minted to the attendee's Solana wallet representing their attendance proof."
+      q: "How does automated Solana POAP minting execute?",
+      a: "When an attendee is successfully checked in at the door, the backend triggers an automated transaction using nextvibe nft-service. A POAP is minted to the attendee's Solana wallet representing their attendance proof."
     },
     {
       q: "Can I edit or delete events once they are created?",
@@ -131,14 +131,14 @@ export default function HelpPage() {
     },
     {
       title: "4. Automated Minting",
-      description: "Once checked in, the NextVibe backend automatically mints a Solana compressed NFT (cNFT) containing the event details directly to their wallet address.",
+      description: "Once checked in, the NextVibe backend automatically mints a Solana POAP containing the event details directly to their wallet address.",
       icon: Sparkles,
       visual: () => (
         <div className="flex flex-col items-center justify-center p-4 h-full bg-white/[0.01] border border-white/5 rounded-xl gap-2 text-center">
           <div className="w-8 h-8 bg-[#00e0c2]/10 border border-[#00e0c2]/20 rounded-lg flex items-center justify-center">
             <Sparkles className="w-4 h-4 text-[#00e0c2]" />
           </div>
-          <span className="text-[9px] font-mono text-white/40 uppercase tracking-wide">Minting cNFT...</span>
+          <span className="text-[9px] font-mono text-white/40 uppercase tracking-wide">Minting POAP...</span>
           <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-500 flex items-center gap-1 justify-center"><CheckCircle2 className="w-3.5 h-3.5" /> Minted</span>
         </div>
       )
