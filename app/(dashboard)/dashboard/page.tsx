@@ -233,6 +233,10 @@ export default function AnalyticsPage() {
 
   const selectedEvent = visibleEvents.find(e => e.post_id === selectedEventId);
 
+  const lastHourNetworking = analytics?.hourly_activity && analytics.hourly_activity.length > 0
+    ? analytics.hourly_activity[analytics.hourly_activity.length - 1].networking
+    : 0;
+
   // If sponsor has no side events, show empty state prompt
   if (role === "sponsor" && visibleEvents.length === 0) {
     return (
@@ -443,7 +447,7 @@ export default function AnalyticsPage() {
                     {/* Live trend badge */}
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-mono font-bold text-emerald-500 uppercase tracking-wider">
                       <TrendingUp className="w-3 h-3" />
-                      {role === "sponsor" ? "+120" : "+180"} last hr
+                      +{role === "sponsor" ? Math.round(lastHourNetworking * 0.68) : lastHourNetworking} last hr
                     </span>
                   </div>
 
