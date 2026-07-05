@@ -93,8 +93,8 @@ export default function AttendeesPage() {
     try {
       await actOnEventRequest(requestId, action);
       // Optimistic update
-      setRequests((prev) => 
-        prev.map((req) => 
+      setRequests((prev) =>
+        prev.map((req) =>
           req.id === requestId ? { ...req, status: action === "approve" ? "approved" : "rejected" } : req
         )
       );
@@ -117,7 +117,7 @@ export default function AttendeesPage() {
       <TopNav title="Registration Requests" userProfile={userProfile} />
 
       <main className="flex-1 overflow-hidden flex flex-col mt-2 px-4 md:px-8">
-        
+
         {/* Title Block */}
         <div className="mb-6 flex flex-col gap-1">
           <span className="text-[10px] tracking-widest text-[#00e0c2] font-mono font-bold uppercase">incoming requests</span>
@@ -139,13 +139,13 @@ export default function AttendeesPage() {
           ) : (
             <motion.div variants={container} initial="hidden" animate="show" className="grid gap-4">
               {requests.map((request) => (
-                <motion.div 
-                  key={request.id} 
+                <motion.div
+                  key={request.id}
                   variants={item}
                   className="bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-4 md:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm backdrop-blur-md transition-all duration-200"
                 >
                   <div className="flex items-center gap-3.5 w-full sm:w-auto">
-                    
+
                     {/* Styled Avatar Placeholder */}
                     <div className="w-11 h-11 rounded-full overflow-hidden border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 flex items-center justify-center font-display font-extrabold text-sm text-[#00e0c2] uppercase tracking-wide">
                       {request.avatar ? (
@@ -154,7 +154,7 @@ export default function AttendeesPage() {
                         request.username ? request.username.charAt(0) : <User className="w-4 h-4 text-white/30" />
                       )}
                     </div>
-                    
+
                     <div>
                       <div className="font-display font-bold uppercase text-sm text-black dark:text-white tracking-tight">{request.username}</div>
                       <div className="text-black/50 dark:text-white/50 text-xs flex items-center gap-1.5 mt-1">
@@ -171,7 +171,7 @@ export default function AttendeesPage() {
                   <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto mt-2 sm:mt-0">
                     {request.status === "pending" ? (
                       <div className="flex items-center gap-2 w-full sm:w-auto">
-                        <button 
+                        <button
                           onClick={() => handleAction(request.id, "reject")}
                           disabled={processingAction === request.id}
                           className="flex-1 sm:flex-none justify-center px-4 py-2.5 rounded-xl border border-red-500/20 hover:bg-red-500/10 text-red-500 text-xs font-display font-extrabold uppercase tracking-wider transition-colors flex items-center gap-2 disabled:opacity-50 cursor-pointer"
@@ -179,8 +179,8 @@ export default function AttendeesPage() {
                           {processingAction === request.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <XCircle className="w-3.5 h-3.5" />}
                           Reject
                         </button>
-                        
-                        <button 
+
+                        <button
                           onClick={() => handleAction(request.id, "approve")}
                           disabled={processingAction === request.id}
                           className="flex-1 sm:flex-none justify-center px-4 py-2.5 rounded-xl border border-[#00e0c2]/20 hover:bg-[#00e0c2]/10 text-[#00e0c2] text-xs font-display font-extrabold uppercase tracking-wider transition-colors flex items-center gap-2 disabled:opacity-50 cursor-pointer"
@@ -190,11 +190,10 @@ export default function AttendeesPage() {
                         </button>
                       </div>
                     ) : (
-                      <div className={`px-3 py-1.5 rounded-lg border text-[10px] font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 ${
-                        request.status === "approved" 
+                      <div className={`px-3 py-1.5 rounded-lg border text-[10px] font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 ${request.status === "approved"
                           ? "border-[#00e0c2]/20 bg-[#00e0c2]/5 text-[#00e0c2]"
                           : "border-red-500/20 bg-red-500/5 text-red-400"
-                      }`}>
+                        }`}>
                         {request.status === "approved" ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
                         {request.status}
                       </div>

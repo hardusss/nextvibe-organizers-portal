@@ -3,16 +3,16 @@
 import { useEffect, useState } from "react";
 import TopNav from "@/src/components/layout/TopNav";
 import { getUserDetail } from "@/src/api/user.detail";
-import { 
-  getHostedEvents, 
-  getEventAnalytics, 
-  getEventTopUsers, 
-  getEventSocialGraph, 
-  type TopUser, 
-  type EventAnalyticsData, 
-  type SocialGraphData 
+import {
+  getHostedEvents,
+  getEventAnalytics,
+  getEventTopUsers,
+  getEventSocialGraph,
+  type TopUser,
+  type EventAnalyticsData,
+  type SocialGraphData
 } from "@/src/api/events";
-import { 
+import {
   FileText, Radio, Fingerprint, Award, ChevronRight, Activity, Star, ChevronDown, Users,
   Tv, X, ShieldAlert, AlertCircle, Volume2, TrendingUp, Calendar
 } from "lucide-react";
@@ -125,12 +125,12 @@ export default function AnalyticsPage() {
           getUserDetail(undefined, true),
           getHostedEvents()
         ]);
-        
+
         setUserProfile(profileData);
-        
+
         const evts = eventsResponse.data || [];
         evts.sort((a: any, b: any) => new Date(b.create_at).getTime() - new Date(a.create_at).getTime());
-        
+
         setEvents(evts);
       } catch (error) {
         console.error("Failed to initialize dashboard data:", error);
@@ -258,11 +258,11 @@ export default function AnalyticsPage() {
 
   return (
     <div className="flex flex-col h-full overflow-y-auto custom-scrollbar pb-8 transition-colors duration-200">
-      
+
       {/* Fullscreen Projected Screen Leaderboard */}
       <AnimatePresence>
         {isFullscreenLeaderboardOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -352,13 +352,13 @@ export default function AnalyticsPage() {
         )}
       </AnimatePresence>
 
-      <TopNav 
+      <TopNav
         title="Dashboard"
-        userProfile={userProfile} 
+        userProfile={userProfile}
       />
 
       <main className="px-4 md:px-8 flex-1 flex flex-col gap-8 mt-2">
-        
+
         {/* Editorial Event Selector Header */}
         <div className="flex flex-col gap-2">
           <span className="text-[10px] tracking-widest text-[#00e0c2] font-mono font-bold uppercase">active session telemetry</span>
@@ -369,8 +369,8 @@ export default function AnalyticsPage() {
                   {selectedEvent?.about || 'Select Event'}
                   <ChevronDown className="w-5 h-5 text-black/35 dark:text-white/35 group-hover:text-black/70 dark:group-hover:text-white/70 transition-colors" />
                 </h1>
-                
-                <select 
+
+                <select
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   value={selectedEventId || ''}
                   onChange={(e) => setSelectedEventId(Number(e.target.value))}
@@ -385,14 +385,14 @@ export default function AnalyticsPage() {
             ) : (
               <h1 className="text-2xl md:text-3xl font-display font-extrabold uppercase text-black dark:text-white tracking-tight">Overview</h1>
             )}
-            
+
             <p className="text-black/50 dark:text-white/50 text-xs font-medium max-w-xs sm:text-right">
               Live statistics and connection heatmaps synced with the Solana ledger.
             </p>
           </div>
         </div>
 
-        <motion.div 
+        <motion.div
           variants={container}
           initial="hidden"
           animate="show"
@@ -400,11 +400,11 @@ export default function AnalyticsPage() {
         >
           {/* ASYMMETRICAL STAT CARDS GRID WITH HERO METRIC */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
+
             {/* Promoted leftmost Hero Card (col-span-5) */}
-            <motion.div 
-              variants={item} 
-              whileHover={{ y: -4 }} 
+            <motion.div
+              variants={item}
+              whileHover={{ y: -4 }}
               className="lg:col-span-5 bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-6 flex flex-col justify-between shadow-sm backdrop-blur-md relative overflow-hidden transition-all duration-250 cursor-default min-h-[200px]"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--accent-glow)] rounded-full blur-[50px] opacity-60 pointer-events-none" />
@@ -414,7 +414,7 @@ export default function AnalyticsPage() {
                     {role === "sponsor" ? "what happened next" : "peer connections"}
                   </h3>
                   <p className="text-[9px] text-black/50 dark:text-white/40 font-mono uppercase tracking-wide leading-normal">
-                    {role === "sponsor" 
+                    {role === "sponsor"
                       ? "Peer connections made by attendees after visiting your booth/event"
                       : "Attendee ↔ attendee networking taps (earns reputation)"}
                   </p>
@@ -427,7 +427,7 @@ export default function AnalyticsPage() {
                   )}
                 </div>
               </div>
-              
+
               {isLoadingAnalytics ? (
                 <div className="animate-pulse space-y-4 w-full mt-6 relative z-10">
                   <div className="h-10 bg-black/10 dark:bg-white/10 rounded w-1/3"></div>
@@ -439,14 +439,14 @@ export default function AnalyticsPage() {
                     <span className="text-5xl font-mono font-bold text-black dark:text-white tracking-tight">
                       <CountUp to={role === "sponsor" ? Math.round((analytics.total_irl_taps || 0) * 0.68) : (analytics.total_irl_taps || 0)} />
                     </span>
-                    
+
                     {/* Live trend badge */}
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-mono font-bold text-emerald-500 uppercase tracking-wider">
                       <TrendingUp className="w-3 h-3" />
                       {role === "sponsor" ? "+120" : "+180"} last hr
                     </span>
                   </div>
-                  
+
                   <Sparkline />
                 </div>
               ) : (
@@ -456,18 +456,18 @@ export default function AnalyticsPage() {
 
             {/* Other 4 cards grouped beside/below the hero card (col-span-7) */}
             <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              
+
               {/* Card 1: Event Requests (Compact) */}
-              <motion.div 
-                variants={item} 
-                whileHover={{ y: -4 }} 
+              <motion.div
+                variants={item}
+                whileHover={{ y: -4 }}
                 className="bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-5 flex flex-col justify-between shadow-sm backdrop-blur-md transition-all duration-250 cursor-default min-h-[160px]"
               >
                 <div className="flex justify-between items-start">
                   <h3 className="text-black/40 dark:text-white/40 text-[10px] font-mono tracking-widest font-bold uppercase">event requests</h3>
                   <div className="p-1.5 bg-black/5 dark:bg-white/5 rounded-lg border border-black/5 dark:border-white/5"><FileText className="w-3.5 h-3.5 text-black/60 dark:text-white/60" /></div>
                 </div>
-                
+
                 {isLoadingAnalytics ? (
                   <div className="animate-pulse space-y-3 w-full mt-3">
                     <div className="h-6 bg-black/10 dark:bg-white/10 rounded w-1/3"></div>
@@ -478,13 +478,13 @@ export default function AnalyticsPage() {
                     <div className="text-3xl font-mono font-bold text-black dark:text-white tracking-tight">
                       <CountUp to={analytics.total_requests || 0} />
                     </div>
-                    
+
                     {/* Progress Bar */}
                     <div className="w-full flex h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
                       <div style={{ width: `${(analytics.accepted_requests / (analytics.total_requests || 1)) * 100}%` }} className="bg-[#00e0c2]"></div>
                       <div style={{ width: `${(analytics.rejected_requests / (analytics.total_requests || 1)) * 100}%` }} className="bg-red-500"></div>
                     </div>
-                    
+
                     <div className="flex items-center gap-2.5 text-[9px] font-mono font-bold uppercase flex-wrap">
                       <span className="text-[#00e0c2]"><CountUp to={analytics.accepted_requests || 0} /> Acc</span>
                       <span className="text-red-500"><CountUp to={analytics.rejected_requests || 0} /> Rej</span>
@@ -497,9 +497,9 @@ export default function AnalyticsPage() {
               </motion.div>
 
               {/* Card 2: Event Check-ins (Compact) */}
-              <motion.div 
-                variants={item} 
-                whileHover={{ y: -4 }} 
+              <motion.div
+                variants={item}
+                whileHover={{ y: -4 }}
                 className="bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-5 flex flex-col justify-between shadow-sm backdrop-blur-md transition-all duration-250 cursor-default min-h-[160px]"
               >
                 <div className="flex justify-between items-start">
@@ -511,7 +511,7 @@ export default function AnalyticsPage() {
                   </div>
                   <div className="p-1.5 bg-black/5 dark:bg-white/5 rounded-lg border border-black/5 dark:border-white/5 shrink-0 ml-2"><Radio className="w-3.5 h-3.5 text-black/60 dark:text-white/60" /></div>
                 </div>
-                
+
                 {isLoadingAnalytics ? (
                   <div className="animate-pulse space-y-3 w-full mt-3">
                     <div className="h-6 bg-black/10 dark:bg-white/10 rounded w-1/3"></div>
@@ -528,7 +528,7 @@ export default function AnalyticsPage() {
                         <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#00e0c2]"></span>
                       </span>
                     </div>
-                    
+
                     <div className="w-full h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
                       <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(100, (analytics.nfc_checkins / (analytics.total_requests || 1)) * 100)}%` }} transition={{ duration: 1, delay: 0.5 }} className="h-full bg-[#00e0c2] rounded-full"></motion.div>
                     </div>
@@ -542,9 +542,9 @@ export default function AnalyticsPage() {
               </motion.div>
 
               {/* Card 3: Rep Earned (Compact) */}
-              <motion.div 
-                variants={item} 
-                whileHover={{ y: -4 }} 
+              <motion.div
+                variants={item}
+                whileHover={{ y: -4 }}
                 className="bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-5 flex flex-col justify-between shadow-sm backdrop-blur-md relative overflow-hidden transition-all duration-250 cursor-default min-h-[160px]"
               >
                 <div className="absolute top-0 right-0 w-20 h-20 bg-[var(--accent-glow)] rounded-full blur-[30px] opacity-40 pointer-events-none" />
@@ -552,7 +552,7 @@ export default function AnalyticsPage() {
                   <h3 className="text-black/40 dark:text-white/40 text-[10px] font-mono tracking-widest font-bold uppercase">rep earned</h3>
                   <div className="p-1.5 bg-black/5 dark:bg-white/5 rounded-lg border border-black/5 dark:border-white/5"><Award className="w-3.5 h-3.5 text-[var(--accent-primary)]" /></div>
                 </div>
-                
+
                 {isLoadingAnalytics ? (
                   <div className="animate-pulse space-y-3 w-full mt-3 relative z-10">
                     <div className="h-6 bg-black/10 dark:bg-white/10 rounded w-1/3"></div>
@@ -570,16 +570,16 @@ export default function AnalyticsPage() {
               </motion.div>
 
               {/* Card 4: cNFT Claims (Compact) */}
-              <motion.div 
-                variants={item} 
-                whileHover={{ y: -4 }} 
+              <motion.div
+                variants={item}
+                whileHover={{ y: -4 }}
                 className="bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-5 flex flex-col justify-between shadow-sm backdrop-blur-md transition-all duration-250 cursor-default min-h-[160px]"
               >
                 <div className="flex justify-between items-start">
                   <h3 className="text-black/40 dark:text-white/40 text-[10px] font-mono tracking-widest font-bold uppercase">cnft claims</h3>
                   <div className="p-1.5 bg-black/5 dark:bg-white/5 rounded-lg border border-black/5 dark:border-white/5"><Award className="w-3.5 h-3.5 text-cyan-400" /></div>
                 </div>
-                
+
                 {isLoadingAnalytics ? (
                   <div className="animate-pulse space-y-3 w-full mt-3">
                     <div className="h-6 bg-black/10 dark:bg-white/10 rounded w-1/3"></div>
@@ -633,10 +633,10 @@ export default function AnalyticsPage() {
 
           {/* SECTION 2: MAP & LEADERBOARD SPLIT */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
+
             {/* Spatial Heatmap Box (col-span-8) */}
-            <motion.div 
-              variants={item} 
+            <motion.div
+              variants={item}
               className="lg:col-span-8 bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-5 md:p-6 flex flex-col shadow-sm backdrop-blur-md"
             >
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
@@ -649,7 +649,7 @@ export default function AnalyticsPage() {
                   <span className="text-[10px] font-mono uppercase tracking-wider font-bold text-red-500">Telemetry Feed</span>
                 </div>
               </div>
-              
+
               {selectedEventId ? (
                 <TapHeatmap postId={selectedEventId} />
               ) : (
@@ -660,8 +660,8 @@ export default function AnalyticsPage() {
             </motion.div>
 
             {/* Top Attendees Box with Live Leaderboard switch (col-span-4) */}
-            <motion.div 
-              variants={item} 
+            <motion.div
+              variants={item}
               className="lg:col-span-4 bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-5 md:p-6 flex flex-col shadow-sm backdrop-blur-md"
             >
               <div className="flex justify-between items-start mb-6">
@@ -679,21 +679,19 @@ export default function AnalyticsPage() {
                   <div className="flex bg-black/10 dark:bg-white/5 p-0.5 rounded-lg border border-black/5 dark:border-white/5 font-mono text-[9px] font-bold uppercase tracking-wider">
                     <button
                       onClick={() => setLeaderboardMode("private")}
-                      className={`px-2 py-1 rounded-md transition-all cursor-pointer ${
-                        leaderboardMode === "private"
+                      className={`px-2 py-1 rounded-md transition-all cursor-pointer ${leaderboardMode === "private"
                           ? "bg-[var(--accent-primary)] text-white font-extrabold"
                           : "text-black/40 dark:text-white/40 hover:text-white"
-                      }`}
+                        }`}
                     >
                       Priv
                     </button>
                     <button
                       onClick={() => setLeaderboardMode("public")}
-                      className={`px-2 py-1 rounded-md transition-all cursor-pointer ${
-                        leaderboardMode === "public"
+                      className={`px-2 py-1 rounded-md transition-all cursor-pointer ${leaderboardMode === "public"
                           ? "bg-[var(--accent-primary)] text-white font-extrabold"
                           : "text-black/40 dark:text-white/40 hover:text-white"
-                      }`}
+                        }`}
                     >
                       Pub
                     </button>
@@ -749,7 +747,7 @@ export default function AnalyticsPage() {
                             <span className={`font-mono text-xs font-bold w-4 text-center ${isTop3 ? "text-[#00e0c2]" : "text-white/35"}`}>
                               {rank}
                             </span>
-                            
+
                             <div className="w-9 h-9 rounded-full relative border border-white/10 flex items-center justify-center overflow-hidden bg-white/5">
                               {user.avatar ? (
                                 <img src={user.avatar} alt={user.username} className="w-full h-full object-cover" />
@@ -762,13 +760,13 @@ export default function AnalyticsPage() {
                                 </div>
                               )}
                             </div>
-                            
+
                             <div>
                               <div className="text-black dark:text-white font-semibold text-xs tracking-tight">{user.username}</div>
                               <div className="text-black/35 dark:text-white/35 text-[9px] font-mono uppercase tracking-wider">verified peer</div>
                             </div>
                           </div>
-                          
+
                           <div className="text-right">
                             <div className={`font-mono text-xs font-bold ${isTop3 ? "text-[#00e0c2]" : "text-white/80"}`}>
                               {user.total_taps} T
@@ -790,7 +788,7 @@ export default function AnalyticsPage() {
                           <span className={`font-mono text-xs font-bold w-4 text-center ${isTop3 ? "text-[#00e0c2]" : "text-white/35"}`}>
                             {rank}
                           </span>
-                          
+
                           <div className="w-9 h-9 rounded-full relative border border-white/10 flex items-center justify-center overflow-hidden bg-white/5">
                             {user.avatar ? (
                               <img src={user.avatar} alt={user.username} className="w-full h-full object-cover" />
@@ -803,13 +801,13 @@ export default function AnalyticsPage() {
                               </div>
                             )}
                           </div>
-                          
+
                           <div>
                             <div className="text-black dark:text-white font-semibold text-xs tracking-tight">{user.username}</div>
                             <div className="text-black/35 dark:text-white/35 text-[10px] font-mono">{walletShort}</div>
                           </div>
                         </div>
-                        
+
                         <div className="text-right">
                           <div className={`font-mono text-xs font-bold ${isTop3 ? "text-[#00e0c2]" : "text-white/80"}`}>
                             {user.total_taps} T
@@ -843,7 +841,7 @@ export default function AnalyticsPage() {
                 web2Users={analytics?.ecosystem_stats?.web2_users ?? 0}
               />
             </div>
-            
+
             {/* Peak Activity Timeline (col-span-8) */}
             <div className="lg:col-span-8">
               <ActivityTimelineChart

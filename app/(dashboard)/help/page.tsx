@@ -3,13 +3,13 @@
 import { useState, useEffect } from "react";
 import TopNav from "@/src/components/layout/TopNav";
 import { getUserDetail } from "@/src/api/user.detail";
-import { 
-  HelpCircle, 
-  ChevronDown, 
-  ChevronUp, 
-  Send, 
-  CheckCircle2, 
-  ArrowRight, 
+import {
+  HelpCircle,
+  ChevronDown,
+  ChevronUp,
+  Send,
+  CheckCircle2,
+  ArrowRight,
   ArrowLeft,
   Sparkles,
   Layers,
@@ -28,10 +28,10 @@ interface FAQItem {
 export default function HelpPage() {
   const [userProfile, setUserProfile] = useState<any>(null);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
-  
+
   // Interactive Walkthrough state
   const [activeStep, setActiveStep] = useState(0);
-  
+
   // Form states
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -45,7 +45,7 @@ export default function HelpPage() {
     if (token) {
       getUserDetail(undefined, true)
         .then((data) => setUserProfile(data))
-        .catch(() => {});
+        .catch(() => { });
     }
   }, []);
 
@@ -188,11 +188,11 @@ export default function HelpPage() {
 
   return (
     <div className="flex flex-col h-full overflow-y-auto custom-scrollbar pb-8 transition-colors duration-200">
-      
+
       <TopNav title="Help & Guides" userProfile={userProfile} />
 
       <div className="max-w-6xl mx-auto px-4 md:px-8 w-full mt-4 space-y-6">
-        
+
         {/* Intro Hero Section */}
         <div className="relative overflow-hidden bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm backdrop-blur-md">
           <div className="space-y-2 max-w-xl">
@@ -209,10 +209,10 @@ export default function HelpPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          
+
           {/* Left Column: Flow Walkthrough & FAQ */}
           <div className="space-y-6">
-            
+
             {/* Walkthrough Slider Card */}
             <div className="bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-6 shadow-sm backdrop-blur-md">
               <div className="flex items-center gap-3 mb-6">
@@ -243,7 +243,7 @@ export default function HelpPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex gap-2">
                     {steps.map((_, idx) => (
-                      <button 
+                      <button
                         key={idx}
                         onClick={() => setActiveStep(idx)}
                         className={`w-2 h-2 rounded-full transition-all cursor-pointer ${activeStep === idx ? "w-6 bg-[#00e0c2]" : "bg-white/20"}`}
@@ -252,14 +252,14 @@ export default function HelpPage() {
                   </div>
 
                   <div className="flex gap-2">
-                    <button 
+                    <button
                       onClick={() => setActiveStep(prev => Math.max(0, prev - 1))}
                       disabled={activeStep === 0}
                       className="p-2 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-40 border border-white/10 text-white/70 transition-colors cursor-pointer"
                     >
                       <ArrowLeft className="w-4 h-4" />
                     </button>
-                    <button 
+                    <button
                       onClick={() => setActiveStep(prev => Math.min(steps.length - 1, prev + 1))}
                       disabled={activeStep === steps.length - 1}
                       className="p-2 rounded-xl bg-white/5 hover:bg-white/10 disabled:opacity-40 border border-white/10 text-white/70 transition-colors cursor-pointer"
@@ -287,7 +287,7 @@ export default function HelpPage() {
                 {faqs.map((faq, idx) => {
                   const isActive = activeFaq === idx;
                   return (
-                    <div 
+                    <div
                       key={idx}
                       className="border border-black/5 dark:border-white/5 rounded-xl overflow-hidden bg-black/[0.005] dark:bg-white/[0.005]"
                     >
@@ -298,7 +298,7 @@ export default function HelpPage() {
                         <span>{faq.q}</span>
                         {isActive ? <ChevronUp className="w-4 h-4 text-[#00e0c2]" /> : <ChevronDown className="w-4 h-4 text-white/30" />}
                       </button>
-                      
+
                       <AnimatePresence initial={false}>
                         {isActive && (
                           <motion.div
@@ -323,7 +323,7 @@ export default function HelpPage() {
 
           {/* Right Column: Support Form */}
           <div className="space-y-6">
-            
+
             <div className="bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-6 shadow-sm backdrop-blur-md h-full flex flex-col justify-between">
               <div>
                 <div className="flex items-center gap-3 mb-6">
@@ -347,7 +347,7 @@ export default function HelpPage() {
                         Thank you! Your simulated request was received. We will get back to you shortly.
                       </p>
                     </div>
-                    <button 
+                    <button
                       onClick={() => setIsSubmitted(false)}
                       className="text-[10px] font-mono uppercase tracking-wider font-bold text-[#00e0c2] hover:underline cursor-pointer"
                     >
@@ -358,8 +358,8 @@ export default function HelpPage() {
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                       <label className="block text-[10px] font-mono uppercase tracking-wider font-bold text-black/60 dark:text-white/60 mb-2">Your Name</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         required
                         value={name}
                         onChange={(e) => setName(e.target.value)}
@@ -370,8 +370,8 @@ export default function HelpPage() {
 
                     <div>
                       <label className="block text-[10px] font-mono uppercase tracking-wider font-bold text-black/60 dark:text-white/60 mb-2">Email Address</label>
-                      <input 
-                        type="email" 
+                      <input
+                        type="email"
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
@@ -382,7 +382,7 @@ export default function HelpPage() {
 
                     <div>
                       <label className="block text-[10px] font-mono uppercase tracking-wider font-bold text-black/60 dark:text-white/60 mb-2">Message</label>
-                      <textarea 
+                      <textarea
                         required
                         rows={5}
                         value={message}
@@ -392,7 +392,7 @@ export default function HelpPage() {
                       />
                     </div>
 
-                    <button 
+                    <button
                       type="submit"
                       disabled={isSubmitting}
                       className="w-full py-3.5 bg-transparent border border-white/10 hover:border-[#00e0c2] text-white font-display font-extrabold uppercase tracking-wider text-xs rounded-xl flex items-center justify-center gap-2 disabled:opacity-50 transition-all cursor-pointer"

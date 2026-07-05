@@ -72,7 +72,7 @@ export default function BroadcastPanel({ eventId, recipientCount }: Props) {
 
   return (
     <div className="bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-5 md:p-6 flex flex-col justify-between shadow-sm backdrop-blur-md relative overflow-hidden transition-all min-h-[300px]">
-      
+
       {/* Confirmation Modal */}
       {showConfirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
@@ -119,7 +119,7 @@ export default function BroadcastPanel({ eventId, recipientCount }: Props) {
         </div>
       ) : (
         <form onSubmit={handleSendClick} className="flex-1 flex flex-col gap-4 mt-4 justify-between">
-          
+
           {/* Text Area */}
           <div className="flex-1 flex flex-col gap-2 relative">
             <textarea
@@ -143,11 +143,10 @@ export default function BroadcastPanel({ eventId, recipientCount }: Props) {
           {/* Status Messages */}
           {status.type && (
             <div
-              className={`rounded-xl p-2.5 flex items-center gap-2 text-[10px] font-mono font-bold uppercase ${
-                status.type === "success"
+              className={`rounded-xl p-2.5 flex items-center gap-2 text-[10px] font-mono font-bold uppercase ${status.type === "success"
                   ? "bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 dark:text-emerald-400"
                   : "bg-red-500/10 border border-red-500/25 text-red-500"
-              }`}
+                }`}
             >
               {status.type === "success" ? (
                 <CheckCircle className="w-3.5 h-3.5 shrink-0 text-emerald-500" />
@@ -162,13 +161,12 @@ export default function BroadcastPanel({ eventId, recipientCount }: Props) {
           <button
             type="submit"
             disabled={isSending || !message.trim() || message.length > maxChars}
-            className={`w-full py-3 rounded-xl font-display text-xs uppercase tracking-wider font-extrabold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-              isSending
+            className={`w-full py-3 rounded-xl font-display text-xs uppercase tracking-wider font-extrabold flex items-center justify-center gap-2 transition-all cursor-pointer ${isSending
                 ? "bg-black/5 dark:bg-white/5 border border-black/15 dark:border-white/10 text-black/45 dark:text-white/40 cursor-not-allowed"
                 : !message.trim() || message.length > maxChars
-                ? "bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 text-black/25 dark:text-white/20 cursor-not-allowed"
-                : "bg-black dark:bg-white hover:bg-black/80 dark:hover:bg-white/90 text-white dark:text-black shadow-md hover:shadow-lg active:scale-[0.99]"
-            }`}
+                  ? "bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 text-black/25 dark:text-white/20 cursor-not-allowed"
+                  : "bg-black dark:bg-white hover:bg-black/80 dark:hover:bg-white/90 text-white dark:text-black shadow-md hover:shadow-lg active:scale-[0.99]"
+              }`}
           >
             {isSending ? (
               <>

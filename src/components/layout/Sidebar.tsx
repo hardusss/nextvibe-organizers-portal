@@ -72,39 +72,15 @@ export default function Sidebar() {
               <div>
                 <h1 className="text-black dark:text-white font-display font-extrabold text-xl tracking-tight leading-tight uppercase">NextVibe</h1>
                 <p className="text-black/40 dark:text-white/40 font-sans text-[10px] uppercase tracking-widest font-bold">
-                  {role === "sponsor" ? "Sponsor Portal" : "Organizer Portal"}
+                  Organizer Portal
                 </p>
               </div>
             </div>
-            <button 
+            <button
               onClick={closeMobileMenu}
               className="md:hidden p-2 rounded-lg text-black/50 dark:text-white/50 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
             >
               <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Role Toggle Switcher */}
-          <div className="flex rounded-xl bg-black/5 dark:bg-white/5 p-1 border border-black/10 dark:border-white/5 font-mono text-[9px] font-bold uppercase tracking-wider relative overflow-hidden">
-            <button
-              onClick={() => setRole("organizer")}
-              className={`flex-1 py-1.5 rounded-lg text-center transition-all relative z-10 cursor-pointer ${
-                role === "organizer"
-                  ? "text-white bg-[var(--accent-primary,#8b5cf6)] shadow-sm font-extrabold"
-                  : "text-black/50 dark:text-white/35 hover:text-black/80 dark:hover:text-white/70"
-              }`}
-            >
-              Organizer
-            </button>
-            <button
-              onClick={() => setRole("sponsor")}
-              className={`flex-1 py-1.5 rounded-lg text-center transition-all relative z-10 cursor-pointer ${
-                role === "sponsor"
-                  ? "text-white bg-[var(--accent-primary,#8b5cf6)] shadow-sm font-extrabold"
-                  : "text-black/50 dark:text-white/35 hover:text-black/80 dark:hover:text-white/70"
-              }`}
-            >
-              Sponsor
             </button>
           </div>
         </div>
@@ -128,33 +104,31 @@ export default function Sidebar() {
                 ? pathname === "/dashboard" || pathname === "/" || !isOtherActive
                 : pathname === item.href || pathname.startsWith(item.href + "/");
             return (
-                <motion.div key={item.name} whileHover={{ x: 4 }} whileTap={{ scale: 0.98 }}>
-                  <Link
-                    href={item.href}
-                    onClick={() => {
-                      if (window.innerWidth < 768) closeMobileMenu();
-                    }}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group relative ${
-                      isActive
-                        ? "text-black dark:text-white font-semibold"
-                        : "text-black/50 dark:text-white/50 hover:text-black/80 dark:hover:text-white/80"
+              <motion.div key={item.name} whileHover={{ x: 4 }} whileTap={{ scale: 0.98 }}>
+                <Link
+                  href={item.href}
+                  onClick={() => {
+                    if (window.innerWidth < 768) closeMobileMenu();
+                  }}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group relative ${isActive
+                      ? "text-black dark:text-white font-semibold"
+                      : "text-black/50 dark:text-white/50 hover:text-black/80 dark:hover:text-white/80"
                     }`}
-                  >
-                    {isActive && (
-                      <motion.div
-                        layoutId="sidebar-active-bar"
-                        className="absolute left-0 top-3 bottom-3 w-[3px] rounded-r bg-[var(--accent-primary,#8b5cf6)]"
-                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                      />
-                    )}
-                    <item.icon
-                      className={`w-5 h-5 transition-colors ${
-                        isActive ? "text-[var(--accent-primary,#8b5cf6)]" : "text-black/40 dark:text-white/40 group-hover:text-black/70 dark:group-hover:text-white/70"
-                      }`}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="sidebar-active-bar"
+                      className="absolute left-0 top-3 bottom-3 w-[3px] rounded-r bg-[var(--accent-primary,#8b5cf6)]"
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
-                    <span className="text-sm font-medium tracking-tight">{item.name}</span>
-                  </Link>
-                </motion.div>
+                  )}
+                  <item.icon
+                    className={`w-5 h-5 transition-colors ${isActive ? "text-[var(--accent-primary,#8b5cf6)]" : "text-black/40 dark:text-white/40 group-hover:text-black/70 dark:group-hover:text-white/70"
+                      }`}
+                  />
+                  <span className="text-sm font-medium tracking-tight">{item.name}</span>
+                </Link>
+              </motion.div>
             );
           })}
         </nav>
@@ -189,18 +163,15 @@ export default function Sidebar() {
                 className="w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors group cursor-pointer hover:bg-black/5 dark:hover:bg-white/5"
               >
                 <div className="flex items-center gap-3">
-                  <FlaskConical className={`w-5 h-5 transition-colors ${
-                    isDemoMode ? "text-[var(--accent-primary,#8b5cf6)]" : "text-black/40 dark:text-white/40"
-                  }`} />
-                  <span className={`text-sm font-medium tracking-tight transition-colors ${
-                    isDemoMode ? "text-black dark:text-white" : "text-black/50 dark:text-white/50"
-                  }`}>Demo Mode</span>
+                  <FlaskConical className={`w-5 h-5 transition-colors ${isDemoMode ? "text-[var(--accent-primary,#8b5cf6)]" : "text-black/40 dark:text-white/40"
+                    }`} />
+                  <span className={`text-sm font-medium tracking-tight transition-colors ${isDemoMode ? "text-black dark:text-white" : "text-black/50 dark:text-white/50"
+                    }`}>Demo Mode</span>
                 </div>
-                <div className={`relative w-10 h-[22px] rounded-full transition-colors duration-300 ${
-                  isDemoMode
+                <div className={`relative w-10 h-[22px] rounded-full transition-colors duration-300 ${isDemoMode
                     ? "bg-[var(--accent-primary,#8b5cf6)]"
                     : "bg-black/10 dark:bg-white/10"
-                }`}>
+                  }`}>
                   <motion.div
                     className="absolute top-[3px] w-4 h-4 rounded-full bg-white shadow-sm"
                     animate={{ left: isDemoMode ? 21 : 3 }}
@@ -230,15 +201,15 @@ export default function Sidebar() {
             >
               <h3 className="text-xl font-bold text-black dark:text-white mb-2">Confirm Logout</h3>
               <p className="text-black/60 dark:text-white/60 mb-6">Are you sure you want to log out?</p>
-              
+
               <div className="flex gap-3 justify-end">
-                <button 
+                <button
                   onClick={() => setShowLogoutModal(false)}
                   className="px-4 py-2 rounded-lg font-medium text-black/70 dark:text-white/70 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
                 >
                   Cancel
                 </button>
-                <button 
+                <button
                   onClick={() => {
                     setShowLogoutModal(false);
                     logout();

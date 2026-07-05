@@ -3,14 +3,14 @@
 import { useState, useEffect } from "react";
 import TopNav from "@/src/components/layout/TopNav";
 import { getUserDetail } from "@/src/api/user.detail";
-import { 
-  Wallet, 
-  Map, 
-  Palette, 
-  Check, 
-  Copy, 
-  Sun, 
-  Moon, 
+import {
+  Wallet,
+  Map,
+  Palette,
+  Check,
+  Copy,
+  Sun,
+  Moon,
   Sparkles,
   VolumeX,
   Volume1,
@@ -24,19 +24,19 @@ export default function SettingsPage() {
   const [userProfile, setUserProfile] = useState<any>(null);
   const { theme, setTheme } = useTheme();
   const { role } = useRole();
-  
+
   // Wallet states
   const [walletAddress, setWalletAddress] = useState("4k3DyjzvzpEs41D6y289as71bM4rD8z9zKk27a819b10");
   const [copied, setCopied] = useState(false);
-  
+
   // Map settings
   const [mapZoom, setMapZoom] = useState("19");
   const [mapStyle, setMapStyle] = useState("dark");
-  
+
   // Audio state
   const [playSound, setPlaySound] = useState(true);
   const [alertPlaying, setAlertPlaying] = useState(false);
-  
+
   // Accent color state
   const [accent, setAccent] = useState("purple");
   const [showToast, setShowToast] = useState(false);
@@ -47,7 +47,7 @@ export default function SettingsPage() {
     if (token) {
       getUserDetail(undefined, true)
         .then((data) => setUserProfile(data))
-        .catch(() => {});
+        .catch(() => { });
     }
 
     setWalletAddress(localStorage.getItem("nextvibe_wallet") || "4k3DyjzvzpEs41D6y289as71bM4rD8z9zKk27a819b10");
@@ -102,26 +102,26 @@ export default function SettingsPage() {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
       if (!AudioCtx) return;
       const ctx = new AudioCtx();
-      
+
       const osc1 = ctx.createOscillator();
       const osc2 = ctx.createOscillator();
       const gain = ctx.createGain();
-      
+
       osc1.type = "sine";
       osc1.frequency.setValueAtTime(880, ctx.currentTime);
       osc1.frequency.exponentialRampToValueAtTime(1760, ctx.currentTime + 0.15);
-      
+
       osc2.type = "triangle";
       osc2.frequency.setValueAtTime(440, ctx.currentTime);
       osc2.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.1);
-      
+
       gain.gain.setValueAtTime(0.12, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-      
+
       osc1.connect(gain);
       osc2.connect(gain);
       gain.connect(ctx.destination);
-      
+
       osc1.start();
       osc2.start();
       osc1.stop(ctx.currentTime + 0.3);
@@ -184,7 +184,7 @@ export default function SettingsPage() {
       {/* Floating toast notification */}
       <AnimatePresence>
         {showToast && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9, y: -20 }}
@@ -204,7 +204,7 @@ export default function SettingsPage() {
       <TopNav title="Settings" userProfile={userProfile} />
 
       <div className="max-w-4xl mx-auto px-4 md:px-8 w-full mt-4 space-y-6">
-        
+
         {/* Title */}
         <div className="mb-2 flex flex-col gap-1">
           <span className="text-[10px] tracking-widest text-[#00e0c2] font-mono font-bold uppercase">preferences</span>
@@ -216,7 +216,7 @@ export default function SettingsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Column 1 */}
           <div className="space-y-6">
-            
+
             {/* Card A: Solana Wallet Info */}
             <div className="bg-white/75 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-6 shadow-sm backdrop-blur-md">
               <div className="flex items-center gap-3 mb-6">
@@ -236,7 +236,7 @@ export default function SettingsPage() {
                     <div className="flex-1 font-mono text-[11px] bg-black/[0.02] dark:bg-white/[0.02] border border-black/10 dark:border-white/10 rounded-xl px-4 py-3 text-black/70 dark:text-white/70 truncate flex items-center">
                       {walletAddress}
                     </div>
-                    <button 
+                    <button
                       onClick={handleCopy}
                       className="p-3 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-black/10 dark:border-white/10 text-black/70 dark:text-white/70 transition-colors cursor-pointer"
                     >
@@ -268,7 +268,7 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[10px] font-mono uppercase tracking-wider font-bold text-black/60 dark:text-white/60 mb-2">Default Map Zoom</label>
-                    <select 
+                    <select
                       value={mapZoom}
                       onChange={(e) => setMapZoom(e.target.value)}
                       className="w-full text-xs bg-black/[0.02] dark:bg-white/[0.02] border border-black/10 dark:border-white/10 rounded-xl px-4 py-2.5 text-black dark:text-white font-mono focus:outline-none focus:border-[#00e0c2]"
@@ -281,7 +281,7 @@ export default function SettingsPage() {
 
                   <div>
                     <label className="block text-[10px] font-mono uppercase tracking-wider font-bold text-black/60 dark:text-white/60 mb-2">Base Map Style</label>
-                    <select 
+                    <select
                       value={mapStyle}
                       onChange={(e) => setMapStyle(e.target.value)}
                       className="w-full text-xs bg-black/[0.02] dark:bg-white/[0.02] border border-black/10 dark:border-white/10 rounded-xl px-4 py-2.5 text-black dark:text-white font-mono focus:outline-none focus:border-[#00e0c2]"
@@ -301,24 +301,22 @@ export default function SettingsPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <button 
+                    <button
                       onClick={handleTestSound}
                       className={`px-3 py-1.5 rounded-lg border border-black/10 dark:border-white/10 text-[9px] font-mono uppercase tracking-wider text-black/80 dark:text-white/80 hover:bg-black/5 dark:hover:bg-white/5 transition-all cursor-pointer ${alertPlaying ? "scale-95 bg-[#00e0c2]/10" : ""}`}
                     >
                       Test Sound
                     </button>
-                    
+
                     {/* Custom Toggle Switch */}
                     <button
                       onClick={() => setPlaySound(!playSound)}
-                      className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border border-white/10 transition-colors duration-200 ease-in-out focus:outline-none ${
-                        playSound ? "bg-[#00e0c2]" : "bg-white/5"
-                      }`}
+                      className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border border-white/10 transition-colors duration-200 ease-in-out focus:outline-none ${playSound ? "bg-[#00e0c2]" : "bg-white/5"
+                        }`}
                     >
                       <span
-                        className={`pointer-events-none inline-block h-4.5 w-4.5 transform rounded-full bg-white transition duration-200 ease-in-out ${
-                          playSound ? "translate-x-4" : "translate-x-0"
-                        }`}
+                        className={`pointer-events-none inline-block h-4.5 w-4.5 transform rounded-full bg-white transition duration-200 ease-in-out ${playSound ? "translate-x-4" : "translate-x-0"
+                          }`}
                       />
                     </button>
                   </div>
@@ -347,23 +345,21 @@ export default function SettingsPage() {
                 <div>
                   <label className="block text-[10px] font-mono uppercase tracking-wider font-bold text-black/60 dark:text-white/60 mb-2">General Theme Mode</label>
                   <div className="grid grid-cols-2 gap-4">
-                    <button 
+                    <button
                       onClick={() => setTheme("dark")}
-                      className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-display font-extrabold uppercase tracking-wider transition-all cursor-pointer ${
-                        theme === "dark" 
-                          ? "bg-white/5 border-[#00e0c2] text-white" 
+                      className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-display font-extrabold uppercase tracking-wider transition-all cursor-pointer ${theme === "dark"
+                          ? "bg-white/5 border-[#00e0c2] text-white"
                           : "bg-transparent border-white/10 text-white/40 hover:bg-white/5"
-                      }`}
+                        }`}
                     >
                       <Moon className="w-4 h-4" /> Dark
                     </button>
-                    <button 
+                    <button
                       onClick={() => setTheme("light")}
-                      className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-display font-extrabold uppercase tracking-wider transition-all cursor-pointer ${
-                        theme === "light" 
-                          ? "bg-black/5 border-[#00e0c2] text-black" 
+                      className={`flex items-center justify-center gap-2 p-3 rounded-xl border text-xs font-display font-extrabold uppercase tracking-wider transition-all cursor-pointer ${theme === "light"
+                          ? "bg-black/5 border-[#00e0c2] text-black"
                           : "bg-transparent border-black/10 text-black/40 hover:bg-black/5"
-                      }`}
+                        }`}
                     >
                       <Sun className="w-4 h-4" /> Light
                     </button>
@@ -372,7 +368,7 @@ export default function SettingsPage() {
 
                 <div>
                   <label className="block text-[10px] font-mono uppercase tracking-wider font-bold text-black/60 dark:text-white/60 mb-3">Custom System Accent Color</label>
-                  
+
                   {/* Organic circular swatch layout */}
                   <div className="flex items-center justify-between px-2 py-3 bg-white/[0.01] border border-white/5 rounded-xl">
                     {accentColors.map((color) => (
@@ -415,7 +411,7 @@ export default function SettingsPage() {
 
         {/* Footer actions */}
         <div className="flex justify-end pt-4 border-t border-black/5 dark:border-white/5">
-          <button 
+          <button
             onClick={handleSave}
             className="flex items-center gap-2 px-6 py-3.5 text-xs font-display font-extrabold uppercase tracking-wider text-white rounded-xl shadow-lg transition-all dynamic-accent-btn active:scale-95 cursor-pointer"
           >

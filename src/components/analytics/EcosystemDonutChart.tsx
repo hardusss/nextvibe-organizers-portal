@@ -19,10 +19,10 @@ export default function EcosystemDonutChart({
   const [hoveredSlice, setHoveredSlice] = useState<"mwa" | "web2" | null>(null);
 
   const totalUsers = mwaUsers + web2Users;
-  
+
   // Handle empty state
   const hasUsers = totalUsers > 0;
-  
+
   // Clean percentages to handle NaN or 0 total cases
   const cleanMwa = hasUsers ? Math.round(mwaPercentage) : 0;
   const cleanWeb2 = hasUsers ? Math.round(web2Percentage) : 0;
@@ -156,9 +156,8 @@ export default function EcosystemDonutChart({
           <div className="flex flex-col gap-3 shrink-0">
             {/* Solana MWA Legend */}
             <div
-              className={`flex items-center gap-3 p-2 rounded-lg transition-colors border border-transparent ${
-                hoveredSlice === "mwa" ? "bg-white/10 dark:bg-white/[0.03] border-white/5" : ""
-              }`}
+              className={`flex items-center gap-3 p-2 rounded-lg transition-colors border border-transparent ${hoveredSlice === "mwa" ? "bg-white/10 dark:bg-white/[0.03] border-white/5" : ""
+                }`}
               onMouseEnter={() => setHoveredSlice("mwa")}
               onMouseLeave={() => setHoveredSlice(null)}
             >
@@ -173,9 +172,8 @@ export default function EcosystemDonutChart({
 
             {/* Web2 Legend */}
             <div
-              className={`flex items-center gap-3 p-2 rounded-lg transition-colors border border-transparent ${
-                hoveredSlice === "web2" ? "bg-white/10 dark:bg-white/[0.03] border-white/5" : ""
-              }`}
+              className={`flex items-center gap-3 p-2 rounded-lg transition-colors border border-transparent ${hoveredSlice === "web2" ? "bg-white/10 dark:bg-white/[0.03] border-white/5" : ""
+                }`}
               onMouseEnter={() => setHoveredSlice("web2")}
               onMouseLeave={() => setHoveredSlice(null)}
             >

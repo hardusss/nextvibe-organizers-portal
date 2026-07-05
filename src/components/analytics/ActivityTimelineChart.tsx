@@ -118,7 +118,7 @@ export default function ActivityTimelineChart({ hourlyActivity = [] }: Props) {
           <h3 className="text-black/40 dark:text-white/40 text-[10px] font-mono tracking-widest font-bold uppercase">peak activity timeline</h3>
           <h4 className="text-sm font-semibold text-black dark:text-white mt-1">Hourly Connections Feed</h4>
         </div>
-        
+
         {/* Live Legend */}
         {hasData && (
           <div className="flex gap-4 text-[10px] font-mono font-bold uppercase">
@@ -256,8 +256,8 @@ export default function ActivityTimelineChart({ hourlyActivity = [] }: Props) {
                 bottom: `${Math.min(
                   ((paddingTop + chartHeight - points[hoveredIndex].y) /
                     viewBoxHeight) *
-                    100 +
-                    12,
+                  100 +
+                  12,
                   65
                 )}%`,
               }}

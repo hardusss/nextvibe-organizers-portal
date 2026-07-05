@@ -21,7 +21,7 @@ export default function TapHeatmap({ postId }: Props) {
   const [scriptsLoaded, setScriptsLoaded] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<EventTap[] | null>(null);
   const [is3DMode, setIs3DMode] = useState(false);
-  
+
   // Layer visibility toggles
   const [showHeatmap, setShowHeatmap] = useState(true);
   const [showMarkers, setShowMarkers] = useState(true);
@@ -116,7 +116,7 @@ export default function TapHeatmap({ postId }: Props) {
 
     // Detect if portal is in dark mode
     const isDark = document.documentElement.classList.contains("dark");
-    
+
     // Choose appropriate tiles
     const tileUrl = isDark
       ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
@@ -143,7 +143,7 @@ export default function TapHeatmap({ postId }: Props) {
     } else {
       // B. If Map exists, update view and tile layer
       mapRef.current.setView(mapCenter, 19);
-      
+
       // Update tile layer url to match dark/light theme
       mapRef.current.eachLayer((layer: any) => {
         if (layer._url) {
@@ -172,7 +172,7 @@ export default function TapHeatmap({ postId }: Props) {
     // Add or remove markers group based on checkbox state
     if (showMarkers) {
       markersGroupRef.current.addTo(mapRef.current);
-      
+
       // Custom clustering algorithm (groups items within ~2 meters)
       const groups: { center: { lat: number; lng: number }; taps: EventTap[] }[] = [];
       tapsData.taps.forEach((tap) => {
@@ -202,7 +202,7 @@ export default function TapHeatmap({ postId }: Props) {
             : (isDark ? "#a855f7" : "#ef4444"); // Purple or Red
 
           const pointsText = tap.points ? `+${tap.points} Rep` : "";
-          
+
           // Clear and clean inline-styled HTML structure with absolute fallback colors
           const popupContent = `
             <div style="font-family: sans-serif; font-size: 11px; min-width: 155px; color: ${isDark ? '#ffffff' : '#0e0e11'}; padding: 4px 2px;">
@@ -232,8 +232,8 @@ export default function TapHeatmap({ postId }: Props) {
             opacity: 0.9,
             fillOpacity: 0.9,
           })
-          .bindPopup(popupContent, popupOptions)
-          .addTo(markersGroupRef.current);
+            .bindPopup(popupContent, popupOptions)
+            .addTo(markersGroupRef.current);
 
         } else {
           // Clustered marker showing counts
@@ -307,19 +307,19 @@ export default function TapHeatmap({ postId }: Props) {
           max: 1.0,
           gradient: isDark
             ? {
-                0.15: "rgba(59, 130, 246, 0.25)", // Blue (Faint density)
-                0.4: "rgba(0, 224, 194, 0.5)",    // Teal/Green (Low-Medium)
-                0.65: "rgba(234, 179, 8, 0.75)",  // Yellow (Medium-High)
-                0.85: "rgba(249, 115, 22, 0.9)",  // Orange (High)
-                1.0: "rgba(239, 68, 68, 1.0)"     // Red (Dense Hotspot)
-              }
+              0.15: "rgba(59, 130, 246, 0.25)", // Blue (Faint density)
+              0.4: "rgba(0, 224, 194, 0.5)",    // Teal/Green (Low-Medium)
+              0.65: "rgba(234, 179, 8, 0.75)",  // Yellow (Medium-High)
+              0.85: "rgba(249, 115, 22, 0.9)",  // Orange (High)
+              1.0: "rgba(239, 68, 68, 1.0)"     // Red (Dense Hotspot)
+            }
             : {
-                0.15: "blue",
-                0.4: "cyan",
-                0.65: "lime",
-                0.85: "orange",
-                1.0: "red"
-              },
+              0.15: "blue",
+              0.4: "cyan",
+              0.65: "lime",
+              0.85: "orange",
+              1.0: "red"
+            },
         }).addTo(mapRef.current);
 
         // Listen for zoom changes and dynamically rescale the heatmap radius/blur sizes
@@ -415,23 +415,21 @@ export default function TapHeatmap({ postId }: Props) {
       {/* 2D / 3D Toggle Controller Overlay (Left-Side) */}
       {tapsData && tapsData.taps.length > 0 && !isLoading && (
         <div className="absolute top-4 left-4 bg-white/90 dark:bg-[#0d0d12]/90 backdrop-blur border border-black/10 dark:border-white/10 rounded-lg p-1 flex gap-1 shadow-md z-20">
-          <button 
+          <button
             onClick={() => setIs3DMode(false)}
-            className={`px-2 py-1 text-[10px] font-bold rounded-md flex items-center gap-1 transition-all ${
-              !is3DMode 
-                ? "bg-purple-600 dark:bg-[#00e0c2] text-white dark:text-black shadow-sm" 
+            className={`px-2 py-1 text-[10px] font-bold rounded-md flex items-center gap-1 transition-all ${!is3DMode
+                ? "bg-purple-600 dark:bg-[#00e0c2] text-white dark:text-black shadow-sm"
                 : "text-black/60 dark:text-white/60 hover:bg-black/5 dark:hover:bg-white/5"
-            }`}
+              }`}
           >
             2D Flat
           </button>
-          <button 
+          <button
             onClick={() => setIs3DMode(true)}
-            className={`px-2 py-1 text-[10px] font-bold rounded-md flex items-center gap-1 transition-all ${
-              is3DMode 
-                ? "bg-purple-600 dark:bg-[#00e0c2] text-white dark:text-black shadow-sm" 
+            className={`px-2 py-1 text-[10px] font-bold rounded-md flex items-center gap-1 transition-all ${is3DMode
+                ? "bg-purple-600 dark:bg-[#00e0c2] text-white dark:text-black shadow-sm"
                 : "text-black/60 dark:text-white/60 hover:bg-black/5 dark:hover:bg-white/5"
-            }`}
+              }`}
           >
             <Layers className="w-3 h-3" />
             3D Tilt
@@ -442,23 +440,21 @@ export default function TapHeatmap({ postId }: Props) {
       {/* Visibility Toggle Settings Overlay (Right-Side) */}
       {tapsData && tapsData.taps.length > 0 && !isLoading && (
         <div className="absolute top-4 right-4 bg-white/90 dark:bg-[#0d0d12]/90 backdrop-blur border border-black/10 dark:border-white/10 rounded-lg p-1 flex gap-1 shadow-md z-20">
-          <button 
+          <button
             onClick={() => setShowHeatmap(!showHeatmap)}
-            className={`px-2 py-1 text-[10px] font-bold rounded-md transition-all ${
-              showHeatmap 
-                ? "bg-purple-600 dark:bg-[#00e0c2] text-white dark:text-black shadow-sm" 
+            className={`px-2 py-1 text-[10px] font-bold rounded-md transition-all ${showHeatmap
+                ? "bg-purple-600 dark:bg-[#00e0c2] text-white dark:text-black shadow-sm"
                 : "text-black/60 dark:text-white/60 hover:bg-black/5 dark:hover:bg-white/5"
-            }`}
+              }`}
           >
             Heatmap
           </button>
-          <button 
+          <button
             onClick={() => setShowMarkers(!showMarkers)}
-            className={`px-2 py-1 text-[10px] font-bold rounded-md transition-all ${
-              showMarkers 
-                ? "bg-purple-600 dark:bg-[#00e0c2] text-white dark:text-black shadow-sm" 
+            className={`px-2 py-1 text-[10px] font-bold rounded-md transition-all ${showMarkers
+                ? "bg-purple-600 dark:bg-[#00e0c2] text-white dark:text-black shadow-sm"
                 : "text-black/60 dark:text-white/60 hover:bg-black/5 dark:hover:bg-white/5"
-            }`}
+              }`}
           >
             Markers
           </button>
@@ -466,17 +462,17 @@ export default function TapHeatmap({ postId }: Props) {
       )}
 
       {/* Map Container (with dynamic 3D Perspective transition styling) */}
-      <div 
-        ref={containerRef} 
+      <div
+        ref={containerRef}
         style={{
-          transform: is3DMode 
-            ? "perspective(1200px) rotateX(25deg) rotateY(-8deg) rotateZ(5deg)" 
+          transform: is3DMode
+            ? "perspective(1200px) rotateX(25deg) rotateY(-8deg) rotateZ(5deg)"
             : "none",
           boxShadow: is3DMode
             ? "0 35px 65px rgba(0,0,0,0.5), 0 15px 25px rgba(0,0,0,0.35)"
             : "none",
         }}
-        className="w-full h-full min-h-[350px] z-10 transition-all duration-700 cubic-bezier(0.4, 0, 0.2, 1) origin-center" 
+        className="w-full h-full min-h-[350px] z-10 transition-all duration-700 cubic-bezier(0.4, 0, 0.2, 1) origin-center"
       />
 
       {/* Map legend */}
@@ -503,7 +499,7 @@ export default function TapHeatmap({ postId }: Props) {
                 <Users className="w-5 h-5 text-purple-600 dark:text-[#00e0c2]" />
                 <h3 className="font-bold text-base text-black dark:text-white">Clustered Taps ({selectedGroup.length})</h3>
               </div>
-              <button 
+              <button
                 onClick={() => setSelectedGroup(null)}
                 className="p-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white"
               >
@@ -516,22 +512,21 @@ export default function TapHeatmap({ postId }: Props) {
               {selectedGroup.map((tap, idx) => {
                 const isCheckin = tap.type === "checkin";
                 const avatarUrl = tap.user?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${tap.user?.username || idx}`;
-                
+
                 return (
-                  <div 
-                    key={idx} 
+                  <div
+                    key={idx}
                     className="flex items-start gap-4 p-3 rounded-xl border border-black/5 dark:border-white/5 bg-black/[0.01] dark:bg-white/[0.01] hover:bg-black/[0.03] dark:hover:bg-white/[0.03] transition-colors"
                   >
                     {/* User Avatar */}
                     <div className="relative shrink-0">
-                      <img 
-                        src={avatarUrl} 
-                        alt={tap.user?.username} 
-                        className="w-10 h-10 rounded-full border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 object-cover" 
+                      <img
+                        src={avatarUrl}
+                        alt={tap.user?.username}
+                        className="w-10 h-10 rounded-full border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 object-cover"
                       />
-                      <div className={`absolute -bottom-1 -right-1 p-0.5 rounded-full border border-white dark:border-[#0d0d12] shadow-sm ${
-                        isCheckin ? "bg-blue-500 dark:bg-[#00e0c2]" : "bg-red-500 dark:bg-purple-600"
-                      }`}>
+                      <div className={`absolute -bottom-1 -right-1 p-0.5 rounded-full border border-white dark:border-[#0d0d12] shadow-sm ${isCheckin ? "bg-blue-500 dark:bg-[#00e0c2]" : "bg-red-500 dark:bg-purple-600"
+                        }`}>
                         {isCheckin ? (
                           <CheckCircle2 className="w-3 h-3 text-white dark:text-black" />
                         ) : (
@@ -550,7 +545,7 @@ export default function TapHeatmap({ postId }: Props) {
                           <Award className="w-3 h-3" /> +{tap.points || 5} Rep
                         </span>
                       </div>
-                      
+
                       <p className="text-xs text-black/60 dark:text-white/50 leading-relaxed">
                         {isCheckin ? (
                           <span>Checked in via host <span className="font-medium text-black dark:text-white">@{tap.given_by?.username || "host"}</span></span>
@@ -568,10 +563,10 @@ export default function TapHeatmap({ postId }: Props) {
                 );
               })}
             </div>
-            
+
             {/* Footer */}
             <div className="p-4 border-t border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5 flex justify-end">
-              <button 
+              <button
                 onClick={() => setSelectedGroup(null)}
                 className="px-4 py-2 bg-black dark:bg-white hover:bg-black/80 dark:hover:bg-white/95 text-white dark:text-black font-semibold rounded-xl text-xs transition-colors shadow-md"
               >

@@ -41,8 +41,11 @@ export default function RoleProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedRole = storage.getItem(ROLE_STORAGE_KEY) as UserRole | null;
-      if (storedRole === "organizer" || storedRole === "sponsor") {
-        setRoleState(storedRole);
+      if (storedRole === "sponsor") {
+        setRoleState("organizer");
+        storage.setItem(ROLE_STORAGE_KEY, "organizer");
+      } else if (storedRole === "organizer") {
+        setRoleState("organizer");
       }
 
       const storedEvents = storage.getItem(SPONSOR_EVENTS_KEY);
