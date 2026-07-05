@@ -364,6 +364,14 @@ const MOCK_TOP_USERS = [
   { user_id: 105, username: "next_pioneer", wallet_address: "2X56wZ4S4yYn...dF9Y", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=pioneer", total_taps: 27, total_reputation: 405 },
   { user_id: 102, username: "crypto_ninja", wallet_address: "3Y78wZ4S4yYn...eF7Z", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=ninja", total_taps: 24, total_reputation: 360 },
   { user_id: 110, username: "hacker_guy", wallet_address: "4Z89wZ4S4yYn...fF6Z", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=hacker", total_taps: 19, total_reputation: 285 },
+  { user_id: 111, username: "sol_maxi", wallet_address: "2B89wZ4S4yYn...gF6X", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=maxi", total_taps: 17, total_reputation: 255 },
+  { user_id: 112, username: "alice_w3", wallet_address: "3C89wZ4S4yYn...hF6Y", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=alice", total_taps: 15, total_reputation: 225 },
+  { user_id: 113, username: "bob_builder", wallet_address: "4D89wZ4S4yYn...iF6Z", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=bob", total_taps: 14, total_reputation: 210 },
+  { user_id: 114, username: "charlie_dev", wallet_address: "5E89wZ4S4yYn...jF6A", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=charlie", total_taps: 12, total_reputation: 180 },
+  { user_id: 115, username: "dave_nft", wallet_address: "6F89wZ4S4yYn...kF6B", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=dave", total_taps: 10, total_reputation: 150 },
+  { user_id: 116, username: "eve_solana", wallet_address: "7G89wZ4S4yYn...lF6C", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=eve", total_taps: 8, total_reputation: 120 },
+  { user_id: 117, username: "frank_web3", wallet_address: "8H89wZ4S4yYn...mF6D", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=frank", total_taps: 7, total_reputation: 105 },
+  { user_id: 118, username: "grace_ninja", wallet_address: "9I89wZ4S4yYn...nF6E", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=grace", total_taps: 5, total_reputation: 75 },
 ];
 
 function getSeededRandom(seed: number): number {

@@ -104,6 +104,7 @@ export default function AnalyticsPage() {
   // Leaderboard states
   const [leaderboardMode, setLeaderboardMode] = useState<"private" | "public">("private");
   const [isFullscreenLeaderboardOpen, setIsFullscreenLeaderboardOpen] = useState<boolean>(false);
+  const [isFullLeaderboardModalOpen, setIsFullLeaderboardModalOpen] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number>(5);
 
   const { role, isSponsorEvent } = useRole();
@@ -352,6 +353,90 @@ export default function AnalyticsPage() {
               <span>powered by nextvibe telemetry</span>
               <span>sync status: active</span>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Full Leaderboard Popup Modal */}
+      <AnimatePresence>
+        {isFullLeaderboardModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+            onClick={() => setIsFullLeaderboardModalOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-[#0c0c0f] border border-white/10 rounded-xl shadow-2xl max-w-lg w-[95%] md:w-full max-h-[85vh] flex flex-col overflow-hidden font-mono"
+            >
+              <div className="p-4 md:p-5 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+                <h3 className="text-base font-display font-extrabold uppercase tracking-tight text-white flex items-center gap-2.5">
+                  <Award className="w-5 h-5 text-[#00e0c2]" />
+                  Event Leaderboard
+                </h3>
+                <button
+                  onClick={() => setIsFullLeaderboardModalOpen(false)}
+                  className="p-1 rounded-full hover:bg-white/10 text-white/50 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-2">
+                {topUsers.map((user, i) => {
+                  const rank = i + 1;
+                  const isTop3 = rank <= 3;
+                  const walletShort = user.wallet_address
+                    ? `${user.wallet_address.slice(0, 6)}...${user.wallet_address.slice(-6)}`
+                    : "—";
+                  const rankColors = [
+                    "border-[#00e0c2]/35 bg-[#00e0c2]/5 text-[#00e0c2]",
+                    "border-[#8b5cf6]/35 bg-[#8b5cf6]/5 text-[#8b5cf6]",
+                    "border-cyan-400/35 bg-cyan-400/5 text-cyan-400"
+                  ];
+                  const rankColor = isTop3 ? rankColors[rank - 1] : "border-white/10 bg-white/[0.01] text-white/80";
+
+                  return (
+                    <div
+                      key={user.user_id}
+                      className={`flex items-center justify-between p-3.5 rounded-xl border ${rankColor} transition-all`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="font-bold w-6 text-center text-xs">
+                          #{rank}
+                        </span>
+                        <div className="w-9 h-9 rounded-full relative border border-white/10 flex items-center justify-center overflow-hidden bg-white/5">
+                          {user.avatar ? (
+                            <img src={user.avatar} alt={user.username} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full opacity-60 bg-cover" style={{ backgroundImage: `url('https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}')` }} />
+                          )}
+                        </div>
+                        <div>
+                          <div className="font-display font-extrabold uppercase text-xs text-white">{user.username}</div>
+                          <div className="text-[9px] text-white/40">{walletShort}</div>
+                        </div>
+                      </div>
+
+                      <div className="text-right">
+                        <div className="text-sm font-bold text-white">
+                          {user.total_taps} T
+                        </div>
+                        <div className="text-[9px] text-white/40">
+                          {user.total_reputation} R
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -826,8 +911,11 @@ export default function AnalyticsPage() {
                 )}
               </div>
 
-              {topUsers.length > 5 && (
-                <button className="w-full mt-6 py-3 border-t border-black/5 dark:border-white/5 text-xs font-display font-extrabold uppercase tracking-wider text-black/60 dark:text-white/60 hover:text-[#00e0c2] flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+              {topUsers.length > 0 && (
+                <button
+                  onClick={() => setIsFullLeaderboardModalOpen(true)}
+                  className="w-full mt-6 py-3 border-t border-black/5 dark:border-white/5 text-xs font-display font-extrabold uppercase tracking-wider text-black/60 dark:text-white/60 hover:text-[#00e0c2] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                >
                   View Full Leaderboard <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               )}
