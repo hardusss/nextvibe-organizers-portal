@@ -22,10 +22,10 @@ function AccentLoader() {
     const applyAccent = () => {
       const accent = localStorage.getItem("nextvibe_accent") || "purple";
       const accents: Record<string, { primary: string; hover: string; glow: string }> = {
-        purple: { primary: "#8b5cf6", hover: "#7c3aed", glow: "rgba(139,92,246,0.2)" },
-        emerald: { primary: "#10b981", hover: "#059669", glow: "rgba(16,185,129,0.2)" },
-        cyan: { primary: "#06b6d4", hover: "#0891b2", glow: "rgba(6,182,212,0.2)" },
-        orange: { primary: "#f97316", hover: "#ea580c", glow: "rgba(249,115,22,0.2)" },
+        purple: { primary: "#a855f7", hover: "#c084fc", glow: "rgba(168, 85, 247, 0.15)" },
+        emerald: { primary: "#34d399", hover: "#6ee7b7", glow: "rgba(52, 211, 153, 0.15)" },
+        cyan: { primary: "#22d3ee", hover: "#67e8f9", glow: "rgba(34, 211, 238, 0.15)" },
+        orange: { primary: "#fb923c", hover: "#fdba74", glow: "rgba(251, 146, 60, 0.15)" },
       };
 
       const currentConfig = accents[accent] || accents.purple;

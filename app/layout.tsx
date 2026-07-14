@@ -1,24 +1,30 @@
 import type { Metadata } from "next";
-import { Outfit, DM_Sans, Space_Mono } from "next/font/google";
+import { Italiana, Pinyon_Script, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import Providers from "@/src/components/providers/Providers";
 import "./globals.css";
 
-const outfit = Outfit({
-  variable: "--font-outfit",
+const italiana = Italiana({
+  variable: "--font-italiana",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400"],
 });
 
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
+const pinyonScript = Pinyon_Script({
+  variable: "--font-pinyon-script",
+  subsets: ["latin"],
+  weight: ["400"],
+});
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-plus-jakarta-sans",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
   weight: ["400", "500", "700"],
-});
-
-const spaceMono = Space_Mono({
-  variable: "--font-space-mono",
-  subsets: ["latin"],
-  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -34,7 +40,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${outfit.variable} ${dmSans.variable} ${spaceMono.variable} h-full antialiased`}
+      className={`${italiana.variable} ${pinyonScript.variable} ${plusJakartaSans.variable} ${jetbrainsMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">

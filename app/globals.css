@@ -41,23 +41,28 @@
 }
 
 .dark {
-  --background: #080c10;
-  --foreground: #ededed;
+  --background: #030206; /* deep obsidian black */
+  --foreground: #f1edf7; /* elegant off-white lavender */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-dm-sans);
-  --font-display: var(--font-outfit);
-  --font-mono: var(--font-space-mono);
+  --font-sans: var(--font-plus-jakarta-sans);
+  --font-display: var(--font-italiana);
+  --font-mono: var(--font-jetbrains-mono);
+  --font-cursive: var(--font-pinyon-script);
+}
+
+.font-cursive {
+  font-family: var(--font-pinyon-script), cursive;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), sans-serif;
-  transition: background-color 0.2s, color 0.2s;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 h1,
@@ -67,11 +72,12 @@ h4,
 h5,
 h6 {
   font-family: var(--font-display), sans-serif;
+  letter-spacing: -0.02em;
 }
 
 /* Global selection color */
 ::selection {
-  background: rgba(0, 224, 194, 0.3);
+  background: rgba(168, 85, 247, 0.25);
   color: #fff;
 }
 
@@ -86,10 +92,51 @@ h6 {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(168, 85, 247, 0.1);
   border-radius: 99px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(168, 85, 247, 0.25);
+}
+
+/* Premium Styling System */
+.premium-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(139, 92, 246, 0.12);
+  border-radius: 1.25rem;
+  box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark .premium-card {
+  background: rgba(11, 9, 21, 0.45);
+  border: 1px solid rgba(168, 85, 247, 0.08);
+  box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.5);
+}
+
+.premium-card:hover {
+  border-color: rgba(168, 85, 247, 0.25);
+  box-shadow: 0 16px 45px -8px rgba(168, 85, 247, 0.08);
+  transform: translateY(-2px);
+}
+
+.premium-glow-purple {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, rgba(0,0,0,0) 70%);
+  filter: blur(20px);
+  pointer-events: none;
+}
+
+.premium-text-gradient {
+  background: linear-gradient(135deg, #171717 30%, #7c3aed 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dark .premium-text-gradient {
+  background: linear-gradient(135deg, #f1edf7 30%, #c084fc 100%);
 }
