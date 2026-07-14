@@ -62,7 +62,7 @@ export default function Sidebar() {
         )}
       </AnimatePresence>
 
-      <div className={`fixed inset-y-0 left-0 z-50 flex flex-col w-64 bg-white dark:bg-[#05070a] border-r border-black/5 dark:border-white/5 h-[100dvh] transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
+      <div className={`fixed inset-y-0 left-0 z-50 flex flex-col w-64 bg-[#050409]/95 dark:bg-[#030206]/98 border-r border-white/5 h-[100dvh] transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="p-6 pb-4 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -70,15 +70,15 @@ export default function Sidebar() {
                 <Image src="/logo.png" alt="NextVibe" width={32} height={32} className="object-cover" />
               </div>
               <div>
-                <h1 className="text-black dark:text-white font-display font-extrabold text-xl tracking-tight leading-tight uppercase">NextVibe</h1>
-                <p className="text-black/40 dark:text-white/40 font-sans text-[10px] uppercase tracking-widest font-bold">
+                <h1 className="text-white font-cursive text-2xl tracking-normal leading-tight capitalize">NextVibe</h1>
+                <p className="text-white/50 font-display italic text-[11px] tracking-wide">
                   Organizer Portal
                 </p>
               </div>
             </div>
             <button
               onClick={closeMobileMenu}
-              className="md:hidden p-2 rounded-lg text-black/50 dark:text-white/50 hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+              className="md:hidden p-2 rounded-lg text-white/50 hover:bg-white/5 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -88,7 +88,7 @@ export default function Sidebar() {
         <div className="px-4 py-2">
           <button
             onClick={() => setShowCreateEvent(true)}
-            className="w-full flex items-center justify-center gap-2 bg-transparent hover:bg-black/5 dark:hover:bg-white/5 text-black/80 dark:text-white/80 transition-all py-3 rounded-xl border border-black/10 dark:border-white/10 hover:border-[var(--accent-primary)] font-display text-xs uppercase tracking-wider font-extrabold cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 bg-white/[0.03] hover:bg-white/[0.06] text-white/90 transition-all py-3 rounded-xl border border-white/10 hover:border-[var(--accent-primary)] hover:shadow-[0_0_15px_var(--accent-glow)] font-display text-xs uppercase tracking-wider font-extrabold cursor-pointer"
           >
             <Plus className="w-4 h-4" /> Create Event
           </button>
@@ -110,20 +110,20 @@ export default function Sidebar() {
                   onClick={() => {
                     if (window.innerWidth < 768) closeMobileMenu();
                   }}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group relative ${isActive
-                      ? "text-black dark:text-white font-semibold"
-                      : "text-black/50 dark:text-white/50 hover:text-black/80 dark:hover:text-white/80"
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative ${isActive
+                      ? "text-white bg-white/[0.04] border border-white/5 font-semibold"
+                      : "text-white/50 hover:text-white hover:bg-white/[0.02]"
                     }`}
                 >
                   {isActive && (
                     <motion.div
                       layoutId="sidebar-active-bar"
-                      className="absolute left-0 top-3 bottom-3 w-[3px] rounded-r bg-[var(--accent-primary,#8b5cf6)]"
+                      className="absolute left-0 top-3 bottom-3 w-[3px] rounded-r bg-[var(--accent-primary,#a855f7)]"
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
                   )}
                   <item.icon
-                    className={`w-5 h-5 transition-colors ${isActive ? "text-[var(--accent-primary,#8b5cf6)]" : "text-black/40 dark:text-white/40 group-hover:text-black/70 dark:group-hover:text-white/70"
+                    className={`w-5 h-5 transition-colors ${isActive ? "text-[var(--accent-primary,#a855f7)]" : "text-white/40 group-hover:text-white/70"
                       }`}
                   />
                   <span className="text-sm font-medium tracking-tight">{item.name}</span>
@@ -139,38 +139,38 @@ export default function Sidebar() {
             onClick={() => {
               if (window.innerWidth < 768) closeMobileMenu();
             }}
-            className="flex items-center gap-3 px-4 py-3 rounded-lg text-black/50 dark:text-white/50 hover:bg-black/5 dark:hover:bg-white/5 hover:text-black/80 dark:hover:text-white/80 transition-colors group relative"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/50 hover:bg-white/[0.02] hover:text-white transition-colors group relative"
           >
             {pathname === "/help" && (
               <motion.div
                 layoutId="sidebar-active-bar"
-                className="absolute left-0 top-3 bottom-3 w-[3px] rounded-r bg-[var(--accent-primary,#8b5cf6)]"
+                className="absolute left-0 top-3 bottom-3 w-[3px] rounded-r bg-[var(--accent-primary,#a855f7)]"
                 transition={{ type: "spring", stiffness: 380, damping: 30 }}
               />
             )}
-            <HelpCircle className={`w-5 h-5 transition-colors ${pathname === "/help" ? "text-[var(--accent-primary,#8b5cf6)]" : "text-black/40 dark:text-white/40 group-hover:text-black/70 dark:group-hover:text-white/70"}`} />
+            <HelpCircle className={`w-5 h-5 transition-colors ${pathname === "/help" ? "text-[var(--accent-primary,#a855f7)]" : "text-white/40 group-hover:text-white/70"}`} />
             <span className="text-sm font-medium tracking-tight">Help</span>
           </Link>
-          <button onClick={() => setShowLogoutModal(true)} className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[#ff6b6b]/70 hover:bg-[#ff6b6b]/5 hover:text-[#ff6b6b] transition-colors group cursor-pointer">
+          <button onClick={() => setShowLogoutModal(true)} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[#ff6b6b]/70 hover:bg-[#ff6b6b]/5 hover:text-[#ff6b6b] transition-colors group cursor-pointer">
             <LogOut className="w-5 h-5 text-[#ff6b6b]/60 group-hover:text-[#ff6b6b]" />
             <span className="text-sm font-medium tracking-tight">Logout</span>
           </button>
 
           {canAccessDemo && (
-            <div className="mt-3 pt-3 border-t border-black/5 dark:border-white/5">
+            <div className="mt-3 pt-3 border-t border-white/5">
               <button
                 onClick={toggleDemoMode}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors group cursor-pointer hover:bg-black/5 dark:hover:bg-white/5"
+                className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-colors group cursor-pointer hover:bg-white/[0.02]"
               >
                 <div className="flex items-center gap-3">
-                  <FlaskConical className={`w-5 h-5 transition-colors ${isDemoMode ? "text-[var(--accent-primary,#8b5cf6)]" : "text-black/40 dark:text-white/40"
+                  <FlaskConical className={`w-5 h-5 transition-colors ${isDemoMode ? "text-[var(--accent-primary,#a855f7)]" : "text-white/40"
                     }`} />
-                  <span className={`text-sm font-medium tracking-tight transition-colors ${isDemoMode ? "text-black dark:text-white" : "text-black/50 dark:text-white/50"
+                  <span className={`text-sm font-medium tracking-tight transition-colors ${isDemoMode ? "text-white" : "text-white/50"
                     }`}>Demo Mode</span>
                 </div>
                 <div className={`relative w-10 h-[22px] rounded-full transition-colors duration-300 ${isDemoMode
-                    ? "bg-[var(--accent-primary,#8b5cf6)]"
-                    : "bg-black/10 dark:bg-white/10"
+                    ? "bg-[var(--accent-primary,#a855f7)]"
+                    : "bg-white/10"
                   }`}>
                   <motion.div
                     className="absolute top-[3px] w-4 h-4 rounded-full bg-white shadow-sm"

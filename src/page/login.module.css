@@ -11,7 +11,7 @@
   background: #060a0f;
 }
 
-/* Subtle teal corner glow – bottom-right */
+/* Subtle violet corner glow – bottom-right */
 .pageWrapper::before {
   content: "";
   position: absolute;
@@ -20,7 +20,7 @@
   width: 60vmin;
   height: 60vmin;
   border-radius: 50%;
-  background: rgba(0, 224, 194, 0.15);
+  background: rgba(139, 92, 246, 0.15);
   filter: blur(120px);
   pointer-events: none;
 }
@@ -84,17 +84,17 @@
   width: 88px;
   height: 88px;
   object-fit: contain;
-  filter: drop-shadow(0 0 20px rgba(0, 224, 194, 0.2));
+  filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.2));
   animation: logoPulse 3s ease-in-out infinite;
 }
 
 @keyframes logoPulse {
   0%,
   100% {
-    filter: drop-shadow(0 0 20px rgba(0, 224, 194, 0.2));
+    filter: drop-shadow(0 0 20px rgba(139, 92, 246, 0.2));
   }
   50% {
-    filter: drop-shadow(0 0 30px rgba(0, 224, 194, 0.35));
+    filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.35));
   }
 }
 
@@ -131,9 +131,9 @@
   margin-bottom: 16px;
   padding: 8px 14px;
   border-radius: 10px;
-  background: rgba(0, 224, 194, 0.08);
-  border: 1px solid rgba(0, 224, 194, 0.2);
-  color: #00e0c2;
+  background: rgba(139, 92, 246, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  color: #8b5cf6;
   font-size: 0.82rem;
   font-weight: 500;
   font-family: var(--font-mono), monospace;
@@ -144,14 +144,14 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #00e0c2;
-  box-shadow: 0 0 8px rgba(0, 224, 194, 0.5);
+  background: #8b5cf6;
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
   animation: dotPulse 2s ease-in-out infinite;
 }
 
 @keyframes dotPulse {
-  0%, 100% { box-shadow: 0 0 8px rgba(0, 224, 194, 0.5); }
-  50% { box-shadow: 0 0 14px rgba(0, 224, 194, 0.8); }
+  0%, 100% { box-shadow: 0 0 8px rgba(139, 92, 246, 0.5); }
+  50% { box-shadow: 0 0 14px rgba(139, 92, 246, 0.8); }
 }
 
 @keyframes fadeIn {
@@ -192,14 +192,14 @@
 
 .btnSolana {
   background: transparent;
-  border: 1.5px solid rgba(0, 224, 194, 0.5);
-  color: #00e0c2;
+  border: 1.5px solid rgba(139, 92, 246, 0.5);
+  color: #8b5cf6;
 }
 
 .btnSolana:hover:not(:disabled) {
-  background: rgba(0, 224, 194, 0.08);
-  border-color: rgba(0, 224, 194, 0.75);
-  box-shadow: 0 0 20px rgba(0, 224, 194, 0.12);
+  background: rgba(139, 92, 246, 0.08);
+  border-color: rgba(139, 92, 246, 0.75);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.12);
 }
 
 .btnGoogle {
@@ -292,7 +292,7 @@
 }
 
 .inputWrapper:focus-within .inputIcon {
-  color: rgba(0, 224, 194, 0.6);
+  color: rgba(139, 92, 246, 0.6);
 }
 
 .input {
@@ -314,9 +314,9 @@
 }
 
 .input:focus {
-  border-color: rgba(0, 224, 194, 0.4);
-  background: rgba(0, 224, 194, 0.03);
-  box-shadow: 0 0 0 3px rgba(0, 224, 194, 0.06);
+  border-color: rgba(139, 92, 246, 0.4);
+  background: rgba(139, 92, 246, 0.03);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.06);
 }
 
 .input:disabled {
@@ -331,7 +331,7 @@
   height: 50px;
   border: none;
   border-radius: 12px;
-  background: linear-gradient(135deg, #00e0c2 0%, #a855f7 60%, #d946ef 100%);
+  background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 60%, #d946ef 100%);
   color: #fff;
   font-size: 1rem;
   font-weight: 700;
@@ -362,7 +362,7 @@
 .submitBtn:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow:
-    0 8px 30px -8px rgba(0, 224, 194, 0.35),
+    0 8px 30px -8px rgba(139, 92, 246, 0.35),
     0 4px 15px -4px rgba(168, 85, 247, 0.25);
 }
 

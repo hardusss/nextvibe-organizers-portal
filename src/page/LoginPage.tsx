@@ -214,7 +214,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#080c10] text-[#ededed] font-sans antialiased overflow-hidden selection:bg-[#00e0c2]/30 selection:text-white">
+    <div className="min-h-screen flex bg-[#080c10] text-[#ededed] font-sans antialiased overflow-hidden selection:bg-[#8b5cf6]/30 selection:text-white">
       
       {/* LEFT: Dynamic Branding Panel (hidden on mobile) */}
       <div className="hidden md:flex md:w-1/2 relative bg-[#040608] border-r border-white/5 flex-col justify-between p-12 overflow-hidden">
@@ -229,27 +229,27 @@ export default function LoginPage() {
           <div className="w-6 h-6 rounded-full overflow-hidden">
             <Image src="/logo.png" alt="NextVibe" width={24} height={24} className="object-cover" />
           </div>
-          <span className="font-display font-extrabold text-xs uppercase tracking-widest text-[#00e0c2]">NextVibe - IRL Networking Layer on Solana</span>
+          <span className="font-display font-extrabold text-xs uppercase tracking-widest text-[#8b5cf6]">NextVibe - IRL Networking Layer on Solana</span>
         </div>
 
         {/* Center: Hero Branding / Huge Mascot Image */}
         <div className="z-10 my-auto space-y-8 max-w-md">
           <div className="relative w-44 h-44 mx-auto md:mx-0">
             {/* Spinning/pulsing neon glow behind logo */}
-            <div className="absolute inset-0 bg-[#00e0c2]/20 rounded-full blur-[40px] animate-pulse" />
+            <div className="absolute inset-0 bg-[#8b5cf6]/20 rounded-full blur-[40px] animate-pulse" />
             <Image
               src="/logo.png"
               alt="NextVibe mascot logo"
               fill
               priority
-              className="object-contain drop-shadow-[0_0_35px_rgba(0,224,192,0.4)] animate-[bounce_4s_infinite_ease-in-out]"
+              className="object-contain drop-shadow-[0_0_35px_rgba(139,92,246,0.4)] animate-[bounce_4s_infinite_ease-in-out]"
             />
           </div>
           
           <div className="space-y-4">
-            <h2 className="text-4xl md:text-5xl font-display font-extrabold leading-tight tracking-tight uppercase">
+            <h2 className="text-4xl md:text-5xl font-display font-bold leading-tight tracking-tight capitalize text-white">
               The Spatial Web3 <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#00e0c2] to-[#a855f7]">Organizer Hub.</span>
+              <span className="font-cursive text-[#c084fc] normal-case text-5xl md:text-6xl block mt-2">Organizer Hub.</span>
             </h2>
             <p className="text-sm text-white/50 leading-relaxed max-w-sm">
               Verify real-life NFC check-ins, manage attendee connection heatmaps, and issue cryptographic certificates instantly.
@@ -267,7 +267,7 @@ export default function LoginPage() {
       {/* RIGHT: Edge-Anchored Sleek Sign In Panel */}
       <div className="w-full md:w-1/2 flex flex-col justify-center p-8 sm:p-16 md:p-24 relative overflow-y-auto custom-scrollbar">
         {/* Subtle background glow */}
-        <div className="absolute top-[-20%] right-[-20%] w-[60%] h-[60%] rounded-full bg-[#00e0c2]/5 blur-[120px] pointer-events-none" />
+        <div className="absolute top-[-20%] right-[-20%] w-[60%] h-[60%] rounded-full bg-[#8b5cf6]/5 blur-[120px] pointer-events-none" />
         
         <div className="max-w-md w-full mx-auto space-y-8 z-10">
           
@@ -275,9 +275,9 @@ export default function LoginPage() {
           <div className="space-y-2">
             <div className="flex items-center gap-2 md:hidden">
               <Image src="/logo.png" alt="NextVibe" width={32} height={32} className="object-contain" />
-              <span className="font-display font-extrabold text-sm uppercase tracking-widest text-[#00e0c2]">NextVibe</span>
+              <span className="font-cursive text-xl capitalize text-[#8b5cf6]">NextVibe</span>
             </div>
-            <h1 className="text-3xl font-display font-extrabold tracking-tight uppercase">
+            <h1 className="text-3xl font-display font-bold tracking-tight capitalize text-white">
               Organizer Login
             </h1>
             <p className="text-sm text-white/50">
@@ -295,9 +295,9 @@ export default function LoginPage() {
 
           {/* Connected wallet info */}
           {publicKey && (
-            <div className="p-4 rounded-xl bg-[#00e0c2]/5 border border-[#00e0c2]/20 text-[#00e0c2] text-xs font-mono flex items-center justify-between animate-[fadeIn_0.2s_ease]">
+            <div className="p-4 rounded-xl bg-[#8b5cf6]/5 border border-[#8b5cf6]/20 text-[#8b5cf6] text-xs font-mono flex items-center justify-between animate-[fadeIn_0.2s_ease]">
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#00e0c2] shadow-[0_0_8px_rgba(0,224,192,0.8)] animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-[#8b5cf6] shadow-[0_0_8px_rgba(139,92,246,0.8)] animate-pulse" />
                 <span>Connected: {publicKey.toBase58().slice(0, 6)}…{publicKey.toBase58().slice(-6)}</span>
               </div>
               <button onClick={() => disconnect()} className="text-[10px] uppercase font-bold text-white/40 hover:text-white transition-colors">
@@ -312,10 +312,10 @@ export default function LoginPage() {
             <button
               onClick={handleSolanaLogin}
               disabled={loading !== null}
-              className="group flex items-center justify-center gap-3 w-full h-12 rounded-xl border border-[#00e0c2]/30 text-[#00e0c2] bg-transparent hover:bg-[#00e0c2]/5 hover:border-[#00e0c2]/60 font-semibold text-sm transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group flex items-center justify-center gap-3 w-full h-12 rounded-xl border border-[#8b5cf6]/30 text-[#8b5cf6] bg-transparent hover:bg-[#8b5cf6]/5 hover:border-[#8b5cf6]/60 font-semibold text-sm transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading === "solana" || connecting ? (
-                <Loader2 className="w-4 h-4 animate-spin text-[#00e0c2]" />
+                <Loader2 className="w-4 h-4 animate-spin text-[#8b5cf6]" />
               ) : (
                 <SolanaIcon />
               )}
@@ -359,7 +359,7 @@ export default function LoginPage() {
                 Email Address
               </label>
               <div className="relative flex items-center">
-                <span className="absolute left-4 text-white/30 pointer-events-none group-focus-within:text-[#00e0c2] transition-colors">
+                <span className="absolute left-4 text-white/30 pointer-events-none group-focus-within:text-[#8b5cf6] transition-colors">
                   <Mail className="w-4 h-4" />
                 </span>
                 <input
@@ -369,7 +369,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={loading !== null}
-                  className="w-full h-12 pl-12 pr-4 bg-white/[0.02] border border-white/10 rounded-xl text-white placeholder-white/20 outline-none text-sm transition-all focus:border-[#00e0c2]/50 focus:bg-[#00e0c2]/[0.01]"
+                  className="w-full h-12 pl-12 pr-4 bg-white/[0.02] border border-white/10 rounded-xl text-white placeholder-white/20 outline-none text-sm transition-all focus:border-[#8b5cf6]/50 focus:bg-[#8b5cf6]/[0.01]"
                   required
                 />
               </div>
@@ -391,7 +391,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={loading !== null}
-                  className="w-full h-12 pl-12 pr-4 bg-white/[0.02] border border-white/10 rounded-xl text-white placeholder-white/20 outline-none text-sm transition-all focus:border-[#00e0c2]/50 focus:bg-[#00e0c2]/[0.01]"
+                  className="w-full h-12 pl-12 pr-4 bg-white/[0.02] border border-white/10 rounded-xl text-white placeholder-white/20 outline-none text-sm transition-all focus:border-[#8b5cf6]/50 focus:bg-[#8b5cf6]/[0.01]"
                   required
                 />
               </div>
@@ -401,10 +401,10 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading !== null}
-              className="w-full h-12 rounded-xl bg-gradient-to-r from-[#00e0c2] to-[#a855f7] text-black font-extrabold text-sm uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#00e0c2]/10 hover:shadow-[#00e0c2]/20 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full h-12 rounded-xl bg-gradient-to-r from-[#8b5cf6] via-[#a855f7] to-[#d946ef] text-white font-extrabold text-sm uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#8b5cf6]/10 hover:shadow-[#8b5cf6]/20 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading === "email" ? (
-                <Loader2 className="w-4 h-4 animate-spin text-black" />
+                <Loader2 className="w-4 h-4 animate-spin text-white" />
               ) : (
                 <>
                   <span>Sign In to Portal</span>
