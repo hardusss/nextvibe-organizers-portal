@@ -23,6 +23,7 @@ import ActivityTimelineChart from "@/src/components/analytics/ActivityTimelineCh
 import SocialForceGraph from "@/src/components/analytics/SocialForceGraph";
 import BroadcastPanel from "@/src/components/analytics/BroadcastPanel";
 import AttendeeRaffle from "@/src/components/analytics/AttendeeRaffle";
+import EventPostsSection from "@/src/components/analytics/EventPostsSection";
 import { useRole } from "@/src/contexts/RoleContext";
 
 const container = {
@@ -971,7 +972,10 @@ export default function AnalyticsPage() {
             </div>
           </div>
 
-          {/* SECTION 5: ATTENDEE RAFFLE & GIVEAWAY SECTION */}
+          {/* SECTION 5: EVENT POSTS FROM ATTENDEES */}
+          <EventPostsSection postId={selectedEventId} />
+
+          {/* SECTION 6: ATTENDEE RAFFLE & GIVEAWAY SECTION */}
           <AttendeeRaffle
             key={selectedEventId ?? "no-event"}
             attendees={topUsers}

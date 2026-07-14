@@ -6,12 +6,13 @@ import { getUserDetail } from "@/src/api/user.detail";
 import { getHostedEvents, getEventAttendees, deleteEventPost } from "@/src/api/events";
 import {
   Calendar, Users, CheckCircle, XCircle, Clock,
-  MapPin, Loader2, User, ShieldCheck, Plus, Edit3, Trash2
+  MapPin, Loader2, User, ShieldCheck, Plus, Edit3, Trash2, Image as ImageIcon
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import CreateEventModal from "@/src/components/modals/CreateEventModal";
 import EditEventModal from "@/src/components/modals/EditEventModal";
+import EventPostsModal from "@/src/components/modals/EventPostsModal";
 import { useRole } from "@/src/contexts/RoleContext";
 
 interface HostedEvent {
@@ -67,6 +68,10 @@ export default function EventsPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const { role, isSponsorEvent } = useRole();
+
+  // Event Posts modal
+  const [postsEventId, setPostsEventId] = useState<number | null>(null);
+  const [postsEventTitle, setPostsEventTitle] = useState<string>("");
 
   useEffect(() => {
     const token = typeof window !== "undefined" ? localStorage.getItem("nextvibe_access") : null;
@@ -253,6 +258,14 @@ export default function EventsPage() {
                           </button>
 
                           <button
+                            onClick={() => { setPostsEventId(evt.post_id); setPostsEventTitle(evt.about); }}
+                            className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-transparent border border-black/10 dark:border-white/10 hover:border-[#8b5cf6] hover:bg-[#8b5cf6]/5 text-[#8b5cf6] text-xs font-display font-extrabold uppercase tracking-wider transition-colors cursor-pointer"
+                            title="View Posts"
+                          >
+                            <ImageIcon className="w-3.5 h-3.5" /> Posts
+                          </button>
+
+                          <button
                             onClick={() => { setEditingEvent(evt); setShowEditModal(true); }}
                             className="flex items-center justify-center p-2.5 rounded-xl border border-black/10 dark:border-white/10 hover:bg-white/5 text-black/60 dark:text-white/60 hover:text-[#00e0c2] transition-colors cursor-pointer"
                             title="Edit Event"
@@ -357,6 +370,13 @@ export default function EventsPage() {
         onClose={() => { setShowEditModal(false); setEditingEvent(null); }}
         event={editingEvent}
         onEventUpdated={() => fetchEvents()}
+      />
+
+      <EventPostsModal
+        isOpen={postsEventId !== null}
+        onClose={() => { setPostsEventId(null); setPostsEventTitle(""); }}
+        eventId={postsEventId}
+        eventTitle={postsEventTitle}
       />
 
       {/* Custom Delete Confirmation Modal */}

@@ -20,6 +20,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "images.lumacdn.com",
       },
+      {
+        protocol: "https",
+        hostname: "nextvibe-s3.s3.amazonaws.com",
+      },
     ],
   },
 };

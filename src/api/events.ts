@@ -857,4 +857,78 @@ export async function getEventTaps(postId: number): Promise<EventTapsResult> {
   return response.data;
 }
 
+// ─── Event Posts (posts made at an event by attendees) ────────────────────────
 
+export interface EventPostMedia {
+  id: number;
+  media_url: string | null;
+  media_preview: string | null;
+  type: "image" | "video";
+}
+
+export interface EventPost {
+  id: number;
+  about: string;
+  create_at: string;
+  location: string | null;
+  count_likes: number;
+  is_comments_enabled: boolean;
+  owner__user_id: number;
+  owner__username: string;
+  owner__avatar: string | null;
+  owner__official: boolean;
+  media: EventPostMedia[];
+  is_ai_generated: boolean;
+  moderation_status: string;
+  is_nft: boolean;
+  minted_count: number;
+  total_supply: number;
+  nft_price: string | null;
+  already_claimed: boolean;
+  sold_out: boolean;
+  is_owner: boolean;
+  owner_wallet: string | null;
+  owner__is_og: boolean;
+  owner__edition: number | null;
+  owner__invited_count: number;
+  is_luma_event: boolean;
+  luma_event_url: string | null;
+  luma_event_verified: boolean;
+  luma_event_start_time: string | null;
+  luma_event_end_time: string | null;
+  event_request_status: string | null;
+  on_event: number | null;
+  reputation_earned: number;
+}
+
+export interface EventPostsResponse {
+  results: EventPost[];
+  count: number;
+  total: number;
+  more_posts: boolean;
+  liked_posts: number[];
+}
+
+export async function getEventPosts(
+  postId: number,
+  index: number = 0,
+  limit: number = 50
+): Promise<EventPostsResponse> {
+  const token = storage.getItem("access");
+
+  if (!token) {
+    throw new Error("No access token found");
+  }
+
+  const response = await axios.get(
+    `${getApiUrl()}/posts/event-posts/${postId}/`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: { index, limit },
+    }
+  );
+
+  return response.data;
+}
