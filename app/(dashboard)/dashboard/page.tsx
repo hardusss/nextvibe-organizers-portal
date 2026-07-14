@@ -22,6 +22,7 @@ import EcosystemDonutChart from "@/src/components/analytics/EcosystemDonutChart"
 import ActivityTimelineChart from "@/src/components/analytics/ActivityTimelineChart";
 import SocialForceGraph from "@/src/components/analytics/SocialForceGraph";
 import BroadcastPanel from "@/src/components/analytics/BroadcastPanel";
+import AttendeeRaffle from "@/src/components/analytics/AttendeeRaffle";
 import { useRole } from "@/src/contexts/RoleContext";
 
 const container = {
@@ -234,9 +235,18 @@ export default function AnalyticsPage() {
 
   const selectedEvent = visibleEvents.find(e => e.post_id === selectedEventId);
 
-  const lastHourNetworking = analytics?.hourly_activity && analytics.hourly_activity.length > 0
-    ? analytics.hourly_activity[analytics.hourly_activity.length - 1].networking
-    : 0;
+  const getLastHourNetworking = () => {
+    if (!analytics?.hourly_activity || analytics.hourly_activity.length === 0) return 0;
+    const lastItem = analytics.hourly_activity[analytics.hourly_activity.length - 1];
+    const lastHourDate = new Date(lastItem.hour);
+    const now = new Date();
+    
+    // Check if the last activity hour is within the last 2 hours (to account for timezone/hour boundaries)
+    const isRecent = (now.getTime() - lastHourDate.getTime()) < 2 * 60 * 60 * 1000;
+    return isRecent ? lastItem.networking : 0;
+  };
+
+  const lastHourNetworking = getLastHourNetworking();
 
   // If sponsor has no side events, show empty state prompt
   if (role === "sponsor" && visibleEvents.length === 0) {
@@ -526,13 +536,13 @@ export default function AnalyticsPage() {
                 <div className="mt-6 space-y-3 relative z-10">
                   <div className="flex items-baseline gap-3 flex-wrap">
                     <span className="text-5xl font-mono font-bold text-black dark:text-white tracking-tight">
-                      <CountUp to={role === "sponsor" ? Math.round((analytics.total_irl_taps || 0) * 0.68) : (analytics.total_irl_taps || 0)} />
+                      <CountUp to={analytics.total_irl_taps || 0} />
                     </span>
 
                     {/* Live trend badge */}
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-mono font-bold text-emerald-500 uppercase tracking-wider">
                       <TrendingUp className="w-3 h-3" />
-                      +{role === "sponsor" ? Math.round(lastHourNetworking * 0.68) : lastHourNetworking} last hr
+                      +{lastHourNetworking} last hr
                     </span>
                   </div>
 
@@ -960,6 +970,14 @@ export default function AnalyticsPage() {
               />
             </div>
           </div>
+
+          {/* SECTION 5: ATTENDEE RAFFLE & GIVEAWAY SECTION */}
+          <AttendeeRaffle
+            key={selectedEventId ?? "no-event"}
+            attendees={topUsers}
+            isLoading={isLoadingTopUsers}
+            selectedEventId={selectedEventId}
+          />
 
         </motion.div>
       </main>

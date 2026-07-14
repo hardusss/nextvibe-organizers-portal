@@ -11,7 +11,7 @@ import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import "@solana/wallet-adapter-react-ui/styles.css";
 
 const SOLANA_RPC =
-  process.env.NEXT_PUBLIC_SOLANA_RPC_URL ??
+  process.env.NEXT_PUBLIC_SOLANA_RPC_URL ||
   "https://api.mainnet-beta.solana.com";
 
 export default function SolanaProvider({ children }: { children: ReactNode }) {
