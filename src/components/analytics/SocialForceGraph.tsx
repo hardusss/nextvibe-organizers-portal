@@ -11,6 +11,7 @@ interface SocialNode {
   connections_count: number;
   reputation_earned: number;
   is_super_connector: boolean;
+  is_organizer?: boolean;
 }
 
 interface SocialEdge {
@@ -78,10 +79,23 @@ export default function SocialForceGraph({ nodes = [], edges = [] }: Props) {
 
   // Initialize and run Simulation
   useEffect(() => {
-    if (nodes.length === 0) return;
+    if (!nodes || nodes.length === 0) return;
 
-    // Clone data to prevent modifying parent props
-    const d3Nodes = nodes.map((n) => ({
+    // 1. Filter out invalid nodes and ensure uniqueness by ID
+    const uniqueNodesMap = new Map<number, SocialNode>();
+    nodes.forEach((n) => {
+      if (n && typeof n.id === "number") {
+        if (!uniqueNodesMap.has(n.id)) {
+          uniqueNodesMap.set(n.id, n);
+        }
+      }
+    });
+
+    const cleanNodes = Array.from(uniqueNodesMap.values());
+    const validNodeIds = new Set(cleanNodes.map((n) => n.id));
+
+    // 2. Clone nodes with initial position properties for D3
+    const d3Nodes = cleanNodes.map((n) => ({
       ...n,
       x: dimensions.width / 2 + (Math.random() - 0.5) * 100,
       y: dimensions.height / 2 + (Math.random() - 0.5) * 100,
@@ -89,11 +103,19 @@ export default function SocialForceGraph({ nodes = [], edges = [] }: Props) {
       vy: 0,
     }));
 
-    const d3Edges = edges.map((e) => ({
-      ...e,
-      source: e.source,
-      target: e.target,
-    }));
+    // 3. Filter edges to only include links where both source and target exist in validNodeIds
+    const d3Edges = (edges || [])
+      .filter((e) => {
+        if (!e) return false;
+        const sourceId = typeof e.source === "object" ? e.source.id : e.source;
+        const targetId = typeof e.target === "object" ? e.target.id : e.target;
+        return validNodeIds.has(sourceId) && validNodeIds.has(targetId);
+      })
+      .map((e) => ({
+        ...e,
+        source: typeof e.source === "object" ? e.source.id : e.source,
+        target: typeof e.target === "object" ? e.target.id : e.target,
+      }));
 
     // Reset center pan
     setTransform({ x: 0, y: 0, k: 1 });
@@ -285,10 +307,8 @@ export default function SocialForceGraph({ nodes = [], edges = [] }: Props) {
 
           const weight = edge.weight || 1;
           ctx.lineWidth = Math.max(1, Math.min(8, weight / 2));
-          // Use violet gradient colored edge
-          ctx.strokeStyle = isDark
-            ? `rgba(139, 92, 246, ${Math.max(0.1, Math.min(0.6, weight / 10))})`
-            : `rgba(139, 92, 246, ${Math.max(0.1, Math.min(0.4, weight / 12))})`;
+          // Use premium purple colored edge (primary color: #a855f7)
+          ctx.strokeStyle = `rgba(168, 85, 247, ${Math.max(0.15, Math.min(0.75, weight / 10))})`;
           ctx.stroke();
         });
 
@@ -298,8 +318,30 @@ export default function SocialForceGraph({ nodes = [], edges = [] }: Props) {
 
           const r = getNodeRadius(node.connections_count);
 
-          // A. Draw gold outer glowing border for super connectors
-          if (node.is_super_connector) {
+          // A. Draw glowing outer border for organizer or super connector
+          if (node.is_organizer) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, r + 4, 0, Math.PI * 2);
+
+            // Pulsing violet circle ring
+            const pulseRadius = r + 5 + Math.sin(pulseTimeRef.current * 0.05) * 3;
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, pulseRadius, 0, Math.PI * 2);
+            ctx.strokeStyle = "rgba(168, 85, 247, 0.4)";
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            // Main violet rim
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, r + 2, 0, Math.PI * 2);
+            ctx.strokeStyle = "#a855f7"; // Neon purple
+            ctx.lineWidth = 2.5;
+            ctx.shadowColor = "#a855f7";
+            ctx.shadowBlur = 12;
+            ctx.stroke();
+            ctx.restore();
+          } else if (node.is_super_connector) {
             ctx.save();
             ctx.beginPath();
             ctx.arc(node.x, node.y, r + 4, 0, Math.PI * 2);
@@ -357,21 +399,22 @@ export default function SocialForceGraph({ nodes = [], edges = [] }: Props) {
           }
           ctx.restore();
 
-          // Border for the node
+          // Border for the node (match obsidian purple border style)
           ctx.beginPath();
           ctx.arc(node.x, node.y, r, 0, Math.PI * 2);
-          ctx.strokeStyle = isDark ? "#1f1f29" : "#e2e8f0";
+          ctx.strokeStyle = "rgba(168, 85, 247, 0.25)";
           ctx.lineWidth = 2;
           ctx.stroke();
 
           // C. Draw label text under the node
-          ctx.fillStyle = isDark ? "rgba(255, 255, 255, 0.7)" : "rgba(0, 0, 0, 0.8)";
-          ctx.font = `600 10px monospace`;
+          ctx.fillStyle = node.is_organizer ? "#c084fc" : "rgba(241, 237, 247, 0.8)";
+          ctx.font = node.is_organizer ? `bold 10px monospace` : `600 10px monospace`;
           ctx.textAlign = "center";
           ctx.textBaseline = "top";
           // Truncate name if long
           const labelText = node.label.length > 12 ? `${node.label.slice(0, 10)}...` : node.label;
-          ctx.fillText(`@${labelText}`, node.x, node.y + r + 5);
+          const displayLabel = node.is_organizer ? `👑 @${labelText}` : `@${labelText}`;
+          ctx.fillText(displayLabel, node.x, node.y + r + 5);
         });
       }
 
@@ -395,37 +438,37 @@ export default function SocialForceGraph({ nodes = [], edges = [] }: Props) {
   return (
     <div
       ref={containerRef}
-      className="bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-5 md:p-6 flex flex-col shadow-sm backdrop-blur-md relative overflow-hidden transition-all min-h-[450px]"
+      className="premium-card p-5 md:p-6 flex flex-col relative overflow-hidden min-h-[450px]"
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <div>
-          <h2 className="text-lg font-display font-extrabold uppercase text-black dark:text-white tracking-tight flex items-center gap-2">
-            <Activity className="w-5 h-5 text-[#00e0c2]" />
+          <h2 className="text-lg font-display font-extrabold uppercase text-foreground tracking-tight flex items-center gap-2">
+            <Activity className="w-5 h-5 text-[var(--accent-primary,#a855f7)]" />
             Social Connection Graph
           </h2>
-          <p className="text-black/40 dark:text-white/40 text-xs">Force-directed map of attendee peer-to-peer telemetry</p>
+          <p className="text-foreground/40 text-xs">Force-directed map of attendee peer-to-peer telemetry</p>
         </div>
 
         {/* Toolbar Controls */}
         {hasGraphData && (
-          <div className="flex items-center gap-1.5 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-lg p-1">
+          <div className="flex items-center gap-1.5 bg-foreground/5 border border-foreground/10 rounded-lg p-1">
             <button
               onClick={() => handleZoom(1.2)}
-              className="p-1.5 rounded hover:bg-black/5 dark:hover:bg-white/5 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white transition-colors"
+              className="p-1.5 rounded hover:bg-foreground/5 text-foreground/60 hover:text-foreground transition-colors cursor-pointer"
               title="Zoom In"
             >
               <ZoomIn className="w-4 h-4" />
             </button>
             <button
               onClick={() => handleZoom(0.8)}
-              className="p-1.5 rounded hover:bg-black/5 dark:hover:bg-white/5 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white transition-colors"
+              className="p-1.5 rounded hover:bg-foreground/5 text-foreground/60 hover:text-foreground transition-colors cursor-pointer"
               title="Zoom Out"
             >
               <ZoomOut className="w-4 h-4" />
             </button>
             <button
               onClick={handleResetZoom}
-              className="p-1.5 rounded hover:bg-black/5 dark:hover:bg-white/5 text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white transition-colors"
+              className="p-1.5 rounded hover:bg-foreground/5 text-foreground/60 hover:text-foreground transition-colors cursor-pointer"
               title="Reset View"
             >
               <Maximize2 className="w-4 h-4" />
@@ -435,12 +478,12 @@ export default function SocialForceGraph({ nodes = [], edges = [] }: Props) {
       </div>
 
       {!hasGraphData ? (
-        <div className="flex-1 flex flex-col items-center justify-center py-20 text-black/30 dark:text-white/30 text-xs">
+        <div className="flex-1 flex flex-col items-center justify-center py-20 text-foreground/30 text-xs">
           <Users className="w-10 h-10 mb-2 opacity-25" />
           <span className="font-mono">Telemetry graph awaiting connection logs</span>
         </div>
       ) : (
-        <div className="flex-1 relative border border-black/5 dark:border-white/5 bg-gray-50/50 dark:bg-black/30 rounded-xl overflow-hidden min-h-[350px]">
+        <div className="flex-1 relative border border-foreground/5 bg-black/40 rounded-xl overflow-hidden min-h-[350px]">
           <canvas
             ref={canvasRef}
             width={dimensions.width}
@@ -455,7 +498,7 @@ export default function SocialForceGraph({ nodes = [], edges = [] }: Props) {
           {/* Floating Hover Card Detail Tooltip */}
           {hoveredNode && (
             <div
-              className="absolute pointer-events-none bg-white/95 dark:bg-[#0c0c0f]/95 border border-black/10 dark:border-white/10 rounded-2xl p-4 shadow-2xl backdrop-blur-md flex flex-col gap-2 w-[190px] z-20 transition-all duration-100"
+              className="absolute pointer-events-none bg-[#0c0c0f]/95 border border-[#a855f7]/20 rounded-2xl p-4 shadow-2xl backdrop-blur-md flex flex-col gap-2 w-[190px] z-20 transition-all duration-100"
               style={{
                 left: `${hoveredPos.x + 15}px`,
                 top: `${hoveredPos.y - 70}px`,
@@ -463,33 +506,39 @@ export default function SocialForceGraph({ nodes = [], edges = [] }: Props) {
             >
               {/* Profile Header */}
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full border border-black/10 dark:border-white/10 overflow-hidden bg-black/5 dark:bg-white/5 shrink-0">
+                <div className="w-8 h-8 rounded-full border border-foreground/10 overflow-hidden bg-foreground/5 shrink-0">
                   {hoveredNode.avatar ? (
                     <img src={hoveredNode.avatar} alt={hoveredNode.label} className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-indigo-600 text-white font-bold text-[10px] uppercase">
+                    <div className="w-full h-full flex items-center justify-center bg-[#a855f7] text-foreground font-bold text-[10px] uppercase">
                       {hoveredNode.label.slice(0, 2)}
                     </div>
                   )}
                 </div>
                 <div className="min-w-0">
-                  <div className="font-bold text-xs text-black dark:text-white truncate">@{hoveredNode.label}</div>
-                  <div className="text-[9px] font-mono text-black/40 dark:text-white/40">ID: #{hoveredNode.id}</div>
+                  <div className="font-bold text-xs text-foreground truncate">@{hoveredNode.label}</div>
+                  <div className="text-[9px] font-mono text-foreground/40">ID: #{hoveredNode.id}</div>
                 </div>
               </div>
 
               {/* Status details */}
-              <div className="h-[1px] bg-black/5 dark:bg-white/5 my-1" />
+              <div className="h-[1px] bg-foreground/5 my-1" />
 
               <div className="space-y-1 text-[10px] font-mono">
-                <div className="flex justify-between items-center text-black/60 dark:text-white/60">
+                <div className="flex justify-between items-center text-foreground/60">
                   <span>Connections:</span>
-                  <span className="font-bold text-black dark:text-white">{hoveredNode.connections_count}</span>
+                  <span className="font-bold text-foreground">{hoveredNode.connections_count}</span>
                 </div>
-                <div className="flex justify-between items-center text-black/60 dark:text-white/60">
+                <div className="flex justify-between items-center text-foreground/60">
                   <span>Reputation:</span>
-                  <span className="font-bold text-[#00e0c2]">+{hoveredNode.reputation_earned} Rep</span>
+                  <span className="font-bold text-[var(--accent-primary,#a855f7)]">+{hoveredNode.reputation_earned} Rep</span>
                 </div>
+
+                {hoveredNode.is_organizer && (
+                  <div className="mt-2 text-[9px] tracking-wider text-[var(--accent-primary,#a855f7)] font-extrabold uppercase border border-[#a855f7]/20 bg-[#a855f7]/5 rounded px-1.5 py-0.5 text-center">
+                    👑 Event Host / Organizer
+                  </div>
+                )}
 
                 {hoveredNode.is_super_connector && (
                   <div className="mt-2 text-[9px] tracking-wider text-yellow-500 font-extrabold uppercase border border-yellow-500/20 bg-yellow-500/5 rounded px-1.5 py-0.5 text-center">
@@ -501,8 +550,8 @@ export default function SocialForceGraph({ nodes = [], edges = [] }: Props) {
           )}
 
           {/* Quick Guide Overlay */}
-          <div className="absolute bottom-3 right-3 bg-white/95 dark:bg-[#0c0c0f]/90 backdrop-blur border border-black/10 dark:border-white/10 rounded-lg p-2 text-[8px] font-mono text-black/50 dark:text-white/40 flex flex-col gap-1 pointer-events-none select-none max-w-[150px]">
-            <span className="font-bold uppercase text-black dark:text-white mb-0.5">Telemetry Instructions</span>
+          <div className="absolute bottom-3 right-3 bg-[#0c0c0f]/90 backdrop-blur border border-foreground/10 rounded-lg p-2 text-[8px] font-mono text-foreground/40 flex flex-col gap-1 pointer-events-none select-none max-w-[150px]">
+            <span className="font-bold uppercase text-foreground mb-0.5">Telemetry Instructions</span>
             <div>• Drag nodes to reorganize</div>
             <div>• Scroll / pinch to zoom</div>
             <div>• Drag canvas background to pan</div>

@@ -84,9 +84,12 @@ export default function TapHeatmap({ postId }: Props) {
       try {
         const data = await getEventTaps(postId);
         if (active) {
+          const cleanTaps = (data.taps || []).filter(
+            (t) => t.type === "checkin" || t.type === "networking"
+          );
           setTapsData({
             center: data.center,
-            taps: data.taps || [],
+            taps: cleanTaps,
           });
         }
       } catch (err: any) {
@@ -198,8 +201,8 @@ export default function TapHeatmap({ postId }: Props) {
           const tap = group.taps[0];
           const isCheckin = tap.type === "checkin";
           const color = isCheckin
-            ? (isDark ? "#00e0c2" : "#3b82f6") // Teal or Blue
-            : (isDark ? "#a855f7" : "#ef4444"); // Purple or Red
+            ? (isDark ? "#a855f7" : "#3b82f6") // Purple or Blue
+            : (isDark ? "#c084fc" : "#ef4444"); // Lavender or Red
 
           const pointsText = tap.points ? `+${tap.points} Rep` : "";
 
@@ -242,11 +245,11 @@ export default function TapHeatmap({ postId }: Props) {
           const isCheckinDominant = checkinsCount > count / 2;
 
           const badgeBg = isCheckinDominant
-            ? (isDark ? "bg-[#00e0c2] text-black" : "bg-blue-600 text-white")
-            : "bg-purple-600 text-white";
+            ? (isDark ? "bg-[#a855f7] text-foreground" : "bg-blue-600 text-foreground")
+            : "bg-[#c084fc] text-black";
           const pulseColor = isCheckinDominant
-            ? (isDark ? "rgba(0, 224, 194, 0.4)" : "rgba(59, 130, 246, 0.4)")
-            : "rgba(168, 85, 247, 0.4)";
+            ? (isDark ? "rgba(168, 85, 247, 0.4)" : "rgba(59, 130, 246, 0.4)")
+            : "rgba(192, 132, 252, 0.4)";
 
           const icon = L.divIcon({
             html: `
@@ -307,11 +310,11 @@ export default function TapHeatmap({ postId }: Props) {
           max: 1.0,
           gradient: isDark
             ? {
-              0.15: "rgba(59, 130, 246, 0.25)", // Blue (Faint density)
-              0.4: "rgba(0, 224, 194, 0.5)",    // Teal/Green (Low-Medium)
-              0.65: "rgba(234, 179, 8, 0.75)",  // Yellow (Medium-High)
-              0.85: "rgba(249, 115, 22, 0.9)",  // Orange (High)
-              1.0: "rgba(239, 68, 68, 1.0)"     // Red (Dense Hotspot)
+              0.15: "rgba(168, 85, 247, 0.2)",  // Amethyst/Purple
+              0.4: "rgba(192, 132, 252, 0.45)", // Lavender
+              0.65: "rgba(232, 121, 249, 0.7)", // Fuchsia
+              0.85: "rgba(244, 114, 182, 0.85)",// Pink
+              1.0: "rgba(244, 63, 94, 1.0)"     // Rose
             }
             : {
               0.15: "blue",
@@ -353,23 +356,23 @@ export default function TapHeatmap({ postId }: Props) {
   }, []);
 
   return (
-    <div className="flex-1 min-h-[350px] relative rounded-xl overflow-hidden border border-black/5 dark:border-white/5 bg-gray-100 dark:bg-black flex items-center justify-center">
+    <div className="flex-1 min-h-[350px] relative rounded-xl overflow-hidden border border-black/5 dark:border-foreground/5 bg-gray-100 dark:bg-black flex items-center justify-center">
       {/* Global CSS Overrides for Leaflet Popups to match portal's theme */}
       <style>{`
         .leaflet-popup-content-wrapper {
           padding: 8px 10px !important;
         }
         .dark-leaflet-popup .leaflet-popup-content-wrapper {
-          background: #0d0d12 !important;
+          background: #050409 !important;
           color: #ffffff !important;
-          border: 1px solid rgba(255, 255, 255, 0.12) !important;
+          border: 1px solid rgba(168, 85, 247, 0.15) !important;
           border-radius: 12px !important;
           box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7) !important;
         }
         .dark-leaflet-popup .leaflet-popup-tip {
-          background: #0d0d12 !important;
-          border-left: 1px solid rgba(255, 255, 255, 0.12) !important;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+          background: #050409 !important;
+          border-left: 1px solid rgba(168, 85, 247, 0.15) !important;
+          border-bottom: 1px solid rgba(168, 85, 247, 0.15) !important;
         }
         .light-leaflet-popup .leaflet-popup-content-wrapper {
           background: #ffffff !important;
@@ -387,9 +390,9 @@ export default function TapHeatmap({ postId }: Props) {
 
       {/* Loading state */}
       {(isLoading || !scriptsLoaded) && (
-        <div className="absolute inset-0 bg-white/50 dark:bg-black/50 backdrop-blur-sm z-30 flex flex-col items-center justify-center gap-3">
+        <div className="absolute inset-0 bg-foreground/50 dark:bg-black/50 backdrop-blur-sm z-30 flex flex-col items-center justify-center gap-3">
           <Loader2 className="w-8 h-8 animate-spin text-purple-600 dark:text-purple-400" />
-          <span className="text-xs font-semibold text-black/60 dark:text-white/60">
+          <span className="text-xs font-semibold text-black/60 dark:text-foreground/60">
             {!scriptsLoaded ? "Initializing Map View..." : "Loading Tap Analytics..."}
           </span>
         </div>
@@ -399,14 +402,14 @@ export default function TapHeatmap({ postId }: Props) {
       {error && !isLoading && (
         <div className="absolute inset-0 bg-white dark:bg-[#0d0d12] z-30 p-6 flex flex-col items-center justify-center text-center gap-3">
           <AlertCircle className="w-10 h-10 text-red-500" />
-          <h4 className="font-bold text-sm text-black dark:text-white">Could Not Load Heatmap</h4>
-          <p className="text-xs text-black/50 dark:text-white/40 max-w-xs">{error}</p>
+          <h4 className="font-bold text-sm text-black dark:text-foreground">Could Not Load Heatmap</h4>
+          <p className="text-xs text-black/50 dark:text-foreground/40 max-w-xs">{error}</p>
         </div>
       )}
 
       {/* No Taps empty state */}
       {tapsData && tapsData.taps.length === 0 && !isLoading && (
-        <div className="absolute top-4 right-4 bg-white/90 dark:bg-black/85 backdrop-blur border border-black/10 dark:border-white/10 px-3 py-1.5 rounded-lg text-[10px] text-black/60 dark:text-white/60 z-20 flex items-center gap-1.5 font-medium shadow-sm">
+        <div className="absolute top-4 right-4 bg-foreground/90 dark:bg-black/85 backdrop-blur border border-black/10 dark:border-foreground/10 px-3 py-1.5 rounded-lg text-[10px] text-black/60 dark:text-foreground/60 z-20 flex items-center gap-1.5 font-medium shadow-sm">
           <RefreshCw className="w-3 h-3 text-purple-500 animate-spin" />
           Waiting for check-ins...
         </div>
@@ -414,12 +417,12 @@ export default function TapHeatmap({ postId }: Props) {
 
       {/* 2D / 3D Toggle Controller Overlay (Left-Side) */}
       {tapsData && tapsData.taps.length > 0 && !isLoading && (
-        <div className="absolute top-4 left-4 bg-white/90 dark:bg-[#0d0d12]/90 backdrop-blur border border-black/10 dark:border-white/10 rounded-lg p-1 flex gap-1 shadow-md z-20">
+        <div className="absolute top-4 left-4 bg-foreground/90 dark:bg-[#0d0d12]/90 backdrop-blur border border-black/10 dark:border-foreground/10 rounded-lg p-1 flex gap-1 shadow-md z-20">
           <button
             onClick={() => setIs3DMode(false)}
             className={`px-2 py-1 text-[10px] font-bold rounded-md flex items-center gap-1 transition-all ${!is3DMode
-                ? "bg-purple-600 dark:bg-[#00e0c2] text-white dark:text-black shadow-sm"
-                : "text-black/60 dark:text-white/60 hover:bg-black/5 dark:hover:bg-white/5"
+                ? "bg-purple-600 dark:bg-[#a855f7] text-foreground shadow-sm"
+                : "text-black/60 dark:text-foreground/60 hover:bg-black/5 dark:hover:bg-foreground/5"
               }`}
           >
             2D Flat
@@ -427,8 +430,8 @@ export default function TapHeatmap({ postId }: Props) {
           <button
             onClick={() => setIs3DMode(true)}
             className={`px-2 py-1 text-[10px] font-bold rounded-md flex items-center gap-1 transition-all ${is3DMode
-                ? "bg-purple-600 dark:bg-[#00e0c2] text-white dark:text-black shadow-sm"
-                : "text-black/60 dark:text-white/60 hover:bg-black/5 dark:hover:bg-white/5"
+                ? "bg-purple-600 dark:bg-[#a855f7] text-foreground shadow-sm"
+                : "text-black/60 dark:text-foreground/60 hover:bg-black/5 dark:hover:bg-foreground/5"
               }`}
           >
             <Layers className="w-3 h-3" />
@@ -439,12 +442,12 @@ export default function TapHeatmap({ postId }: Props) {
 
       {/* Visibility Toggle Settings Overlay (Right-Side) */}
       {tapsData && tapsData.taps.length > 0 && !isLoading && (
-        <div className="absolute top-4 right-4 bg-white/90 dark:bg-[#0d0d12]/90 backdrop-blur border border-black/10 dark:border-white/10 rounded-lg p-1 flex gap-1 shadow-md z-20">
+        <div className="absolute top-4 right-4 bg-foreground/90 dark:bg-[#0d0d12]/90 backdrop-blur border border-black/10 dark:border-foreground/10 rounded-lg p-1 flex gap-1 shadow-md z-20">
           <button
             onClick={() => setShowHeatmap(!showHeatmap)}
             className={`px-2 py-1 text-[10px] font-bold rounded-md transition-all ${showHeatmap
-                ? "bg-purple-600 dark:bg-[#00e0c2] text-white dark:text-black shadow-sm"
-                : "text-black/60 dark:text-white/60 hover:bg-black/5 dark:hover:bg-white/5"
+                ? "bg-purple-600 dark:bg-[#a855f7] text-foreground shadow-sm"
+                : "text-black/60 dark:text-foreground/60 hover:bg-black/5 dark:hover:bg-foreground/5"
               }`}
           >
             Heatmap
@@ -452,8 +455,8 @@ export default function TapHeatmap({ postId }: Props) {
           <button
             onClick={() => setShowMarkers(!showMarkers)}
             className={`px-2 py-1 text-[10px] font-bold rounded-md transition-all ${showMarkers
-                ? "bg-purple-600 dark:bg-[#00e0c2] text-white dark:text-black shadow-sm"
-                : "text-black/60 dark:text-white/60 hover:bg-black/5 dark:hover:bg-white/5"
+                ? "bg-purple-600 dark:bg-[#a855f7] text-foreground shadow-sm"
+                : "text-black/60 dark:text-foreground/60 hover:bg-black/5 dark:hover:bg-foreground/5"
               }`}
           >
             Markers
@@ -477,14 +480,14 @@ export default function TapHeatmap({ postId }: Props) {
 
       {/* Map legend */}
       {tapsData && tapsData.taps.length > 0 && (
-        <div className="absolute bottom-4 left-4 bg-white/90 dark:bg-[#0d0d12]/90 backdrop-blur border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 flex gap-4 shadow-md z-20">
+        <div className="absolute bottom-4 left-4 bg-foreground/90 dark:bg-[#050409]/95 backdrop-blur border border-black/10 dark:border-[#a855f7]/15 rounded-lg px-3 py-2 flex gap-4 shadow-md z-20">
           <div className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-blue-500 dark:bg-[#00e0c2]"></div>
-            <span className="text-black/60 dark:text-white/60 text-[10px] font-semibold">Check-in</span>
+            <div className="w-2.5 h-2.5 rounded-full bg-blue-500 dark:bg-[#a855f7]"></div>
+            <span className="text-black/60 dark:text-foreground/60 text-[10px] font-semibold">Check-in</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-red-500 dark:bg-purple-500"></div>
-            <span className="text-black/60 dark:text-white/60 text-[10px] font-semibold">Networking Tap</span>
+            <div className="w-2.5 h-2.5 rounded-full bg-red-500 dark:bg-[#c084fc]"></div>
+            <span className="text-black/60 dark:text-foreground/60 text-[10px] font-semibold">Networking Tap</span>
           </div>
         </div>
       )}
@@ -492,23 +495,23 @@ export default function TapHeatmap({ postId }: Props) {
       {/* Cluster Detailed Modal */}
       {selectedGroup && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#0d0d12] border border-black/10 dark:border-white/10 rounded-2xl max-w-lg w-full max-h-[80vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div className="bg-[#0b0a14] border border-[#a855f7]/15 rounded-2xl max-w-lg w-full max-h-[80vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
             {/* Header */}
-            <div className="p-5 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-black/5 dark:bg-white/5">
+            <div className="p-5 border-b border-foreground/5 flex items-center justify-between bg-foreground/[0.02]">
               <div className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-purple-600 dark:text-[#00e0c2]" />
-                <h3 className="font-bold text-base text-black dark:text-white">Clustered Taps ({selectedGroup.length})</h3>
+                <Users className="w-5 h-5 text-purple-600 dark:text-[#a855f7]" />
+                <h3 className="font-bold text-base text-foreground">Clustered Taps ({selectedGroup.length})</h3>
               </div>
               <button
                 onClick={() => setSelectedGroup(null)}
-                className="p-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white"
+                className="p-1 rounded-lg hover:bg-foreground/5 transition-colors text-foreground/50 hover:text-foreground"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* List */}
-            <div className="flex-1 overflow-y-auto p-5 space-y-4 custom-scrollbar bg-white dark:bg-[#0d0d12]">
+            <div className="flex-1 overflow-y-auto p-5 space-y-4 custom-scrollbar bg-[#0b0a14]">
               {selectedGroup.map((tap, idx) => {
                 const isCheckin = tap.type === "checkin";
                 const avatarUrl = tap.user?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${tap.user?.username || idx}`;
@@ -516,21 +519,21 @@ export default function TapHeatmap({ postId }: Props) {
                 return (
                   <div
                     key={idx}
-                    className="flex items-start gap-4 p-3 rounded-xl border border-black/5 dark:border-white/5 bg-black/[0.01] dark:bg-white/[0.01] hover:bg-black/[0.03] dark:hover:bg-white/[0.03] transition-colors"
+                    className="flex items-start gap-4 p-3 rounded-xl border border-[#a855f7]/10 bg-foreground/[0.01] hover:bg-foreground/[0.03] transition-colors"
                   >
                     {/* User Avatar */}
                     <div className="relative shrink-0">
                       <img
                         src={avatarUrl}
                         alt={tap.user?.username}
-                        className="w-10 h-10 rounded-full border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 object-cover"
+                        className="w-10 h-10 rounded-full border border-foreground/10 bg-foreground/5 object-cover"
                       />
-                      <div className={`absolute -bottom-1 -right-1 p-0.5 rounded-full border border-white dark:border-[#0d0d12] shadow-sm ${isCheckin ? "bg-blue-500 dark:bg-[#00e0c2]" : "bg-red-500 dark:bg-purple-600"
+                      <div className={`absolute -bottom-1 -right-1 p-0.5 rounded-full border border-[#0b0a14] shadow-sm ${isCheckin ? "bg-blue-500 dark:bg-[#a855f7]" : "bg-red-500 dark:bg-[#c084fc]"
                         }`}>
                         {isCheckin ? (
-                          <CheckCircle2 className="w-3 h-3 text-white dark:text-black" />
+                          <CheckCircle2 className="w-3 h-3 text-foreground dark:text-black" />
                         ) : (
-                          <Fingerprint className="w-3 h-3 text-white" />
+                          <Fingerprint className="w-3 h-3 text-foreground" />
                         )}
                       </div>
                     </div>
@@ -538,23 +541,23 @@ export default function TapHeatmap({ postId }: Props) {
                     {/* Details */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2 mb-1">
-                        <span className="font-semibold text-sm text-black dark:text-white truncate">
+                        <span className="font-semibold text-sm text-foreground truncate">
                           @{tap.user?.username || "anonymous"}
                         </span>
-                        <span className="shrink-0 px-2 py-0.5 rounded-full bg-emerald-500/10 dark:bg-[#00e0c2]/10 text-emerald-600 dark:text-[#00e0c2] text-xs font-bold flex items-center gap-0.5">
+                        <span className="shrink-0 px-2 py-0.5 rounded-full bg-[#a855f7]/10 text-[#c084fc] text-xs font-bold flex items-center gap-0.5">
                           <Award className="w-3 h-3" /> +{tap.points || 5} Rep
                         </span>
                       </div>
 
-                      <p className="text-xs text-black/60 dark:text-white/50 leading-relaxed">
+                      <p className="text-xs text-foreground/50 leading-relaxed">
                         {isCheckin ? (
-                          <span>Checked in via host <span className="font-medium text-black dark:text-white">@{tap.given_by?.username || "host"}</span></span>
+                          <span>Checked in via host <span className="font-medium text-foreground">@{tap.given_by?.username || "host"}</span></span>
                         ) : (
-                          <span>Exchanged reputation with <span className="font-medium text-black dark:text-white">@{tap.given_by?.username || "user"}</span></span>
+                          <span>Exchanged reputation with <span className="font-medium text-foreground">@{tap.given_by?.username || "user"}</span></span>
                         )}
                       </p>
 
-                      <div className="flex items-center gap-1 mt-2 text-[10px] text-black/40 dark:text-white/40 font-mono">
+                      <div className="flex items-center gap-1 mt-2 text-[10px] text-foreground/40 font-mono">
                         <MapPin className="w-3 h-3" />
                         <span>Lat: {tap.lat.toFixed(6)}, Lng: {tap.lng.toFixed(6)}</span>
                       </div>
@@ -565,10 +568,10 @@ export default function TapHeatmap({ postId }: Props) {
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5 flex justify-end">
+            <div className="p-4 border-t border-foreground/5 bg-foreground/[0.02] flex justify-end">
               <button
                 onClick={() => setSelectedGroup(null)}
-                className="px-4 py-2 bg-black dark:bg-white hover:bg-black/80 dark:hover:bg-white/95 text-white dark:text-black font-semibold rounded-xl text-xs transition-colors shadow-md"
+                className="px-4 py-2 bg-[#a855f7] hover:bg-[#c084fc] text-foreground font-semibold rounded-xl text-xs transition-colors shadow-md"
               >
                 Close Details
               </button>

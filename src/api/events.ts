@@ -92,6 +92,7 @@ export interface SocialNode {
   connections_count: number;
   reputation_earned: number;
   is_super_connector: boolean;
+  is_organizer?: boolean;
 }
 
 export interface SocialEdge {
@@ -446,7 +447,7 @@ function generateMockTaps(postId: number, center: { lat: number; lng: number }):
 
 function generateMockSocialGraph(postId: number): SocialGraphData {
   const nodes = [
-    { id: 101, label: "alex_sol", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=alex", connections_count: 8, reputation_earned: 120, is_super_connector: true },
+    { id: 101, label: "alex_sol", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=alex", connections_count: 8, reputation_earned: 120, is_super_connector: true, is_organizer: true },
     { id: 102, label: "crypto_ninja", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=ninja", connections_count: 5, reputation_earned: 75, is_super_connector: false },
     { id: 103, label: "vitalik_fan", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=vitalik", connections_count: 9, reputation_earned: 135, is_super_connector: true },
     { id: 104, label: "web3_builder", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=builder", connections_count: 4, reputation_earned: 60, is_super_connector: false },

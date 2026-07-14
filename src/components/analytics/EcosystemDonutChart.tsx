@@ -44,14 +44,14 @@ export default function EcosystemDonutChart({
   const web2Offset = -mwaLength;
 
   return (
-    <div className="bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-5 md:p-6 flex flex-col justify-between shadow-sm backdrop-blur-md relative overflow-hidden transition-all min-h-[300px]">
+    <div className="premium-card p-5 md:p-6 flex flex-col justify-between relative overflow-hidden min-h-[300px]">
       <div>
-        <h3 className="text-black/40 dark:text-white/40 text-[10px] font-mono tracking-widest font-bold uppercase">ecosystem split</h3>
-        <h4 className="text-sm font-semibold text-black dark:text-white mt-1">Auth Provider Distribution</h4>
+        <h3 className="text-foreground/45 text-[10px] font-mono tracking-widest font-bold uppercase">ecosystem split</h3>
+        <h4 className="text-sm font-semibold text-foreground mt-1">Auth Provider Distribution</h4>
       </div>
 
       {!hasUsers ? (
-        <div className="flex-1 flex flex-col items-center justify-center py-6 text-black/30 dark:text-white/30 text-xs">
+        <div className="flex-1 flex flex-col items-center justify-center py-6 text-foreground/30 text-xs">
           <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
             <circle
               cx={center}
@@ -92,7 +92,7 @@ export default function EcosystemDonutChart({
                   cy={center}
                   r={radius}
                   fill="transparent"
-                  stroke="#9945FF" // Solana Purple
+                  stroke="#a855f7" // Rich Purple
                   strokeWidth={hoveredSlice === "mwa" ? strokeWidth + 3 : strokeWidth}
                   strokeDasharray={`${mwaLength} ${circumference}`}
                   strokeDashoffset={mwaOffset}
@@ -101,7 +101,7 @@ export default function EcosystemDonutChart({
                   onMouseLeave={() => setHoveredSlice(null)}
                   className="transition-all duration-200 cursor-pointer"
                   style={{
-                    filter: hoveredSlice === "mwa" ? "drop-shadow(0 0 8px rgba(153, 69, 255, 0.6))" : "none",
+                    filter: hoveredSlice === "mwa" ? "drop-shadow(0 0 8px rgba(168, 85, 247, 0.6))" : "none",
                   }}
                 />
               )}
@@ -113,7 +113,7 @@ export default function EcosystemDonutChart({
                   cy={center}
                   r={radius}
                   fill="transparent"
-                  stroke="#4B5563" // Dark Slate Gray
+                  stroke="#581c87" // Deep Purple
                   strokeWidth={hoveredSlice === "web2" ? strokeWidth + 3 : strokeWidth}
                   strokeDasharray={`${web2Length} ${circumference}`}
                   strokeDashoffset={web2Offset}
@@ -122,7 +122,7 @@ export default function EcosystemDonutChart({
                   onMouseLeave={() => setHoveredSlice(null)}
                   className="transition-all duration-200 cursor-pointer"
                   style={{
-                    filter: hoveredSlice === "web2" ? "drop-shadow(0 0 8px rgba(75, 85, 99, 0.6))" : "none",
+                    filter: hoveredSlice === "web2" ? "drop-shadow(0 0 8px rgba(88, 28, 135, 0.6))" : "none",
                   }}
                 />
               )}
@@ -132,21 +132,21 @@ export default function EcosystemDonutChart({
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
               {hoveredSlice === "mwa" ? (
                 <>
-                  <span className="text-[10px] tracking-widest text-[#14F195] font-mono font-bold uppercase">MWA WALLET</span>
-                  <span className="text-2xl font-mono font-bold text-black dark:text-white">{cleanMwa}%</span>
-                  <span className="text-[10px] text-black/40 dark:text-white/40 font-mono">{mwaUsers} Users</span>
+                  <span className="text-[10px] tracking-widest text-[#c084fc] font-mono font-bold uppercase">MWA WALLET</span>
+                  <span className="text-2xl font-mono font-bold text-foreground">{cleanMwa}%</span>
+                  <span className="text-[10px] text-foreground/40 font-mono">{mwaUsers} Users</span>
                 </>
               ) : hoveredSlice === "web2" ? (
                 <>
-                  <span className="text-[10px] tracking-widest text-gray-400 font-mono font-bold uppercase">WEB2 SIGN-IN</span>
-                  <span className="text-2xl font-mono font-bold text-black dark:text-white">{cleanWeb2}%</span>
-                  <span className="text-[10px] text-black/40 dark:text-white/40 font-mono">{web2Users} Users</span>
+                  <span className="text-[10px] tracking-widest text-fuchsia-400 font-mono font-bold uppercase">WEB2 SIGN-IN</span>
+                  <span className="text-2xl font-mono font-bold text-foreground">{cleanWeb2}%</span>
+                  <span className="text-[10px] text-foreground/40 font-mono">{web2Users} Users</span>
                 </>
               ) : (
                 <>
-                  <span className="text-[9px] tracking-widest text-black/45 dark:text-white/45 font-mono font-bold uppercase">TOTAL USERS</span>
-                  <span className="text-3xl font-mono font-bold text-black dark:text-white">{totalUsers}</span>
-                  <span className="text-[9px] text-black/40 dark:text-white/40 font-mono">registered</span>
+                  <span className="text-[9px] tracking-widest text-foreground/45 font-mono font-bold uppercase">TOTAL USERS</span>
+                  <span className="text-3xl font-mono font-bold text-foreground">{totalUsers}</span>
+                  <span className="text-[9px] text-foreground/40 font-mono">registered</span>
                 </>
               )}
             </div>
@@ -156,15 +156,15 @@ export default function EcosystemDonutChart({
           <div className="flex flex-col gap-3 shrink-0">
             {/* Solana MWA Legend */}
             <div
-              className={`flex items-center gap-3 p-2 rounded-lg transition-colors border border-transparent ${hoveredSlice === "mwa" ? "bg-white/10 dark:bg-white/[0.03] border-white/5" : ""
+              className={`flex items-center gap-3 p-2 rounded-lg transition-colors border border-transparent ${hoveredSlice === "mwa" ? "bg-foreground/[0.03] border-foreground/5" : ""
                 }`}
               onMouseEnter={() => setHoveredSlice("mwa")}
               onMouseLeave={() => setHoveredSlice(null)}
             >
-              <div className="w-3 h-3 rounded bg-[#9945FF] shrink-0" />
+              <div className="w-3 h-3 rounded bg-[#a855f7] shrink-0" />
               <div className="flex flex-col">
-                <span className="text-xs font-semibold text-black dark:text-white">Solana MWA</span>
-                <span className="text-[10px] font-mono text-black/40 dark:text-white/40">
+                <span className="text-xs font-semibold text-foreground">Solana MWA</span>
+                <span className="text-[10px] font-mono text-foreground/40">
                   {cleanMwa}% • {mwaUsers} users
                 </span>
               </div>
@@ -172,15 +172,15 @@ export default function EcosystemDonutChart({
 
             {/* Web2 Legend */}
             <div
-              className={`flex items-center gap-3 p-2 rounded-lg transition-colors border border-transparent ${hoveredSlice === "web2" ? "bg-white/10 dark:bg-white/[0.03] border-white/5" : ""
+              className={`flex items-center gap-3 p-2 rounded-lg transition-colors border border-transparent ${hoveredSlice === "web2" ? "bg-foreground/[0.03] border-foreground/5" : ""
                 }`}
               onMouseEnter={() => setHoveredSlice("web2")}
               onMouseLeave={() => setHoveredSlice(null)}
             >
-              <div className="w-3 h-3 rounded bg-[#4B5563] shrink-0" />
+              <div className="w-3 h-3 rounded bg-[#581c87] shrink-0" />
               <div className="flex flex-col">
-                <span className="text-xs font-semibold text-black dark:text-white">Web2 Login</span>
-                <span className="text-[10px] font-mono text-black/40 dark:text-white/40">
+                <span className="text-xs font-semibold text-foreground">Web2 Login</span>
+                <span className="text-[10px] font-mono text-foreground/40">
                   {cleanWeb2}% • {web2Users} users
                 </span>
               </div>
