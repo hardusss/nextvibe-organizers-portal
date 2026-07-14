@@ -29,7 +29,7 @@ const STEPS = ["Paste URL", "Verify", "Customize", "Submit"];
 
 function StepIndicator({ current }: { current: Step }) {
   return (
-    <div className="flex items-center justify-between border-b border-white/5 bg-white/[0.01] px-5 py-4 flex-wrap gap-2">
+    <div className="flex items-center justify-between border-b border-foreground/5 bg-foreground/[0.01] px-5 py-4 flex-wrap gap-2">
       {STEPS.map((label, i) => {
         const step = (i + 1) as Step;
         const done = step < current;
@@ -37,17 +37,17 @@ function StepIndicator({ current }: { current: Step }) {
         return (
           <div key={label} className="flex items-center gap-2">
             <span className={`w-5 h-5 rounded-full flex items-center justify-center font-mono text-[10px] font-bold border transition-all duration-300 ${
-              done ? "bg-[#00e0c2] border-[#00e0c2] text-black" : active ? "border-[#00e0c2] text-[#00e0c2]" : "border-white/10 text-white/35"
+              done ? "bg-[var(--accent-primary)] border-[var(--accent-primary)] text-foreground" : active ? "border-[var(--accent-primary)] text-[var(--accent-primary)]" : "border-foreground/10 text-foreground/35"
             }`}>
               {step}
             </span>
             <span className={`text-[10px] font-display font-extrabold uppercase tracking-wider transition-colors duration-300 ${
-              active ? "text-[#00e0c2]" : "text-white/35"
+              active ? "text-[var(--accent-primary)]" : "text-foreground/35"
             }`}>
               {label}
             </span>
             {i < STEPS.length - 1 && (
-              <span className="text-white/10 text-xs font-mono ml-1 hidden sm:inline">/</span>
+              <span className="text-foreground/10 text-xs font-mono ml-1 hidden sm:inline">/</span>
             )}
           </div>
         );
@@ -61,9 +61,9 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={() => { navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
-      className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-colors cursor-pointer"
+      className="p-2 rounded-lg bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 transition-colors cursor-pointer"
     >
-      {copied ? <Check className="w-4 h-4 text-[#00e0c2]" /> : <Copy className="w-4 h-4 text-white/55" />}
+      {copied ? <Check className="w-4 h-4 text-[var(--accent-primary)]" /> : <Copy className="w-4 h-4 text-foreground/55" />}
     </button>
   );
 }
@@ -221,7 +221,7 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
   const code = previewData?.code || "";
   const ev = previewData?.event;
 
-  const inputCls = "w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-white placeholder-white/20 text-sm focus:outline-none focus:border-[#00e0c2]/50 focus:bg-[#00e0c2]/[0.01] transition-all";
+  const inputCls = "w-full px-4 py-3 rounded-xl bg-foreground/[0.02] border border-foreground/10 text-foreground placeholder-white/20 text-sm focus:outline-none focus:border-[var(--accent-primary)]/50 focus:bg-[var(--accent-primary)]/[0.01] transition-all";
 
   /* ──────────────────── JSX ──────────────────── */
 
@@ -233,16 +233,16 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
           <motion.div initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.95, opacity: 0, y: 20 }} transition={{ type: "spring", stiffness: 300, damping: 25 }}
             onClick={(e) => e.stopPropagation()}
-            className="bg-[#0c0c0f] border border-white/10 rounded-xl shadow-2xl max-w-lg w-[95%] md:w-full max-h-[90vh] flex flex-col overflow-hidden text-white">
+            className="bg-[#0c0c0f] border border-foreground/10 rounded-xl shadow-2xl max-w-lg w-[95%] md:w-full max-h-[90vh] flex flex-col overflow-hidden text-foreground">
 
             {/* Header */}
-            <div className="p-4 md:p-5 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
-              <h3 className="text-sm md:text-base font-display font-extrabold uppercase tracking-tight text-white flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-[#00e0c2]" />
+            <div className="p-4 md:p-5 border-b border-foreground/5 flex items-center justify-between bg-foreground/[0.02]">
+              <h3 className="text-sm md:text-base font-display font-extrabold uppercase tracking-tight text-foreground flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-[var(--accent-primary)]" />
                 Create New Event
               </h3>
               <button onClick={handleClose} disabled={submitPhase !== null && submitPhase !== "done"}
-                className="p-1.5 rounded-full hover:bg-white/10 text-white/50 transition-colors disabled:opacity-50 cursor-pointer">
+                className="p-1.5 rounded-full hover:bg-foreground/10 text-foreground/50 transition-colors disabled:opacity-50 cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -256,9 +256,9 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
                 {/* ═══ STEP 1: Paste Luma URL ═══ */}
                 {step === 1 && (
                   <motion.div key="s1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
-                    <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-white/55">
-                      <Link2 className="w-4 h-4 text-[#00e0c2]" />
-                      Paste your <span className="font-semibold text-[#00e0c2]">luma.com</span> event URL
+                    <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-foreground/55">
+                      <Link2 className="w-4 h-4 text-[var(--accent-primary)]" />
+                      Paste your <span className="font-semibold text-[var(--accent-primary)]">luma.com</span> event URL
                     </div>
                     <input type="url" value={lumaUrl} onChange={(e) => setLumaUrl(e.target.value)}
                       placeholder="https://luma.com/your-event" className={inputCls}
@@ -278,21 +278,21 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
                   <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                     {/* Event preview card */}
                     {ev && (
-                      <div className="rounded-xl border border-white/10 bg-white/[0.01] overflow-hidden">
+                      <div className="rounded-xl border border-foreground/10 bg-foreground/[0.01] overflow-hidden">
                         {ev.cover_image && (
-                          <div className="relative h-32 w-full border-b border-white/5">
+                          <div className="relative h-32 w-full border-b border-foreground/5">
                             <img src={ev.cover_image} alt={ev.title || "Event"} className="w-full h-full object-cover" />
                           </div>
                         )}
                         <div className="p-3.5 space-y-1.5">
-                          <p className="font-display font-extrabold uppercase text-sm tracking-tight text-white">{ev.title}</p>
+                          <p className="font-display font-extrabold uppercase text-sm tracking-tight text-foreground">{ev.title}</p>
                           {ev.location?.name && (
-                            <p className="text-xs text-white/45 flex items-center gap-1.5 font-mono">
+                            <p className="text-xs text-foreground/45 flex items-center gap-1.5 font-mono">
                               <MapPin className="w-3.5 h-3.5" />{ev.location.name}{ev.location.address ? ` — ${ev.location.address}` : ""}
                             </p>
                           )}
                           {ev.start_time && (
-                            <p className="text-xs text-white/45 flex items-center gap-1.5 font-mono">
+                            <p className="text-xs text-foreground/45 flex items-center gap-1.5 font-mono">
                               <Clock className="w-3.5 h-3.5" />{new Date(ev.start_time).toLocaleString()}
                             </p>
                           )}
@@ -301,18 +301,18 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
                     )}
 
                     {/* Code display */}
-                    <div className="rounded-xl bg-[#00e0c2]/5 border border-[#00e0c2]/20 p-5 space-y-3">
-                      <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider font-bold text-[#00e0c2]">
+                    <div className="rounded-xl bg-[var(--accent-primary)]/5 border border-[var(--accent-primary)]/20 p-5 space-y-3">
+                      <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider font-bold text-[var(--accent-primary)]">
                         <Shield className="w-4 h-4" />
                         Verification Code
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-3xl font-mono font-black tracking-widest text-[#00e0c2]">
+                        <span className="text-3xl font-mono font-black tracking-widest text-[var(--accent-primary)]">
                           {code}
                         </span>
                         <CopyButton text={code} />
                       </div>
-                      <p className="text-[10px] font-mono uppercase tracking-wider text-white/40 leading-relaxed">
+                      <p className="text-[10px] font-mono uppercase tracking-wider text-foreground/40 leading-relaxed">
                         Add this code to your Luma event description, save it, then click <strong>Verify</strong>.
                         Expires in 15 mins.
                       </p>
@@ -331,18 +331,18 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
                   <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                     {/* About */}
                     <div className="space-y-1.5">
-                      <label className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider font-bold text-white/55">
-                        <FileText className="w-4 h-4 text-[#00e0c2]" />
+                      <label className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider font-bold text-foreground/55">
+                        <FileText className="w-4 h-4 text-[var(--accent-primary)]" />
                         Description <span className="text-red-500">*</span>
                       </label>
                       <textarea value={about} onChange={(e) => setAbout(e.target.value.slice(0, 255))}
                         placeholder="Describe your event..." rows={3} className={`${inputCls} resize-none`} />
-                      <p className="text-[10px] text-right font-mono text-white/30">{about.length}/255</p>
+                      <p className="text-[10px] text-right font-mono text-foreground/30">{about.length}/255</p>
                     </div>
                     {/* Location */}
                     <div className="space-y-1.5">
-                      <label className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider font-bold text-white/55">
-                        <MapPin className="w-4 h-4 text-[#00e0c2]" /> Location
+                      <label className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider font-bold text-foreground/55">
+                        <MapPin className="w-4 h-4 text-[var(--accent-primary)]" /> Location
                       </label>
                       <input type="text" value={location} onChange={(e) => setLocation(e.target.value)}
                         placeholder="Event location" className={inputCls} />
@@ -350,15 +350,15 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
                     {/* Dates */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-1.5">
-                        <label className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider font-bold text-white/55">
-                          <Clock className="w-4 h-4 text-[#00e0c2]" /> Start <span className="text-red-500">*</span>
+                        <label className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider font-bold text-foreground/55">
+                          <Clock className="w-4 h-4 text-[var(--accent-primary)]" /> Start <span className="text-red-500">*</span>
                         </label>
                         <input type="datetime-local" value={startTime} onChange={(e) => setStartTime(e.target.value)}
                           className={`${inputCls} [color-scheme:dark]`} />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider font-bold text-white/55">
-                          <Clock className="w-4 h-4 text-[#00e0c2]" /> End <span className="text-red-500">*</span>
+                        <label className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider font-bold text-foreground/55">
+                          <Clock className="w-4 h-4 text-[var(--accent-primary)]" /> End <span className="text-red-500">*</span>
                         </label>
                         <input type="datetime-local" value={endTime} onChange={(e) => setEndTime(e.target.value)}
                           min={startTime} className={`${inputCls} [color-scheme:dark]`} />
@@ -366,16 +366,16 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
                     </div>
                     {/* Media */}
                     <div className="space-y-1.5">
-                      <label className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider font-bold text-white/55">
-                        <ImageIcon className="w-4 h-4 text-[#00e0c2]" /> Cover Banner
+                      <label className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider font-bold text-foreground/55">
+                        <ImageIcon className="w-4 h-4 text-[var(--accent-primary)]" /> Cover Banner
                         <span className="text-red-500">*</span>
                       </label>
                       {mediaPreview ? (
-                        <div className="relative rounded-xl overflow-hidden border border-white/10 group aspect-video">
+                        <div className="relative rounded-xl overflow-hidden border border-foreground/10 group aspect-video">
                           <img src={mediaPreview} alt="Cover" className="w-full h-full object-cover" />
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
                             <button onClick={removeMedia}
-                              className="opacity-0 group-hover:opacity-100 transition-opacity p-2 bg-red-500 rounded-full text-white shadow-lg cursor-pointer">
+                              className="opacity-0 group-hover:opacity-100 transition-opacity p-2 bg-red-500 rounded-full text-foreground shadow-lg cursor-pointer">
                               <Trash2 className="w-5 h-5" />
                             </button>
                           </div>
@@ -386,10 +386,10 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
                           onDragLeave={(e) => { e.preventDefault(); setIsDragging(false); }}
                           onClick={() => fileInputRef.current?.click()}
                           className={`w-full h-28 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-2 cursor-pointer transition-all ${
-                            isDragging ? "border-[#00e0c2] bg-[#00e0c2]/5" : "border-white/15 hover:border-[#00e0c2]/50 hover:bg-white/5"
+                            isDragging ? "border-[var(--accent-primary)] bg-[var(--accent-primary)]/5" : "border-foreground/15 hover:border-[var(--accent-primary)]/50 hover:bg-foreground/5"
                           }`}>
-                          <Upload className={`w-5 h-5 ${isDragging ? "text-[#00e0c2]" : "text-white/30"}`} />
-                          <span className="text-xs text-white/40 font-mono uppercase tracking-wider font-bold">
+                          <Upload className={`w-5 h-5 ${isDragging ? "text-[var(--accent-primary)]" : "text-foreground/30"}`} />
+                          <span className="text-xs text-foreground/40 font-mono uppercase tracking-wider font-bold">
                             {isDragging ? "Drop cover image" : "Drag cover image or click"}
                           </span>
                         </div>
@@ -425,12 +425,12 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
                       const isActive = pi === ci && submitPhase !== "done";
                       return (
                         <div key={phase} className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all ${
-                          isDone ? "bg-[#00e0c2]/5 border-[#00e0c2]/20" : isActive ? "bg-[#00e0c2]/5 border-[#00e0c2]/40" : "bg-white/[0.01] border-transparent opacity-30"
+                          isDone ? "bg-[var(--accent-primary)]/5 border-[var(--accent-primary)]/20" : isActive ? "bg-[var(--accent-primary)]/5 border-[var(--accent-primary)]/40" : "bg-foreground/[0.01] border-transparent opacity-30"
                         }`}>
-                          {isDone ? <CheckCircle className="w-5 h-5 text-[#00e0c2]" />
-                            : isActive ? <Loader2 className="w-5 h-5 text-[#00e0c2] animate-spin" />
+                          {isDone ? <CheckCircle className="w-5 h-5 text-[var(--accent-primary)]" />
+                            : isActive ? <Loader2 className="w-5 h-5 text-[var(--accent-primary)] animate-spin" />
                             : <div className="w-5 h-5 rounded-full border border-white/25" />}
-                          <span className={`text-xs font-mono uppercase tracking-wider font-bold ${isDone ? "text-[#00e0c2]" : isActive ? "text-white" : "text-white/30"}`}>
+                          <span className={`text-xs font-mono uppercase tracking-wider font-bold ${isDone ? "text-[var(--accent-primary)]" : isActive ? "text-foreground" : "text-foreground/30"}`}>
                             {labels[phase]}
                           </span>
                         </div>
@@ -438,7 +438,7 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
                     })}
                     {submitPhase === "done" && (
                       <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
-                        className="flex items-center justify-center gap-2 pt-4 text-[#00e0c2] font-semibold text-sm font-display uppercase tracking-wider">
+                        className="flex items-center justify-center gap-2 pt-4 text-[var(--accent-primary)] font-semibold text-sm font-display uppercase tracking-wider">
                         <Sparkles className="w-5 h-5" /> Live POAP Event registered!
                       </motion.div>
                     )}
@@ -449,26 +449,26 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
 
             {/* Footer */}
             {step !== 4 && (
-              <div className="p-4 md:p-5 border-t border-white/5 flex items-center justify-between gap-3 bg-white/[0.02]">
+              <div className="p-4 md:p-5 border-t border-foreground/5 flex items-center justify-between gap-3 bg-foreground/[0.02]">
                 <div>
                   {step > 1 && (
                     <button onClick={() => { setError(""); setStep((s) => (s - 1) as Step); }}
-                      className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-display font-extrabold uppercase tracking-wider text-white/70 hover:bg-white/5 transition-all cursor-pointer">
+                      className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-display font-extrabold uppercase tracking-wider text-foreground/70 hover:bg-foreground/5 transition-all cursor-pointer">
                       <ArrowLeft className="w-3.5 h-3.5" /> Back
                     </button>
                   )}
                 </div>
                 <div className="flex items-center gap-3">
                   <button onClick={handleClose}
-                    className="px-4 py-2.5 rounded-xl font-display font-extrabold uppercase tracking-wider text-xs text-white/50 hover:bg-white/5 transition-all cursor-pointer">
+                    className="px-4 py-2.5 rounded-xl font-display font-extrabold uppercase tracking-wider text-xs text-foreground/50 hover:bg-foreground/5 transition-all cursor-pointer">
                     Cancel
                   </button>
 
                   {step === 1 && (
                     <button
                       onClick={handlePreview} disabled={!lumaUrl.trim() || isPreviewing}
-                      className={`px-5 py-2.5 rounded-xl font-display font-extrabold uppercase tracking-wider text-xs flex items-center gap-2 transition-all border border-white/10 ${
-                        lumaUrl.trim() && !isPreviewing ? "hover:border-[#00e0c2] hover:bg-white/5 text-white cursor-pointer" : "text-white/30 cursor-not-allowed opacity-50"
+                      className={`px-5 py-2.5 rounded-xl font-display font-extrabold uppercase tracking-wider text-xs flex items-center gap-2 transition-all border border-foreground/10 ${
+                        lumaUrl.trim() && !isPreviewing ? "hover:border-[var(--accent-primary)] hover:bg-foreground/5 text-foreground cursor-pointer" : "text-foreground/30 cursor-not-allowed opacity-50"
                       }`}>
                       {isPreviewing ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Loading…</> : <><ArrowRight className="w-3.5 h-3.5" /> Preview</>}
                     </button>
@@ -477,8 +477,8 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
                   {step === 2 && (
                     <button
                       onClick={handleVerify} disabled={isVerifying}
-                      className={`px-5 py-2.5 rounded-xl font-display font-extrabold uppercase tracking-wider text-xs flex items-center gap-2 transition-all border border-white/10 ${
-                        !isVerifying ? "hover:border-[#00e0c2] hover:bg-[#00e0c2]/5 text-[#00e0c2] cursor-pointer" : "text-white/35 cursor-not-allowed opacity-50"
+                      className={`px-5 py-2.5 rounded-xl font-display font-extrabold uppercase tracking-wider text-xs flex items-center gap-2 transition-all border border-foreground/10 ${
+                        !isVerifying ? "hover:border-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/5 text-[var(--accent-primary)] cursor-pointer" : "text-foreground/35 cursor-not-allowed opacity-50"
                       }`}>
                       {isVerifying ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Verifying…</> : <><Shield className="w-3.5 h-3.5" /> Verify</>}
                     </button>
@@ -487,8 +487,8 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
                   {step === 3 && (
                     <button
                       onClick={handleSubmit} disabled={!isStep3Valid}
-                      className={`px-5 py-2.5 rounded-xl font-display font-extrabold uppercase tracking-wider text-xs flex items-center gap-2 transition-all border border-white/10 ${
-                        isStep3Valid ? "hover:border-[#00e0c2] hover:bg-white/5 text-[#00e0c2] cursor-pointer" : "text-white/30 cursor-not-allowed opacity-50"
+                      className={`px-5 py-2.5 rounded-xl font-display font-extrabold uppercase tracking-wider text-xs flex items-center gap-2 transition-all border border-foreground/10 ${
+                        isStep3Valid ? "hover:border-[var(--accent-primary)] hover:bg-foreground/5 text-[var(--accent-primary)] cursor-pointer" : "text-foreground/30 cursor-not-allowed opacity-50"
                       }`}>
                       <Calendar className="w-3.5 h-3.5" /> Create Event
                     </button>

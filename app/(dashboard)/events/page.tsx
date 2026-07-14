@@ -155,15 +155,15 @@ export default function EventsPage() {
         {/* Header Section */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
-            <span className="text-[10px] tracking-widest text-[#00e0c2] font-mono font-bold uppercase">event directory</span>
-            <h2 className="text-2xl font-display font-extrabold uppercase text-black dark:text-white tracking-tight">
+            <span className="text-[10px] tracking-widest text-[var(--accent-primary)] font-mono font-bold uppercase">event directory</span>
+            <h2 className="text-2xl font-display font-extrabold uppercase text-foreground tracking-tight">
               Hosted Campaigns
             </h2>
           </div>
 
           <button
             onClick={() => setShowCreateEvent(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-black/10 dark:border-white/10 hover:border-[var(--accent-primary)] hover:bg-white/5 text-black dark:text-white transition-all text-xs font-display font-extrabold uppercase tracking-wider cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-black/10 dark:border-foreground/10 hover:border-[var(--accent-primary)] hover:bg-black/5 dark:hover:bg-foreground/5 text-foreground transition-all text-xs font-display font-extrabold uppercase tracking-wider cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             Create Event
@@ -182,10 +182,10 @@ export default function EventsPage() {
             >
               {isLoadingEvents ? (
                 <div className="flex items-center justify-center h-40">
-                  <Loader2 className="w-8 h-8 animate-spin text-[#00e0c2]" />
+                  <Loader2 className="w-8 h-8 animate-spin text-[var(--accent-primary)]" />
                 </div>
               ) : events.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-64 text-white/30">
+                <div className="flex flex-col items-center justify-center h-64 text-foreground/30">
                   <Calendar className="w-12 h-12 mb-3 opacity-30 animate-pulse" />
                   <p className="text-xs font-mono uppercase tracking-wider">No active events found</p>
                 </div>
@@ -196,10 +196,10 @@ export default function EventsPage() {
                       key={evt.post_id}
                       variants={item}
                       whileHover={{ y: -4 }}
-                      className="bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl overflow-hidden flex flex-col shadow-sm backdrop-blur-md transition-all duration-250 group"
+                      className="premium-card overflow-hidden flex flex-col shadow-sm backdrop-blur-md transition-all duration-250 group"
                     >
                       {/* Image section with 16:9 scale and hover zoom */}
-                      <div className="aspect-video bg-black/40 relative flex items-center justify-center overflow-hidden border-b border-white/5">
+                      <div className="aspect-video bg-black/40 relative flex items-center justify-center overflow-hidden border-b border-black/10 dark:border-foreground/5">
                         {(() => {
                           const imgSrc = evt.media && evt.media.length > 0
                             ? (typeof evt.media[0] === 'string' ? evt.media[0] : (evt.media[0]?.media_url || evt.media[0]?.file_url || evt.media[0]?.url))
@@ -223,43 +223,43 @@ export default function EventsPage() {
                               </>
                             );
                           }
-                          return <Calendar className="w-10 h-10 text-white/10 relative z-10" />;
+                          return <Calendar className="w-10 h-10 text-foreground/10 relative z-10" />;
                         })()}
 
                         {/* Static Host Tag */}
-                        <div className="absolute top-3 right-3 bg-black/80 backdrop-blur-md text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg border border-white/10 text-white flex items-center gap-1.5 shadow-md z-20">
-                          <ShieldCheck className="w-3.5 h-3.5 text-[#00e0c2]" /> Host
+                        <div className="absolute top-3 right-3 bg-black/80 backdrop-blur-md text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg border border-foreground/10 text-foreground flex items-center gap-1.5 shadow-md z-20">
+                          <ShieldCheck className="w-3.5 h-3.5 text-[var(--accent-primary)]" /> Host
                         </div>
                       </div>
 
                       <div className="p-5 flex-1 flex flex-col justify-between">
                         <div>
                           {/* Title in display font */}
-                          <h3 className="font-display font-extrabold text-lg uppercase tracking-tight text-black dark:text-white mb-3 line-clamp-1">{evt.about}</h3>
+                          <h3 className="font-display font-extrabold text-lg uppercase tracking-tight text-foreground mb-3 line-clamp-1">{evt.about}</h3>
 
                           <div className="space-y-2 mb-6">
-                            <div className="flex items-center gap-2.5 text-black/50 dark:text-white/50 text-xs font-mono">
-                              <Clock className="w-3.5 h-3.5 text-white/30" />
+                            <div className="flex items-center gap-2.5 text-foreground/50 text-xs font-mono">
+                              <Clock className="w-3.5 h-3.5 text-foreground/30" />
                               <span>{evt.is_luma_event && evt.luma_event_start_time ? formatDate(evt.luma_event_start_time) : formatDate(evt.create_at)}</span>
                             </div>
-                            <div className="flex items-center gap-2.5 text-black/50 dark:text-white/50 text-xs font-mono">
-                              <MapPin className="w-3.5 h-3.5 text-white/30" />
+                            <div className="flex items-center gap-2.5 text-foreground/50 text-xs font-mono">
+                              <MapPin className="w-3.5 h-3.5 text-foreground/30" />
                               <span className="truncate">{evt.location ? evt.location : (evt.is_luma_event ? "Online Luma Event" : "Location TBA")}</span>
                             </div>
                           </div>
                         </div>
 
-                        <div className="pt-4 border-t border-black/5 dark:border-white/5 flex gap-2">
+                        <div className="pt-4 border-t border-black/10 dark:border-foreground/5 flex gap-2">
                           <button
                             onClick={() => openAttendeesModal(evt.post_id)}
-                            className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-transparent border border-black/10 dark:border-white/10 hover:border-[#00e0c2] hover:bg-[#00e0c2]/5 text-[#00e0c2] text-xs font-display font-extrabold uppercase tracking-wider transition-colors cursor-pointer"
+                            className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-transparent border border-black/10 dark:border-foreground/10 hover:border-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/5 text-[var(--accent-primary)] text-xs font-display font-extrabold uppercase tracking-wider transition-colors cursor-pointer"
                           >
                             <Users className="w-3.5 h-3.5" /> Attendees
                           </button>
 
                           <button
                             onClick={() => { setPostsEventId(evt.post_id); setPostsEventTitle(evt.about); }}
-                            className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-transparent border border-black/10 dark:border-white/10 hover:border-[#8b5cf6] hover:bg-[#8b5cf6]/5 text-[#8b5cf6] text-xs font-display font-extrabold uppercase tracking-wider transition-colors cursor-pointer"
+                            className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-transparent border border-black/10 dark:border-foreground/10 hover:border-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/5 text-[var(--accent-primary)] text-xs font-display font-extrabold uppercase tracking-wider transition-colors cursor-pointer"
                             title="View Posts"
                           >
                             <ImageIcon className="w-3.5 h-3.5" /> Posts
@@ -267,7 +267,7 @@ export default function EventsPage() {
 
                           <button
                             onClick={() => { setEditingEvent(evt); setShowEditModal(true); }}
-                            className="flex items-center justify-center p-2.5 rounded-xl border border-black/10 dark:border-white/10 hover:bg-white/5 text-black/60 dark:text-white/60 hover:text-[#00e0c2] transition-colors cursor-pointer"
+                            className="flex items-center justify-center p-2.5 rounded-xl border border-black/10 dark:border-foreground/10 hover:bg-black/5 dark:hover:bg-foreground/5 text-foreground/60 hover:text-[var(--accent-primary)] transition-colors cursor-pointer"
                             title="Edit Event"
                           >
                             <Edit3 className="w-4 h-4" />
@@ -307,16 +307,16 @@ export default function EventsPage() {
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-[#0c0c0f] border border-white/10 rounded-xl shadow-2xl max-w-md w-[95%] md:w-full max-h-[85vh] flex flex-col overflow-hidden"
+              className="bg-white dark:bg-[#0c0c0f] border border-black/10 dark:border-foreground/10 rounded-xl shadow-2xl max-w-md w-[95%] md:w-full max-h-[85vh] flex flex-col overflow-hidden"
             >
-              <div className="p-4 md:p-5 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
-                <h3 className="text-base font-display font-extrabold uppercase tracking-tight text-white flex items-center gap-2.5">
-                  <Users className="w-5 h-5 text-[#00e0c2]" />
+              <div className="p-4 md:p-5 border-b border-black/10 dark:border-foreground/5 flex items-center justify-between bg-black/5 dark:bg-foreground/[0.02]">
+                <h3 className="text-base font-display font-extrabold uppercase tracking-tight text-foreground flex items-center gap-2.5">
+                  <Users className="w-5 h-5 text-[var(--accent-primary)]" />
                   Approved Attendees
                 </h3>
                 <button
                   onClick={closeAttendeesModal}
-                  className="p-1 rounded-full hover:bg-white/10 text-white/50 transition-colors"
+                  className="p-1 rounded-full hover:bg-black/5 dark:hover:bg-foreground/10 text-foreground/50 transition-colors"
                 >
                   <XCircle className="w-5 h-5" />
                 </button>
@@ -325,29 +325,29 @@ export default function EventsPage() {
               <div className="flex-1 overflow-y-auto p-2 custom-scrollbar">
                 {isLoadingAttendees ? (
                   <div className="flex items-center justify-center h-40">
-                    <Loader2 className="w-7 h-7 animate-spin text-[#00e0c2]" />
+                    <Loader2 className="w-7 h-7 animate-spin text-[var(--accent-primary)]" />
                   </div>
                 ) : attendees.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-40 text-white/30 text-xs font-mono uppercase tracking-wider">
+                  <div className="flex flex-col items-center justify-center h-40 text-foreground/30 text-xs font-mono uppercase tracking-wider">
                     No approved attendees yet.
                   </div>
                 ) : (
                   <div className="space-y-1 p-2">
                     {attendees.map((attendee) => (
-                      <div key={attendee.user_id} className="flex items-center gap-3 p-3 rounded-xl border border-transparent hover:border-white/5 hover:bg-white/[0.01] transition-all">
-                        <div className="w-10 h-10 rounded-full overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center">
+                      <div key={attendee.user_id} className="flex items-center gap-3 p-3 rounded-xl border border-transparent hover:border-black/5 dark:hover:border-foreground/5 hover:bg-black/[0.01] dark:hover:bg-foreground/[0.01] transition-all">
+                        <div className="w-10 h-10 rounded-full overflow-hidden border border-black/10 dark:border-foreground/10 bg-black/5 dark:bg-foreground/5 flex items-center justify-center">
                           {attendee.avatar ? (
                             <Image src={attendee.avatar} alt={attendee.username} width={40} height={40} className="object-cover w-full h-full" />
                           ) : (
-                            <User className="w-5 h-5 text-white/30" />
+                            <User className="w-5 h-5 text-foreground/30" />
                           )}
                         </div>
                         <div>
-                          <div className="font-semibold text-sm text-white">{attendee.username}</div>
-                          <div className="text-[10px] text-white/40 font-mono">Approved: {formatDate(attendee.created_at)}</div>
+                          <div className="font-semibold text-sm text-foreground">{attendee.username}</div>
+                          <div className="text-[10px] text-foreground/40 font-mono">Approved: {formatDate(attendee.created_at)}</div>
                         </div>
                         <div className="ml-auto">
-                          <CheckCircle className="w-4 h-4 text-[#00e0c2]" />
+                          <CheckCircle className="w-4 h-4 text-[var(--accent-primary)]" />
                         </div>
                       </div>
                     ))}
@@ -395,14 +395,14 @@ export default function EventsPage() {
               exit={{ scale: 0.95, opacity: 0, y: 15 }}
               transition={{ type: "spring", stiffness: 350, damping: 25 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-[#0c0c0f] border border-white/10 rounded-xl shadow-2xl max-w-sm w-full p-6 space-y-4"
+              className="bg-white dark:bg-[#0c0c0f] border border-black/10 dark:border-foreground/10 rounded-xl shadow-2xl max-w-sm w-full p-6 space-y-4"
             >
               <div className="space-y-2">
                 <h3 className="text-lg font-display font-extrabold uppercase tracking-tight text-red-500 flex items-center gap-2">
                   <Trash2 className="w-5 h-5" />
                   Delete Event
                 </h3>
-                <p className="text-xs text-white/50 leading-relaxed">
+                <p className="text-xs text-foreground/60 leading-relaxed">
                   Are you sure you want to delete this event? This action will permanently remove it from the NextVibe registry.
                 </p>
               </div>
@@ -417,14 +417,14 @@ export default function EventsPage() {
                 <button
                   onClick={() => setEventToDeleteId(null)}
                   disabled={isDeleting}
-                  className="px-4 py-2.5 rounded-xl border border-white/10 text-white/70 text-xs font-semibold hover:bg-white/5 transition-colors cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl border border-black/10 dark:border-foreground/10 text-foreground/70 text-xs font-semibold hover:bg-black/5 dark:hover:bg-foreground/5 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDeleteConfirm}
                   disabled={isDeleting}
-                  className="px-4 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white text-xs font-semibold transition-colors flex items-center gap-2 cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 disabled:opacity-50 text-foreground text-xs font-semibold transition-colors flex items-center gap-2 cursor-pointer"
                 >
                   {isDeleting ? (
                     <>
