@@ -261,10 +261,30 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
         const decimals = 6;
         const baseAmount = Math.round(prizeAmount * Math.pow(10, decimals));
 
-        winners.forEach(w => {
+        for (const w of winners) {
           const recipientPubKey = new PublicKey(w.wallet);
           const sourceATA = getAssociatedTokenAddress(mintAddress, publicKey!);
           const destinationATA = getAssociatedTokenAddress(mintAddress, recipientPubKey);
+
+          // Check if recipient's ATA exists; if not, create it first
+          const ataInfo = await connection.getAccountInfo(destinationATA);
+          if (!ataInfo) {
+            // Create Associated Token Account instruction (manual construction)
+            transaction.add(
+              new TransactionInstruction({
+                keys: [
+                  { pubkey: publicKey!, isSigner: true, isWritable: true },   // payer
+                  { pubkey: destinationATA, isSigner: false, isWritable: true }, // ATA to create
+                  { pubkey: recipientPubKey, isSigner: false, isWritable: false }, // wallet owner
+                  { pubkey: mintAddress, isSigner: false, isWritable: false },    // token mint
+                  { pubkey: SystemProgram.programId, isSigner: false, isWritable: false }, // system program
+                  { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },       // token program
+                ],
+                programId: ASSOCIATED_TOKEN_PROGRAM_ID,
+                data: Buffer.alloc(0), // no data needed for create ATA
+              })
+            );
+          }
 
           transaction.add(
             createSPLTransferInstruction(
@@ -274,7 +294,7 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
               baseAmount
             )
           );
-        });
+        }
       }
 
       setTxStatus("signing");
