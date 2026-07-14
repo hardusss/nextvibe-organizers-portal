@@ -71,20 +71,20 @@ export default function BroadcastPanel({ eventId, recipientCount }: Props) {
   };
 
   return (
-    <div className="bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-5 md:p-6 flex flex-col justify-between shadow-sm backdrop-blur-md relative overflow-hidden transition-all min-h-[300px]">
+    <div className="premium-card p-5 md:p-6 flex flex-col justify-between relative overflow-hidden transition-all min-h-[300px]">
 
       {/* Confirmation Modal */}
       {showConfirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="max-w-md w-full bg-white dark:bg-[#0c0d12] border border-black/10 dark:border-white/10 rounded-xl p-6 shadow-2xl space-y-5">
+          <div className="max-w-md w-full bg-[#0c0a15] border border-foreground/10 rounded-xl p-6 shadow-2xl space-y-5">
             <div className="space-y-1">
-              <h3 className="text-lg font-display font-extrabold uppercase text-black dark:text-white tracking-tight">Confirm Broadcast</h3>
-              <p className="text-xs text-black/60 dark:text-white/40 leading-relaxed font-mono">
+              <h3 className="text-lg font-display font-extrabold uppercase text-foreground tracking-tight">Confirm Broadcast</h3>
+              <p className="text-xs text-foreground/40 leading-relaxed font-mono">
                 Send to {totalRecipients} attendees?
               </p>
             </div>
 
-            <div className="bg-black/5 dark:bg-white/[0.02] border border-black/5 dark:border-white/5 rounded-xl p-3 text-xs text-black/70 dark:text-white/60 font-mono italic max-h-32 overflow-y-auto custom-scrollbar">
+            <div className="bg-foreground/[0.02] border border-foreground/5 rounded-xl p-3 text-xs text-foreground/60 font-mono italic max-h-32 overflow-y-auto custom-scrollbar">
               "{message}"
             </div>
 
@@ -92,14 +92,14 @@ export default function BroadcastPanel({ eventId, recipientCount }: Props) {
               <button
                 type="button"
                 onClick={() => setShowConfirmModal(false)}
-                className="flex-1 py-3 border border-black/10 dark:border-white/10 text-black/60 dark:text-white/60 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors cursor-pointer"
+                className="flex-1 py-3 border border-foreground/10 text-foreground/60 hover:bg-foreground/5 rounded-lg transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleConfirmSend}
-                className="flex-1 py-3 bg-[var(--accent-primary)] hover:opacity-90 text-white rounded-lg transition-all cursor-pointer shadow-md hover:shadow-lg"
+                className="flex-1 py-3 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 text-foreground rounded-lg transition-all cursor-pointer shadow-md hover:shadow-lg"
               >
                 Confirm
               </button>
@@ -109,12 +109,12 @@ export default function BroadcastPanel({ eventId, recipientCount }: Props) {
       )}
 
       <div>
-        <h3 className="text-black/40 dark:text-white/40 text-[10px] font-mono tracking-widest font-bold uppercase">broadcast communications</h3>
-        <h4 className="text-sm font-semibold text-black dark:text-white mt-1">Direct Push Notifications</h4>
+        <h3 className="text-foreground/40 text-[10px] font-mono tracking-widest font-bold uppercase">broadcast communications</h3>
+        <h4 className="text-sm font-semibold text-foreground mt-1">Direct Push Notifications</h4>
       </div>
 
       {!eventId ? (
-        <div className="flex-1 flex items-center justify-center text-xs text-black/30 dark:text-white/30 font-mono py-12">
+        <div className="flex-1 flex items-center justify-center text-xs text-foreground/30 font-mono py-12">
           Select an event to enable broadcasting
         </div>
       ) : (
@@ -127,12 +127,12 @@ export default function BroadcastPanel({ eventId, recipientCount }: Props) {
               onChange={(e) => setMessage(e.target.value)}
               placeholder="e.g. Speaker on the Main Stage is starting in 5 minutes! Don't miss it!"
               disabled={isSending}
-              className="flex-1 min-h-[90px] w-full bg-black/5 dark:bg-black/30 border border-black/10 dark:border-white/5 focus:border-[var(--accent-primary,#8b5cf6)] focus:outline-none rounded-xl p-3 text-xs text-black dark:text-white placeholder-black/30 dark:placeholder-white/25 resize-none transition-colors"
+              className="flex-1 min-h-[90px] w-full bg-foreground/[0.02] border border-foreground/5 focus:border-[var(--accent-primary,#8b5cf6)] focus:outline-none rounded-xl p-3 text-xs text-foreground placeholder-white/20 resize-none transition-colors"
             />
-            <p className="text-[10px] text-black/40 dark:text-white/45 font-mono px-1">
+            <p className="text-[10px] text-foreground/45 font-mono px-1">
               This will be sent to all approved attendees of this event.
             </p>
-            <div className="flex justify-between items-center text-[9px] font-mono text-black/40 dark:text-white/30 px-1 font-bold">
+            <div className="flex justify-between items-center text-[9px] font-mono text-foreground/30 px-1 font-bold">
               <span>{message.length} / {maxChars} chars</span>
               <span className={charsRemaining < 0 ? "text-red-500" : ""}>
                 {charsRemaining >= 0 ? `${charsRemaining} remaining` : `${Math.abs(charsRemaining)} over limit`}
@@ -144,7 +144,7 @@ export default function BroadcastPanel({ eventId, recipientCount }: Props) {
           {status.type && (
             <div
               className={`rounded-xl p-2.5 flex items-center gap-2 text-[10px] font-mono font-bold uppercase ${status.type === "success"
-                  ? "bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 dark:text-emerald-400"
+                  ? "bg-emerald-500/10 border border-emerald-500/25 text-emerald-400"
                   : "bg-red-500/10 border border-red-500/25 text-red-500"
                 }`}
             >
@@ -162,10 +162,10 @@ export default function BroadcastPanel({ eventId, recipientCount }: Props) {
             type="submit"
             disabled={isSending || !message.trim() || message.length > maxChars}
             className={`w-full py-3 rounded-xl font-display text-xs uppercase tracking-wider font-extrabold flex items-center justify-center gap-2 transition-all cursor-pointer ${isSending
-                ? "bg-black/5 dark:bg-white/5 border border-black/15 dark:border-white/10 text-black/45 dark:text-white/40 cursor-not-allowed"
+                ? "bg-foreground/5 border border-foreground/10 text-foreground/40 cursor-not-allowed"
                 : !message.trim() || message.length > maxChars
-                  ? "bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 text-black/25 dark:text-white/20 cursor-not-allowed"
-                  : "bg-black dark:bg-white hover:bg-black/80 dark:hover:bg-white/90 text-white dark:text-black shadow-md hover:shadow-lg active:scale-[0.99]"
+                  ? "bg-foreground/5 border border-foreground/5 text-foreground/20 cursor-not-allowed"
+                  : "bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-90 text-foreground shadow-md hover:shadow-lg active:scale-[0.99]"
               }`}
           >
             {isSending ? (

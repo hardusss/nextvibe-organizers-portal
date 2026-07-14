@@ -112,32 +112,32 @@ export default function EventPostsModal({
             exit={{ scale: 0.95, opacity: 0, y: 20 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
             onClick={(e) => e.stopPropagation()}
-            className="bg-[#0a0a0f] border border-white/10 rounded-2xl shadow-2xl w-[95%] md:w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden"
+            className="bg-[#0a0a0f] border border-foreground/10 rounded-2xl shadow-2xl w-[95%] md:w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden"
           >
             {/* Header */}
-            <div className="p-5 md:p-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02] shrink-0">
+            <div className="p-5 md:p-6 border-b border-foreground/5 flex items-center justify-between bg-foreground/[0.02] shrink-0">
               <div className="space-y-1">
-                <span className="text-[10px] tracking-widest text-[#00e0c2] font-mono font-bold uppercase">
+                <span className="text-[10px] tracking-widest text-[var(--accent-primary)] font-mono font-bold uppercase">
                   attendee content
                 </span>
-                <h3 className="text-lg font-display font-extrabold uppercase tracking-tight text-white flex items-center gap-2.5">
-                  <ImageIcon className="w-5 h-5 text-[#00e0c2]" />
+                <h3 className="text-lg font-display font-extrabold uppercase tracking-tight text-foreground flex items-center gap-2.5">
+                  <ImageIcon className="w-5 h-5 text-[var(--accent-primary)]" />
                   Event Posts
                   {total > 0 && (
-                    <span className="text-xs font-mono font-bold text-white/30 normal-case">
+                    <span className="text-xs font-mono font-bold text-foreground/30 normal-case">
                       ({total})
                     </span>
                   )}
                 </h3>
                 {eventTitle && (
-                  <p className="text-xs text-white/40 font-mono truncate max-w-md">
+                  <p className="text-xs text-foreground/40 font-mono truncate max-w-md">
                     {eventTitle}
                   </p>
                 )}
               </div>
               <button
                 onClick={onClose}
-                className="p-2 rounded-xl hover:bg-white/10 text-white/50 hover:text-white transition-all cursor-pointer"
+                className="p-2 rounded-xl hover:bg-foreground/10 text-foreground/50 hover:text-foreground transition-all cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -147,8 +147,8 @@ export default function EventPostsModal({
             <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6">
               {isLoading ? (
                 <div className="flex flex-col items-center justify-center h-64 gap-3">
-                  <Loader2 className="w-8 h-8 animate-spin text-[#00e0c2]" />
-                  <span className="text-xs font-mono uppercase tracking-wider text-white/30">
+                  <Loader2 className="w-8 h-8 animate-spin text-[var(--accent-primary)]" />
+                  <span className="text-xs font-mono uppercase tracking-wider text-foreground/30">
                     Loading posts...
                   </span>
                 </div>
@@ -161,14 +161,14 @@ export default function EventPostsModal({
                 </div>
               ) : posts.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-64 gap-4">
-                  <div className="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
-                    <ImageIcon className="w-7 h-7 text-white/20" />
+                  <div className="w-16 h-16 rounded-full bg-foreground/5 border border-foreground/10 flex items-center justify-center">
+                    <ImageIcon className="w-7 h-7 text-foreground/20" />
                   </div>
                   <div className="text-center space-y-1">
-                    <p className="text-sm font-display font-extrabold uppercase text-white/40">
+                    <p className="text-sm font-display font-extrabold uppercase text-foreground/40">
                       No posts yet
                     </p>
-                    <p className="text-xs text-white/25 font-mono">
+                    <p className="text-xs text-foreground/25 font-mono">
                       Attendees haven&apos;t shared any posts for this event
                     </p>
                   </div>
@@ -189,7 +189,7 @@ export default function EventPostsModal({
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: Math.min(idx * 0.04, 0.5) }}
                           whileHover={{ y: -3 }}
-                          className="bg-white/[0.03] border border-white/[0.06] rounded-xl overflow-hidden flex flex-col transition-all duration-200 hover:border-white/10 group cursor-pointer"
+                          className="bg-foreground/[0.03] border border-foreground/[0.06] rounded-xl overflow-hidden flex flex-col transition-all duration-200 hover:border-foreground/10 group cursor-pointer"
                           onClick={() => setSelectedPost(post)}
                         >
                           {/* Media */}
@@ -204,19 +204,19 @@ export default function EventPostsModal({
                               />
                               {isVideo && (
                                 <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                                  <div className="w-10 h-10 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center">
-                                    <Play className="w-4 h-4 text-white ml-0.5" fill="white" />
+                                  <div className="w-10 h-10 rounded-full bg-black/60 backdrop-blur-md border border-foreground/20 flex items-center justify-center">
+                                    <Play className="w-4 h-4 text-foreground ml-0.5" fill="white" />
                                   </div>
                                 </div>
                               )}
                               {post.media.length > 1 && (
-                                <div className="absolute top-2.5 right-2.5 bg-black/70 backdrop-blur-md text-[9px] font-mono font-bold px-2 py-0.5 rounded-md text-white/80 border border-white/10">
+                                <div className="absolute top-2.5 right-2.5 bg-black/70 backdrop-blur-md text-[9px] font-mono font-bold px-2 py-0.5 rounded-md text-foreground/80 border border-foreground/10">
                                   +{post.media.length - 1}
                                 </div>
                               )}
                               {/* NFT Badge */}
                               {post.is_nft && (
-                                <div className="absolute top-2.5 left-2.5 bg-[#8b5cf6]/80 backdrop-blur-md text-[9px] font-mono font-bold px-2 py-0.5 rounded-md text-white border border-[#8b5cf6]/30 flex items-center gap-1">
+                                <div className="absolute top-2.5 left-2.5 bg-[#8b5cf6]/80 backdrop-blur-md text-[9px] font-mono font-bold px-2 py-0.5 rounded-md text-foreground border border-[#8b5cf6]/30 flex items-center gap-1">
                                   <Sparkles className="w-2.5 h-2.5" />
                                   cNFT
                                 </div>
@@ -224,7 +224,7 @@ export default function EventPostsModal({
                             </div>
                           ) : (
                             <div className="aspect-square bg-gradient-to-br from-white/[0.04] to-white/[0.01] flex items-center justify-center">
-                              <MessageCircle className="w-8 h-8 text-white/10" />
+                              <MessageCircle className="w-8 h-8 text-foreground/10" />
                             </div>
                           )}
 
@@ -232,7 +232,7 @@ export default function EventPostsModal({
                           <div className="p-3.5 flex-1 flex flex-col">
                             {/* Author */}
                             <div className="flex items-center gap-2.5 mb-2.5">
-                              <div className="w-7 h-7 rounded-full overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center shrink-0">
+                              <div className="w-7 h-7 rounded-full overflow-hidden border border-foreground/10 bg-foreground/5 flex items-center justify-center shrink-0">
                                 {post.owner__avatar ? (
                                   <Image
                                     src={post.owner__avatar}
@@ -243,16 +243,16 @@ export default function EventPostsModal({
                                     unoptimized
                                   />
                                 ) : (
-                                  <User className="w-3.5 h-3.5 text-white/30" />
+                                  <User className="w-3.5 h-3.5 text-foreground/30" />
                                 )}
                               </div>
                               <div className="min-w-0 flex-1">
                                 <div className="flex items-center gap-1.5">
-                                  <span className="text-xs font-display font-extrabold uppercase tracking-tight text-white truncate">
+                                  <span className="text-xs font-display font-extrabold uppercase tracking-tight text-foreground truncate">
                                     {post.owner__username}
                                   </span>
                                   {post.owner__official && (
-                                    <Shield className="w-3 h-3 text-[#00e0c2] shrink-0" />
+                                    <Shield className="w-3 h-3 text-[var(--accent-primary)] shrink-0" />
                                   )}
                                   {post.owner__is_og && (
                                     <span className="text-[8px] font-mono font-bold text-[#8b5cf6] bg-[#8b5cf6]/10 px-1 py-0.5 rounded shrink-0">
@@ -260,7 +260,7 @@ export default function EventPostsModal({
                                     </span>
                                   )}
                                 </div>
-                                <span className="text-[9px] text-white/30 font-mono">
+                                <span className="text-[9px] text-foreground/30 font-mono">
                                   {formatDate(post.create_at)}
                                 </span>
                               </div>
@@ -268,19 +268,19 @@ export default function EventPostsModal({
 
                             {/* Caption */}
                             {post.about && (
-                              <p className="text-[11px] text-white/60 leading-relaxed line-clamp-2 mb-3">
+                              <p className="text-[11px] text-foreground/60 leading-relaxed line-clamp-2 mb-3">
                                 {post.about}
                               </p>
                             )}
 
                             {/* Stats Bar */}
-                            <div className="mt-auto pt-2.5 border-t border-white/[0.04] flex items-center gap-3 text-[10px] font-mono font-bold text-white/35">
+                            <div className="mt-auto pt-2.5 border-t border-foreground/[0.04] flex items-center gap-3 text-[10px] font-mono font-bold text-foreground/35">
                               <span className={`flex items-center gap-1 ${isLiked ? "text-red-400" : ""}`}>
                                 <Heart className="w-3 h-3" fill={isLiked ? "currentColor" : "none"} />
                                 {post.count_likes}
                               </span>
                               {post.reputation_earned > 0 && (
-                                <span className="flex items-center gap-1 text-[#00e0c2]/70">
+                                <span className="flex items-center gap-1 text-[var(--accent-primary)]/70">
                                   <Star className="w-3 h-3" />
                                   +{post.reputation_earned}
                                 </span>
@@ -304,7 +304,7 @@ export default function EventPostsModal({
                       <button
                         onClick={loadMore}
                         disabled={loadingMore}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-white/10 hover:border-[#00e0c2]/30 hover:bg-[#00e0c2]/5 text-white/60 hover:text-[#00e0c2] text-xs font-display font-extrabold uppercase tracking-wider transition-all cursor-pointer disabled:opacity-50"
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-foreground/10 hover:border-[var(--accent-primary)]/30 hover:bg-[var(--accent-primary)]/5 text-foreground/60 hover:text-[var(--accent-primary)] text-xs font-display font-extrabold uppercase tracking-wider transition-all cursor-pointer disabled:opacity-50"
                       >
                         {loadingMore ? (
                           <>
@@ -326,7 +326,7 @@ export default function EventPostsModal({
 
             {/* Footer Stats */}
             {posts.length > 0 && (
-              <div className="px-5 py-3 border-t border-white/5 flex items-center justify-between text-[9px] font-mono font-bold uppercase tracking-widest text-white/25 shrink-0 bg-white/[0.01]">
+              <div className="px-5 py-3 border-t border-foreground/5 flex items-center justify-between text-[9px] font-mono font-bold uppercase tracking-widest text-foreground/25 shrink-0 bg-foreground/[0.01]">
                 <span>{posts.length} of {total} posts loaded</span>
                 <span className="flex items-center gap-1.5">
                   <Heart className="w-2.5 h-2.5" />
@@ -352,12 +352,12 @@ export default function EventPostsModal({
                   exit={{ scale: 0.9, opacity: 0 }}
                   transition={{ type: "spring", stiffness: 300, damping: 25 }}
                   onClick={(e) => e.stopPropagation()}
-                  className="bg-[#0c0c0f] border border-white/10 rounded-2xl shadow-2xl max-w-2xl w-[95%] max-h-[90vh] overflow-y-auto custom-scrollbar"
+                  className="bg-[#0c0c0f] border border-foreground/10 rounded-2xl shadow-2xl max-w-2xl w-[95%] max-h-[90vh] overflow-y-auto custom-scrollbar"
                 >
                   {/* Detail Header */}
-                  <div className="p-4 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+                  <div className="p-4 border-b border-foreground/5 flex items-center justify-between bg-foreground/[0.02]">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full overflow-hidden border border-white/10 bg-white/5 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-full overflow-hidden border border-foreground/10 bg-foreground/5 flex items-center justify-center">
                         {selectedPost.owner__avatar ? (
                           <Image
                             src={selectedPost.owner__avatar}
@@ -368,16 +368,16 @@ export default function EventPostsModal({
                             unoptimized
                           />
                         ) : (
-                          <User className="w-5 h-5 text-white/30" />
+                          <User className="w-5 h-5 text-foreground/30" />
                         )}
                       </div>
                       <div>
                         <div className="flex items-center gap-1.5">
-                          <span className="text-sm font-display font-extrabold uppercase tracking-tight text-white">
+                          <span className="text-sm font-display font-extrabold uppercase tracking-tight text-foreground">
                             {selectedPost.owner__username}
                           </span>
                           {selectedPost.owner__official && (
-                            <Shield className="w-3.5 h-3.5 text-[#00e0c2]" />
+                            <Shield className="w-3.5 h-3.5 text-[var(--accent-primary)]" />
                           )}
                           {selectedPost.owner__is_og && (
                             <span className="text-[8px] font-mono font-bold text-[#8b5cf6] bg-[#8b5cf6]/10 px-1.5 py-0.5 rounded">
@@ -385,7 +385,7 @@ export default function EventPostsModal({
                             </span>
                           )}
                         </div>
-                        <span className="text-[10px] text-white/35 font-mono">
+                        <span className="text-[10px] text-foreground/35 font-mono">
                           {formatDate(selectedPost.create_at)}
                           {selectedPost.location && ` · ${selectedPost.location}`}
                         </span>
@@ -393,7 +393,7 @@ export default function EventPostsModal({
                     </div>
                     <button
                       onClick={() => setSelectedPost(null)}
-                      className="p-2 rounded-xl hover:bg-white/10 text-white/50 hover:text-white transition-all cursor-pointer"
+                      className="p-2 rounded-xl hover:bg-foreground/10 text-foreground/50 hover:text-foreground transition-all cursor-pointer"
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -436,55 +436,55 @@ export default function EventPostsModal({
                   <div className="p-5 space-y-4">
                     {/* Caption */}
                     {selectedPost.about && (
-                      <p className="text-sm text-white/70 leading-relaxed">
+                      <p className="text-sm text-foreground/70 leading-relaxed">
                         {selectedPost.about}
                       </p>
                     )}
 
                     {/* Stats Grid */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                      <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-3 text-center">
-                        <div className="text-lg font-mono font-bold text-white">
+                      <div className="bg-foreground/[0.03] border border-foreground/[0.06] rounded-xl p-3 text-center">
+                        <div className="text-lg font-mono font-bold text-foreground">
                           {selectedPost.count_likes}
                         </div>
-                        <div className="text-[9px] font-mono uppercase tracking-wider text-white/30 mt-0.5">
+                        <div className="text-[9px] font-mono uppercase tracking-wider text-foreground/30 mt-0.5">
                           Likes
                         </div>
                       </div>
-                      <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-3 text-center">
-                        <div className="text-lg font-mono font-bold text-[#00e0c2]">
+                      <div className="bg-foreground/[0.03] border border-foreground/[0.06] rounded-xl p-3 text-center">
+                        <div className="text-lg font-mono font-bold text-[var(--accent-primary)]">
                           +{selectedPost.reputation_earned}
                         </div>
-                        <div className="text-[9px] font-mono uppercase tracking-wider text-white/30 mt-0.5">
+                        <div className="text-[9px] font-mono uppercase tracking-wider text-foreground/30 mt-0.5">
                           Rep Earned
                         </div>
                       </div>
                       {selectedPost.is_nft && (
                         <>
-                          <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-3 text-center">
+                          <div className="bg-foreground/[0.03] border border-foreground/[0.06] rounded-xl p-3 text-center">
                             <div className="text-lg font-mono font-bold text-[#8b5cf6]">
                               {selectedPost.minted_count}/{selectedPost.total_supply}
                             </div>
-                            <div className="text-[9px] font-mono uppercase tracking-wider text-white/30 mt-0.5">
+                            <div className="text-[9px] font-mono uppercase tracking-wider text-foreground/30 mt-0.5">
                               Minted
                             </div>
                           </div>
-                          <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-3 text-center">
-                            <div className="text-lg font-mono font-bold text-white">
+                          <div className="bg-foreground/[0.03] border border-foreground/[0.06] rounded-xl p-3 text-center">
+                            <div className="text-lg font-mono font-bold text-foreground">
                               {selectedPost.nft_price ? `${selectedPost.nft_price} SOL` : "Free"}
                             </div>
-                            <div className="text-[9px] font-mono uppercase tracking-wider text-white/30 mt-0.5">
+                            <div className="text-[9px] font-mono uppercase tracking-wider text-foreground/30 mt-0.5">
                               Price
                             </div>
                           </div>
                         </>
                       )}
                       {!selectedPost.is_nft && (
-                        <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-3 text-center">
-                          <div className="text-lg font-mono font-bold text-white/50">
+                        <div className="bg-foreground/[0.03] border border-foreground/[0.06] rounded-xl p-3 text-center">
+                          <div className="text-lg font-mono font-bold text-foreground/50">
                             {selectedPost.media?.length || 0}
                           </div>
-                          <div className="text-[9px] font-mono uppercase tracking-wider text-white/30 mt-0.5">
+                          <div className="text-[9px] font-mono uppercase tracking-wider text-foreground/30 mt-0.5">
                             Media
                           </div>
                         </div>
@@ -501,12 +501,12 @@ export default function EventPostsModal({
                         </span>
                       )}
                       {selectedPost.owner_wallet && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-[9px] font-mono text-white/40 uppercase tracking-wider">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-foreground/5 border border-foreground/10 text-[9px] font-mono text-foreground/40 uppercase tracking-wider">
                           {selectedPost.owner_wallet.slice(0, 4)}...{selectedPost.owner_wallet.slice(-4)}
                         </span>
                       )}
                       {selectedPost.owner__invited_count > 0 && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#00e0c2]/10 border border-[#00e0c2]/20 text-[9px] font-mono font-bold text-[#00e0c2] uppercase tracking-wider">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[var(--accent-primary)]/10 border border-[var(--accent-primary)]/20 text-[9px] font-mono font-bold text-[var(--accent-primary)] uppercase tracking-wider">
                           {selectedPost.owner__invited_count} invited
                         </span>
                       )}
@@ -515,7 +515,7 @@ export default function EventPostsModal({
                           ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-500"
                           : selectedPost.moderation_status === "pending"
                           ? "bg-amber-500/10 border border-amber-500/20 text-amber-500"
-                          : "bg-white/5 border border-white/10 text-white/40"
+                          : "bg-foreground/5 border border-foreground/10 text-foreground/40"
                       }`}>
                         {selectedPost.moderation_status}
                       </span>

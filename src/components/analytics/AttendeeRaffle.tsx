@@ -336,15 +336,15 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
   };
 
   return (
-    <div className="bg-white/70 dark:bg-[#05070a]/90 border border-black/5 dark:border-white/5 rounded-xl p-5 md:p-6 shadow-sm backdrop-blur-md relative overflow-hidden transition-all mt-6">
+    <div className="premium-card p-5 md:p-6 shadow-sm backdrop-blur-md relative overflow-hidden transition-all mt-6">
       {/* Header */}
-      <div className="flex items-center gap-3.5 mb-6 border-b border-black/5 dark:border-white/5 pb-4">
+      <div className="flex items-center gap-3.5 mb-6 border-b border-foreground/5 pb-4">
         <div className="p-2.5 rounded-xl bg-[var(--accent-primary)]/10 border border-[var(--accent-primary)]/20 text-[var(--accent-primary)]">
           <Trophy className="w-5 h-5 animate-bounce" />
         </div>
         <div>
-          <h3 className="text-black/40 dark:text-white/40 text-[10px] font-mono tracking-widest font-bold uppercase">Event Engagement Tools</h3>
-          <h4 className="text-base font-display font-extrabold uppercase tracking-tight text-black dark:text-white mt-0.5">Attendee Raffle & Solana Giveaway</h4>
+          <h3 className="text-foreground/40 text-[10px] font-mono tracking-widest font-bold uppercase">Event Engagement Tools</h3>
+          <h4 className="text-base font-display font-extrabold uppercase tracking-tight text-foreground mt-0.5">Attendee Raffle & Solana Giveaway</h4>
         </div>
       </div>
 
@@ -352,29 +352,29 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
         {/* Left Side: Directory */}
         <div className="lg:col-span-7 flex flex-col min-h-[420px]">
           <div className="flex justify-between items-center mb-4">
-            <span className="text-[10px] tracking-widest text-[#00e0c2] font-mono font-bold uppercase flex items-center gap-1.5">
+            <span className="text-[10px] tracking-widest text-[var(--accent-primary)] font-mono font-bold uppercase flex items-center gap-1.5">
               <Users className="w-3.5 h-3.5" /> Attendee Directory ({cleanAttendees.length})
             </span>
 
             <div className="relative w-44 md:w-56">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-foreground/30" />
               <input
                 type="text"
                 placeholder="Search username..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="w-full text-xs pl-8.5 pr-3 py-1.5 bg-black/5 dark:bg-white/[0.02] border border-black/10 dark:border-white/10 rounded-lg outline-none text-black dark:text-white placeholder-white/20 focus:border-[#00e0c2]/50 focus:bg-[#00e0c2]/[0.01]"
+                className="w-full text-xs pl-8.5 pr-3 py-1.5 bg-foreground/[0.02] border border-foreground/10 rounded-lg outline-none text-foreground placeholder-white/20 focus:border-[var(--accent-primary)]/50 focus:bg-[var(--accent-primary)]/[0.01]"
               />
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto max-h-[380px] pr-1.5 custom-scrollbar border border-black/5 dark:border-white/5 bg-black/[0.01] dark:bg-white/[0.01] rounded-xl p-3 space-y-2">
+          <div className="flex-1 overflow-y-auto max-h-[380px] pr-1.5 custom-scrollbar border border-foreground/5 bg-foreground/[0.01] rounded-xl p-3 space-y-2">
             {isLoading ? (
-              <div className="flex items-center justify-center h-full text-xs text-white/35 font-mono">
-                <Loader2 className="w-5 h-5 animate-spin mr-2 text-[#00e0c2]" /> Loading directory...
+              <div className="flex items-center justify-center h-full text-xs text-foreground/35 font-mono">
+                <Loader2 className="w-5 h-5 animate-spin mr-2 text-[var(--accent-primary)]" /> Loading directory...
               </div>
             ) : filteredAttendees.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-white/30 py-16">
+              <div className="flex flex-col items-center justify-center text-foreground/30 py-16">
                 <Users className="w-8 h-8 opacity-20 mb-2" />
                 <span className="text-xs font-mono">No attendees match search</span>
               </div>
@@ -387,10 +387,10 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
                 return (
                   <div
                     key={user.user_id}
-                    className="flex items-center justify-between p-2.5 rounded-xl border border-black/5 dark:border-white/5 bg-white/50 dark:bg-black/30 hover:bg-black/5 dark:hover:bg-white/[0.02] transition-all duration-200"
+                    className="flex items-center justify-between p-2.5 rounded-xl border border-foreground/5 bg-foreground/[0.02] hover:bg-foreground/[0.04] transition-all duration-200"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center overflow-hidden bg-white/5 relative">
+                      <div className="w-8 h-8 rounded-full border border-foreground/10 flex items-center justify-center overflow-hidden bg-foreground/5 relative">
                         {user.avatar ? (
                           <Image src={user.avatar} alt={user.username} width={32} height={32} unoptimized className="w-full h-full object-cover" />
                         ) : (
@@ -398,22 +398,22 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
                         )}
                       </div>
                       <div>
-                        <div className="text-black dark:text-white font-semibold text-xs tracking-tight">{user.username}</div>
+                        <div className="text-foreground font-semibold text-xs tracking-tight">{user.username}</div>
                         <div className="flex items-center gap-1.5 mt-0.5">
-                          <span className="text-[10px] text-black/50 dark:text-white/40 font-mono tracking-tight">{walletShort}</span>
+                          <span className="text-[10px] text-foreground/40 font-mono tracking-tight">{walletShort}</span>
                           <button
                             onClick={() => handleCopyWallet(user.wallet_address || "", idx)}
-                            className="p-1 rounded hover:bg-black/10 dark:hover:bg-white/5 text-white/30 hover:text-[#00e0c2] transition-colors cursor-pointer"
+                            className="p-1 rounded hover:bg-foreground/5 text-foreground/30 hover:text-[var(--accent-primary)] transition-colors cursor-pointer"
                           >
-                            {copiedIndex === idx ? <Check className="w-3 h-3 text-[#00e0c2]" /> : <Copy className="w-3 h-3" />}
+                            {copiedIndex === idx ? <Check className="w-3 h-3 text-[var(--accent-primary)]" /> : <Copy className="w-3 h-3" />}
                           </button>
                         </div>
                       </div>
                     </div>
 
                     <div className="text-right">
-                      <div className="font-mono text-xs text-black/75 dark:text-white/80 font-bold">{user.total_taps} T</div>
-                      <div className="font-mono text-[9px] text-black/40 dark:text-white/40 font-bold uppercase">{user.total_reputation} rep</div>
+                      <div className="font-mono text-xs text-foreground/80 font-bold">{user.total_taps} T</div>
+                      <div className="font-mono text-[9px] text-foreground/40 font-bold uppercase">{user.total_reputation} rep</div>
                     </div>
                   </div>
                 );
@@ -423,21 +423,21 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
         </div>
 
         {/* Right Side: Giveaway Manager */}
-        <div className="lg:col-span-5 border-t lg:border-t-0 lg:border-l border-black/5 dark:border-white/5 pt-6 lg:pt-0 lg:pl-6 flex flex-col justify-between">
+        <div className="lg:col-span-5 border-t lg:border-t-0 lg:border-l border-foreground/5 pt-6 lg:pt-0 lg:pl-6 flex flex-col justify-between">
           <div className="space-y-4">
-            <span className="text-[10px] tracking-widest text-[#00e0c2] font-mono font-bold uppercase flex items-center gap-1.5">
+            <span className="text-[10px] tracking-widest text-[var(--accent-primary)] font-mono font-bold uppercase flex items-center gap-1.5">
               <Gift className="w-3.5 h-3.5" /> Draw Panel
             </span>
 
             {/* Prize Type Toggle */}
             <div>
-              <label className="block text-[10px] font-mono uppercase tracking-wider font-bold text-black/60 dark:text-white/60 mb-2">Select Prize Type</label>
-              <div className="grid grid-cols-5 gap-1.5 p-1 bg-black/10 dark:bg-white/5 border border-white/5 rounded-xl text-xs font-display font-extrabold uppercase text-center tracking-wide">
+              <label className="block text-[10px] font-mono uppercase tracking-wider font-bold text-foreground/60 mb-2">Select Prize Type</label>
+              <div className="grid grid-cols-5 gap-1.5 p-1 bg-foreground/5 border border-foreground/5 rounded-xl text-xs font-display font-extrabold uppercase text-center tracking-wide">
                 {(["crypto", "merch", "vip", "nft", "other"] as PrizeType[]).map(type => (
                   <button
                     key={type}
                     onClick={() => setPrizeType(type)}
-                    className={`py-1.5 rounded-lg transition-all cursor-pointer ${prizeType === type ? "bg-[var(--accent-primary)] text-white shadow" : "text-black/50 dark:text-white/40 hover:text-black dark:hover:text-white"}`}
+                    className={`py-1.5 rounded-lg transition-all cursor-pointer ${prizeType === type ? "bg-[var(--accent-primary)] text-foreground shadow" : "text-foreground/40 hover:text-foreground"}`}
                   >
                     {type === "crypto" ? "Coin" : type === "vip" ? "VIP" : type}
                   </button>
@@ -449,60 +449,60 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
             {prizeType === "crypto" ? (
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-mono uppercase tracking-wider font-bold text-black/60 dark:text-white/60 mb-2">Token</label>
+                  <label className="block text-[10px] font-mono uppercase tracking-wider font-bold text-foreground/60 mb-2">Token</label>
                   <select
                     value={cryptoToken}
                     onChange={e => setCryptoToken(e.target.value as CryptoToken)}
-                    className="w-full text-xs bg-black/5 dark:bg-white/[0.02] border border-black/10 dark:border-white/10 rounded-xl px-4 py-2.5 text-black dark:text-white font-mono focus:outline-none focus:border-[#00e0c2]"
+                    className="w-full text-xs bg-foreground/[0.02] border border-foreground/10 rounded-xl px-4 py-2.5 text-foreground font-mono focus:outline-none focus:border-[var(--accent-primary)]"
                   >
-                    <option value="SOL" className="bg-white dark:bg-[#0d0d12] text-black dark:text-white">SOL</option>
-                    <option value="USDC" className="bg-white dark:bg-[#0d0d12] text-black dark:text-white">USDC</option>
-                    <option value="USDT" className="bg-white dark:bg-[#0d0d12] text-black dark:text-white">USDT</option>
+                    <option value="SOL" className="bg-[#0d0d12] text-foreground">SOL</option>
+                    <option value="USDC" className="bg-[#0d0d12] text-foreground">USDC</option>
+                    <option value="USDT" className="bg-[#0d0d12] text-foreground">USDT</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-mono uppercase tracking-wider font-bold text-black/60 dark:text-white/60 mb-2">Amt / Winner</label>
+                  <label className="block text-[10px] font-mono uppercase tracking-wider font-bold text-foreground/60 mb-2">Amt / Winner</label>
                   <input
                     type="number"
                     step="0.01"
                     min="0.001"
                     value={prizeAmount}
                     onChange={e => setPrizeAmount(parseFloat(e.target.value) || 0)}
-                    className="w-full text-xs bg-black/5 dark:bg-white/[0.02] border border-black/10 dark:border-white/10 rounded-xl px-4 py-2 text-black dark:text-white font-mono focus:outline-none focus:border-[#00e0c2]"
+                    className="w-full text-xs bg-foreground/[0.02] border border-foreground/10 rounded-xl px-4 py-2 text-foreground font-mono focus:outline-none focus:border-[var(--accent-primary)]"
                   />
                 </div>
               </div>
             ) : (
               <div>
-                <label className="block text-[10px] font-mono uppercase tracking-wider font-bold text-black/60 dark:text-white/60 mb-2">Prize Description</label>
+                <label className="block text-[10px] font-mono uppercase tracking-wider font-bold text-foreground/60 mb-2">Prize Description</label>
                 <input
                   type="text"
                   placeholder="e.g. NextVibe Premium Black Hoodie"
                   value={prizeName}
                   onChange={e => setPrizeName(e.target.value)}
-                  className="w-full text-xs bg-black/5 dark:bg-white/[0.02] border border-black/10 dark:border-white/10 rounded-xl px-4 py-2.5 text-black dark:text-white font-mono focus:outline-none focus:border-[#00e0c2]"
+                  className="w-full text-xs bg-foreground/[0.02] border border-foreground/10 rounded-xl px-4 py-2.5 text-foreground font-mono focus:outline-none focus:border-[var(--accent-primary)]"
                 />
               </div>
             )}
 
             <div>
-              <label className="block text-[10px] font-mono uppercase tracking-wider font-bold text-black/60 dark:text-white/60 mb-2">Number of Winners</label>
+              <label className="block text-[10px] font-mono uppercase tracking-wider font-bold text-foreground/60 mb-2">Number of Winners</label>
               <input
                 type="number"
                 min="1"
                 max={Math.max(1, cleanAttendees.length)}
                 value={winnersCount}
                 onChange={e => setWinnersCount(parseInt(e.target.value) || 1)}
-                className="w-full text-xs bg-black/5 dark:bg-white/[0.02] border border-black/10 dark:border-white/10 rounded-xl px-4 py-2 text-black dark:text-white font-mono focus:outline-none focus:border-[#00e0c2]"
+                className="w-full text-xs bg-foreground/[0.02] border border-foreground/10 rounded-xl px-4 py-2 text-foreground font-mono focus:outline-none focus:border-[var(--accent-primary)]"
               />
             </div>
 
             {/* Wallet status */}
             {prizeType === "crypto" && (
-              <div className="p-3.5 rounded-xl border border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/[0.01] flex items-center justify-between text-xs">
+              <div className="p-3.5 rounded-xl border border-foreground/5 bg-foreground/[0.01] flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${connected ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)] animate-pulse" : "bg-white/20"}`} />
-                  <span className="font-mono text-black/60 dark:text-white/40">
+                  <div className={`w-2 h-2 rounded-full ${connected ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)] animate-pulse" : "bg-foreground/20"}`} />
+                  <span className="font-mono text-foreground/40">
                     {connected && publicKey
                       ? `Wallet: ${publicKey.toBase58().slice(0, 6)}…${publicKey.toBase58().slice(-6)}`
                       : "Wallet: Not Connected"}
@@ -527,16 +527,16 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
             <button
               onClick={handleDrawWinners}
               disabled={isDrawing || cleanAttendees.length === 0}
-              className="w-full h-11 bg-gradient-to-r from-[#00e0c2] to-[#a855f7] hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 text-black font-display font-extrabold uppercase text-xs tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full h-11 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-95 disabled:opacity-50 text-foreground font-display font-extrabold uppercase text-xs tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
             >
               {isDrawing ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin text-black" />
+                  <Loader2 className="w-4 h-4 animate-spin text-foreground" />
                   Drawing...
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4 text-black" />
+                  <Sparkles className="w-4 h-4 text-foreground" />
                   Draw Winners
                 </>
               )}
@@ -544,14 +544,14 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
 
             {/* Animation state */}
             {isDrawing && (
-              <div className="h-16 flex items-center justify-center border border-[#00e0c2]/30 bg-[#00e0c2]/5 rounded-xl overflow-hidden font-display text-lg font-extrabold uppercase tracking-wider text-[#00e0c2] animate-pulse">
+              <div className="h-16 flex items-center justify-center border border-[var(--accent-primary)]/30 bg-[var(--accent-primary)]/5 rounded-xl overflow-hidden font-display text-lg font-extrabold uppercase tracking-wider text-[var(--accent-primary)] animate-pulse">
                 {cyclerName}
               </div>
             )}
 
             {/* Winners & Transaction Section */}
             {drawCompleted && winners.length > 0 && !isDrawing && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 pt-2 border-t border-black/5 dark:border-white/5">
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4 pt-2 border-t border-foreground/5">
                 <span className="text-[10px] tracking-widest text-yellow-500 font-mono font-bold uppercase flex items-center gap-1.5">
                   <Trophy className="w-3.5 h-3.5" /> Selected Winners
                 </span>
@@ -560,10 +560,10 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
                   {winners.map((w, idx) => (
                     <div
                       key={w.user.user_id}
-                      className="p-2.5 border border-white/5 bg-white/50 dark:bg-black/40 rounded-xl flex items-center justify-between gap-3 shadow-sm hover:border-yellow-500/20 transition-all"
+                      className="p-2.5 border border-foreground/5 bg-foreground/[0.02] rounded-xl flex items-center justify-between gap-3 shadow-sm hover:border-yellow-500/20 transition-all"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center overflow-hidden bg-white/5 relative">
+                        <div className="w-8 h-8 rounded-full border border-foreground/10 flex items-center justify-center overflow-hidden bg-foreground/5 relative">
                           {w.user.avatar ? (
                             <Image src={w.user.avatar} alt={w.user.username} width={32} height={32} unoptimized className="w-full h-full object-cover" />
                           ) : (
@@ -571,11 +571,11 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
                           )}
                         </div>
                         <div>
-                          <div className="text-black dark:text-white font-bold text-xs flex items-center gap-1.5">
+                          <div className="text-foreground font-bold text-xs flex items-center gap-1.5">
                             <span className="w-4 text-center font-mono font-bold text-yellow-500">#{idx + 1}</span>
                             <span>{w.user.username}</span>
                           </div>
-                          <div className="text-[9px] text-black/50 dark:text-white/40 font-mono mt-0.5">
+                          <div className="text-[9px] text-foreground/40 font-mono mt-0.5">
                             {w.wallet.slice(0, 6)}…{w.wallet.slice(-6)}
                           </div>
                         </div>
@@ -585,7 +585,7 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
                       <button
                         onClick={() => handleRerollWinner(idx)}
                         disabled={txStatus !== "idle" && txStatus !== "confirmed"}
-                        className="p-2 border border-black/10 dark:border-white/5 hover:border-[#00e0c2]/20 hover:bg-[#00e0c2]/10 text-white/40 hover:text-[#00e0c2] rounded-lg transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+                        className="p-2 border border-foreground/5 hover:border-[var(--accent-primary)]/20 hover:bg-[var(--accent-primary)]/10 text-foreground/40 hover:text-[var(--accent-primary)] rounded-lg transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
                         title="Reroll this winner"
                       >
                         <RefreshCw className="w-3.5 h-3.5" />
@@ -600,33 +600,33 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
                     {txStatus === "idle" && (
                       <button
                         onClick={handleSendPrizes}
-                        className="w-full h-10 bg-emerald-500 hover:bg-emerald-600 hover:scale-[1.01] active:scale-[0.99] text-white font-display font-extrabold uppercase text-xs tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                        className="w-full h-10 bg-emerald-500 hover:bg-emerald-600 hover:scale-[1.01] active:scale-[0.99] text-foreground font-display font-extrabold uppercase text-xs tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
                       >
-                        <Coins className="w-4 h-4 text-white" />
+                        <Coins className="w-4 h-4 text-foreground" />
                         Send {prizeAmount} {cryptoToken} to Winners
                       </button>
                     )}
 
                     {txStatus !== "idle" && (
-                      <div className="p-4 border border-[#00e0c2]/20 bg-[#00e0c2]/5 rounded-xl space-y-3">
+                      <div className="p-4 border border-[var(--accent-primary)]/20 bg-[var(--accent-primary)]/5 rounded-xl space-y-3">
                         <div className="flex justify-between items-center">
-                          <span className="text-[10px] font-mono uppercase tracking-wider font-bold text-white/50">Transaction status</span>
+                          <span className="text-[10px] font-mono uppercase tracking-wider font-bold text-foreground/50">Transaction status</span>
                           {txStatus !== "confirmed" && txStatus !== "failed" && (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin text-[#00e0c2]" />
+                            <Loader2 className="w-3.5 h-3.5 animate-spin text-[var(--accent-primary)]" />
                           )}
                         </div>
 
                         {/* Status descriptions */}
                         {txStatus === "building" && (
-                          <div className="text-xs font-mono text-white/70">Connecting to Solana RPC and building Instructions...</div>
+                          <div className="text-xs font-mono text-foreground/70">Connecting to Solana RPC and building Instructions...</div>
                         )}
                         {txStatus === "signing" && (
-                          <div className="text-xs font-mono text-[#00e0c2] animate-pulse">
+                          <div className="text-xs font-mono text-[var(--accent-primary)] animate-pulse">
                             Awaiting transaction signature in wallet...
                           </div>
                         )}
                         {txStatus === "broadcasting" && (
-                          <div className="text-xs font-mono text-white/70">Broadcasting transaction and waiting for confirmation...</div>
+                          <div className="text-xs font-mono text-foreground/70">Broadcasting transaction and waiting for confirmation...</div>
                         )}
                         {txStatus === "confirmed" && (
                           <div className="space-y-2">
@@ -638,7 +638,7 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
                                 href={`https://explorer.solana.com/tx/${txSignature}`}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="text-[10px] font-mono text-[#00e0c2] hover:underline flex items-center gap-1 w-fit"
+                                className="text-[10px] font-mono text-[var(--accent-primary)] hover:underline flex items-center gap-1 w-fit"
                               >
                                 View on Solana Explorer <ExternalLink className="w-3 h-3" />
                               </a>
@@ -650,7 +650,7 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
                             <div className="font-bold flex items-center gap-1.5">
                               <AlertTriangle className="w-4 h-4 text-red-400" /> Transaction failed
                             </div>
-                            <div className="text-[10px] text-white/50">{txError}</div>
+                            <div className="text-[10px] text-foreground/50">{txError}</div>
                           </div>
                         )}
 
@@ -658,7 +658,7 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
                         {(txStatus === "confirmed" || txStatus === "failed") && (
                           <button
                             onClick={() => setTxStatus("idle")}
-                            className="mt-2 text-[10px] font-mono uppercase font-bold text-white/40 hover:text-white transition-colors cursor-pointer block underline"
+                            className="mt-2 text-[10px] font-mono uppercase font-bold text-foreground/40 hover:text-foreground transition-colors cursor-pointer block underline"
                           >
                             Reset Transaction
                           </button>
