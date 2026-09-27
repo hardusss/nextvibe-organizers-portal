@@ -7,11 +7,11 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
-import login from "@/src/api/login";
+import login, { errorBody, sendEmailCode, verifyEmail } from "@/src/api/login";
 import googleLoginApi from "@/src/api/google.login";
 import walletSignIn from "@/src/api/wallet.sign.in";
 import { useAuth } from "@/src/components/providers/AuthProvider";
-import { Mail, Lock, Loader2, ArrowRight } from "lucide-react";
+import { Mail, Lock, Loader2, ArrowRight, KeyRound } from "lucide-react";
 
 /* ─── Inline SVG icons ─── */
 
@@ -65,6 +65,17 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState<"solana" | "google" | "email" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  /* Email not confirmed yet: the code step replaces the form */
+  const [codeFor, setCodeFor] = useState<string | null>(null);
+  const [code, setCode] = useState("");
+  const [resendIn, setResendIn] = useState(0);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (resendIn <= 0) return;
+    const timer = setTimeout(() => setResendIn((s) => s - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [resendIn]);
 
   /* ── Solana Wallet ── */
   const { publicKey, connected, connecting, signMessage, disconnect } = useWallet();
@@ -202,14 +213,52 @@ export default function LoginPage() {
 
     try {
       const result = await login(email, password);
+      if ("verificationRequired" in result) {
+        setCodeFor(result.email);
+        setCode("");
+        setResendIn(result.resendIn);
+        setNotice(null);
+        if (result.sendError) setError(result.sendError);
+        return;
+      }
       setAuth(`${result.user_id}`);
       router.push("/");
     } catch (err: any) {
       console.error("Email login error:", err);
-      const detail = err?.response?.data?.detail ?? "Login failed. Please check your credentials.";
+      const data = err?.response?.data;
+      const detail = data?.detail ?? data?.non_field_errors?.[0] ?? "Login failed. Please check your credentials.";
       setError(detail);
     } finally {
       setLoading(null);
+    }
+  };
+
+  const handleCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (code.length !== 6) return;
+    setError(null);
+    setLoading("email");
+    try {
+      const result = await verifyEmail(email, password, code);
+      setAuth(`${result.user_id}`);
+      router.push("/");
+    } catch (err) {
+      setError(errorBody(err)?.error ?? "That code didn't work. Try again.");
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handleResend = async () => {
+    setError(null);
+    setNotice(null);
+    try {
+      setResendIn(await sendEmailCode(email, password));
+      setNotice("A new code is on its way.");
+    } catch (err) {
+      const data = errorBody(err);
+      if (data?.retryIn) setResendIn(Number(data.retryIn));
+      setError(data?.error ?? "We couldn't send a new code. Try again in a minute.");
     }
   };
 
@@ -351,68 +400,134 @@ export default function LoginPage() {
             <div className="h-[1px] flex-1 bg-white/5" />
           </div>
 
-          {/* Form */}
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            {/* Email Input */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-white/60 tracking-wide uppercase" htmlFor="login-email">
-                Email Address
-              </label>
-              <div className="relative flex items-center">
-                <span className="absolute left-4 text-white/30 pointer-events-none group-focus-within:text-[#8b5cf6] transition-colors">
-                  <Mail className="w-4 h-4" />
-                </span>
-                <input
-                  id="login-email"
-                  type="email"
-                  placeholder="name@nextvibe.io"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={loading !== null}
-                  className="w-full h-12 pl-12 pr-4 bg-white/[0.02] border border-white/10 rounded-xl text-white placeholder-white/20 outline-none text-sm transition-all focus:border-[#8b5cf6]/50 focus:bg-[#8b5cf6]/[0.01]"
-                  required
-                />
+          {/* Form; the code step takes its place until the email is confirmed */}
+          {codeFor ? (
+            <form className="space-y-4" onSubmit={handleCode}>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-white/60 tracking-wide uppercase" htmlFor="login-code">
+                  Code from your email
+                </label>
+                <p className="text-sm text-white/50">
+                  Confirm your email to sign in. We sent a 6-digit code to <span className="text-white/80">{codeFor}</span>.
+                </p>
+                <div className="relative flex items-center">
+                  <span className="absolute left-4 text-white/30 pointer-events-none">
+                    <KeyRound className="w-4 h-4" />
+                  </span>
+                  <input
+                    id="login-code"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    placeholder="000000"
+                    maxLength={6}
+                    value={code}
+                    onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                    disabled={loading !== null}
+                    className="w-full h-12 pl-12 pr-4 bg-white/[0.02] border border-white/10 rounded-xl text-white placeholder-white/20 outline-none text-lg tracking-[0.4em] font-mono transition-all focus:border-[#8b5cf6]/50 focus:bg-[#8b5cf6]/[0.01]"
+                    autoFocus
+                    required
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* Password Input */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-white/60 tracking-wide uppercase" htmlFor="login-password">
-                Password
-              </label>
-              <div className="relative flex items-center">
-                <span className="absolute left-4 text-white/30 pointer-events-none transition-colors">
-                  <Lock className="w-4 h-4" />
-                </span>
-                <input
-                  id="login-password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={loading !== null}
-                  className="w-full h-12 pl-12 pr-4 bg-white/[0.02] border border-white/10 rounded-xl text-white placeholder-white/20 outline-none text-sm transition-all focus:border-[#8b5cf6]/50 focus:bg-[#8b5cf6]/[0.01]"
-                  required
-                />
+              {notice && <p className="text-xs text-[#a78bfa]">{notice}</p>}
+
+              <button
+                type="submit"
+                disabled={loading !== null || code.length !== 6}
+                className="w-full h-12 rounded-xl bg-gradient-to-r from-[#8b5cf6] via-[#a855f7] to-[#d946ef] text-white font-extrabold text-sm uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#8b5cf6]/10 hover:shadow-[#8b5cf6]/20 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading === "email" ? (
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                ) : (
+                  <>
+                    <span>Confirm and sign in</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+
+              <div className="flex items-center justify-between text-xs">
+                <button
+                  type="button"
+                  onClick={handleResend}
+                  disabled={resendIn > 0 || loading !== null}
+                  className="font-semibold text-[#a78bfa] hover:text-white transition-colors disabled:text-white/30 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  {resendIn > 0 ? `Send a new code in ${resendIn}s` : "Send a new code"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setCodeFor(null); setCode(""); setError(null); setNotice(null); }}
+                  className="font-semibold text-white/40 hover:text-white transition-colors cursor-pointer"
+                >
+                  Use another account
+                </button>
               </div>
-            </div>
+            </form>
+          ) : (
+            <form className="space-y-4" onSubmit={handleSubmit}>
+              {/* Email Input */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-white/60 tracking-wide uppercase" htmlFor="login-email">
+                  Email Address
+                </label>
+                <div className="relative flex items-center">
+                  <span className="absolute left-4 text-white/30 pointer-events-none group-focus-within:text-[#8b5cf6] transition-colors">
+                    <Mail className="w-4 h-4" />
+                  </span>
+                  <input
+                    id="login-email"
+                    type="email"
+                    placeholder="name@nextvibe.io"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={loading !== null}
+                    className="w-full h-12 pl-12 pr-4 bg-white/[0.02] border border-white/10 rounded-xl text-white placeholder-white/20 outline-none text-sm transition-all focus:border-[#8b5cf6]/50 focus:bg-[#8b5cf6]/[0.01]"
+                    required
+                  />
+                </div>
+              </div>
 
-            {/* Submit CTA */}
-            <button
-              type="submit"
-              disabled={loading !== null}
-              className="w-full h-12 rounded-xl bg-gradient-to-r from-[#8b5cf6] via-[#a855f7] to-[#d946ef] text-white font-extrabold text-sm uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#8b5cf6]/10 hover:shadow-[#8b5cf6]/20 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading === "email" ? (
-                <Loader2 className="w-4 h-4 animate-spin text-white" />
-              ) : (
-                <>
-                  <span>Sign In to Portal</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
-          </form>
+              {/* Password Input */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-white/60 tracking-wide uppercase" htmlFor="login-password">
+                  Password
+                </label>
+                <div className="relative flex items-center">
+                  <span className="absolute left-4 text-white/30 pointer-events-none transition-colors">
+                    <Lock className="w-4 h-4" />
+                  </span>
+                  <input
+                    id="login-password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading !== null}
+                    className="w-full h-12 pl-12 pr-4 bg-white/[0.02] border border-white/10 rounded-xl text-white placeholder-white/20 outline-none text-sm transition-all focus:border-[#8b5cf6]/50 focus:bg-[#8b5cf6]/[0.01]"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Submit CTA */}
+              <button
+                type="submit"
+                disabled={loading !== null}
+                className="w-full h-12 rounded-xl bg-gradient-to-r from-[#8b5cf6] via-[#a855f7] to-[#d946ef] text-white font-extrabold text-sm uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#8b5cf6]/10 hover:shadow-[#8b5cf6]/20 hover:scale-[1.01] active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading === "email" ? (
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                ) : (
+                  <>
+                    <span>Sign In to Portal</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            </form>
+          )}
           
         </div>
       </div>
