@@ -67,7 +67,7 @@ export default function AttendeesPage() {
               <span className="text-[10px] tracking-widest text-red-500 font-mono font-bold uppercase">access restricted</span>
               <h2 className="text-xl font-display font-extrabold uppercase text-foreground tracking-tight">Organizer Role Required</h2>
               <p className="text-xs text-foreground/50 leading-relaxed font-mono">
-                Sponsors do not have access to the global Registration Queue or other organizers' attendees lists.
+                Sponsors do not have access to the global registration queue or other organizers' attendee lists.
               </p>
             </div>
           </div>

@@ -336,7 +336,7 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
                         Description <span className="text-red-500">*</span>
                       </label>
                       <textarea value={about} onChange={(e) => setAbout(e.target.value.slice(0, 255))}
-                        placeholder="Describe your event..." rows={3} className={`${inputCls} resize-none`} />
+                        placeholder="Describe your event…" rows={3} className={`${inputCls} resize-none`} />
                       <p className="text-[10px] text-right font-mono text-foreground/30">{about.length}/255</p>
                     </div>
                     {/* Location */}
@@ -416,7 +416,7 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
                         uploading: "Uploading media…",
                         finalizing: "Submitting for moderation…",
                         minting: "Minting event POAP…",
-                        done: "Event created & POAP minted!"
+                        done: "Event created & POAP minted."
                       };
                       const order = ["creating", "uploading", "finalizing", "minting", "done"];
                       const ci = order.indexOf(submitPhase || "creating");
@@ -439,7 +439,7 @@ export default function CreateEventModal({ isOpen, onClose, onEventCreated }: Pr
                     {submitPhase === "done" && (
                       <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
                         className="flex items-center justify-center gap-2 pt-4 text-[var(--accent-primary)] font-semibold text-sm font-display uppercase tracking-wider">
-                        <Sparkles className="w-5 h-5" /> Live POAP Event registered!
+                        <Sparkles className="w-5 h-5" /> Live POAP Event registered.
                       </motion.div>
                     )}
                   </motion.div>

@@ -69,11 +69,11 @@ export default function EditEventModal({ isOpen, onClose, event, onEventUpdated 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!about.trim()) {
-      setError("Description is required");
+      setError("Description is required.");
       return;
     }
     if (!startTime || !endTime) {
-      setError("Start and End times are required");
+      setError("Start and end times are required.");
       return;
     }
 
@@ -127,9 +127,9 @@ export default function EditEventModal({ isOpen, onClose, event, onEventUpdated 
             <div>
               <h3 className="text-lg font-bold text-black dark:text-white flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                Edit Event
+                Edit event
               </h3>
-              <p className="text-xs text-black/50 dark:text-white/40 mt-0.5">Modify your event details and NFT supply.</p>
+              <p className="text-xs text-black/50 dark:text-white/40 mt-0.5">Modify your event details and POAP supply</p>
             </div>
             <button
               onClick={onClose}
@@ -148,7 +148,7 @@ export default function EditEventModal({ isOpen, onClose, event, onEventUpdated 
                 className="flex flex-col items-center justify-center py-12 text-[#00bda3] space-y-3"
               >
                 <CheckCircle className="w-16 h-16 animate-bounce" />
-                <span className="font-bold text-lg">Event Updated Successfully!</span>
+                <span className="font-bold text-lg">Event updated successfully.</span>
               </motion.div>
             ) : (
               <>
@@ -161,7 +161,7 @@ export default function EditEventModal({ isOpen, onClose, event, onEventUpdated 
                   <textarea
                     value={about}
                     onChange={(e) => setAbout(e.target.value.slice(0, 255))}
-                    placeholder="Describe your event..."
+                    placeholder="Describe your event…"
                     rows={3}
                     className={`${inputCls} resize-none`}
                   />
@@ -238,7 +238,7 @@ export default function EditEventModal({ isOpen, onClose, event, onEventUpdated 
                 {/* Total NFT Supply */}
                 <div className="space-y-2">
                   <label className="flex items-center gap-2 text-sm font-semibold text-black/70 dark:text-white/70">
-                    <Layers className="w-4 h-4 text-purple-600 dark:text-purple-400" /> Total NFT Supply
+                    <Layers className="w-4 h-4 text-purple-600 dark:text-purple-400" /> Total POAP supply
                   </label>
                   <input
                     type="number"
@@ -247,7 +247,7 @@ export default function EditEventModal({ isOpen, onClose, event, onEventUpdated 
                     placeholder="e.g. 100"
                     className={inputCls}
                   />
-                  <p className="text-[11px] text-black/40 dark:text-white/40">The total number of NFTs that can be minted for this event.</p>
+                  <p className="text-[11px] text-black/40 dark:text-white/40">The total number of POAPs this event can give out.</p>
                 </div>
 
                 {error && (
@@ -274,10 +274,10 @@ export default function EditEventModal({ isOpen, onClose, event, onEventUpdated 
                     {isLoading ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        Saving...
+                        Saving…
                       </>
                     ) : (
-                      "Save Changes"
+                      "Save changes"
                     )}
                   </button>
                 </div>

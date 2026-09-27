@@ -72,7 +72,7 @@ export default function Sidebar() {
               <div>
                 <h1 className="text-white font-cursive text-2xl tracking-normal leading-tight capitalize">NextVibe</h1>
                 <p className="text-white/50 font-display italic text-[11px] tracking-wide">
-                  Organizer Portal
+                  Organizer portal
                 </p>
               </div>
             </div>
@@ -166,7 +166,7 @@ export default function Sidebar() {
                   <FlaskConical className={`w-5 h-5 transition-colors ${isDemoMode ? "text-[var(--accent-primary,#a855f7)]" : "text-white/40"
                     }`} />
                   <span className={`text-sm font-medium tracking-tight transition-colors ${isDemoMode ? "text-white" : "text-white/50"
-                    }`}>Demo Mode</span>
+                    }`}>Demo mode</span>
                 </div>
                 <div className={`relative w-10 h-[22px] rounded-full transition-colors duration-300 ${isDemoMode
                     ? "bg-[var(--accent-primary,#a855f7)]"
@@ -199,7 +199,7 @@ export default function Sidebar() {
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
               className="bg-white dark:bg-[#0d0d12] border border-black/10 dark:border-white/10 rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)] max-w-sm w-full mx-4"
             >
-              <h3 className="text-xl font-bold text-black dark:text-white mb-2">Confirm Logout</h3>
+              <h3 className="text-xl font-bold text-black dark:text-white mb-2">Confirm logout</h3>
               <p className="text-black/60 dark:text-white/60 mb-6">Are you sure you want to log out?</p>
 
               <div className="flex gap-3 justify-end">

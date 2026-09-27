@@ -412,7 +412,7 @@ export default function SocialForceGraph({ nodes = [], edges = [] }: Props) {
           ctx.textAlign = "center";
           ctx.textBaseline = "top";
           // Truncate name if long
-          const labelText = node.label.length > 12 ? `${node.label.slice(0, 10)}...` : node.label;
+          const labelText = node.label.length > 12 ? `${node.label.slice(0, 10)}…` : node.label;
           const displayLabel = node.is_organizer ? `👑 @${labelText}` : `@${labelText}`;
           ctx.fillText(displayLabel, node.x, node.y + r + 5);
         });
@@ -455,21 +455,21 @@ export default function SocialForceGraph({ nodes = [], edges = [] }: Props) {
             <button
               onClick={() => handleZoom(1.2)}
               className="p-1.5 rounded hover:bg-foreground/5 text-foreground/60 hover:text-foreground transition-colors cursor-pointer"
-              title="Zoom In"
+              title="Zoom in"
             >
               <ZoomIn className="w-4 h-4" />
             </button>
             <button
               onClick={() => handleZoom(0.8)}
               className="p-1.5 rounded hover:bg-foreground/5 text-foreground/60 hover:text-foreground transition-colors cursor-pointer"
-              title="Zoom Out"
+              title="Zoom out"
             >
               <ZoomOut className="w-4 h-4" />
             </button>
             <button
               onClick={handleResetZoom}
               className="p-1.5 rounded hover:bg-foreground/5 text-foreground/60 hover:text-foreground transition-colors cursor-pointer"
-              title="Reset View"
+              title="Reset view"
             >
               <Maximize2 className="w-4 h-4" />
             </button>
@@ -531,7 +531,7 @@ export default function SocialForceGraph({ nodes = [], edges = [] }: Props) {
                 </div>
                 <div className="flex justify-between items-center text-foreground/60">
                   <span>Reputation:</span>
-                  <span className="font-bold text-[var(--accent-primary,#a855f7)]">+{hoveredNode.reputation_earned} Rep</span>
+                  <span className="font-bold text-[var(--accent-primary,#a855f7)]">+{hoveredNode.reputation_earned} REP</span>
                 </div>
 
                 {hoveredNode.is_organizer && (
@@ -553,7 +553,7 @@ export default function SocialForceGraph({ nodes = [], edges = [] }: Props) {
           <div className="absolute bottom-3 right-3 bg-[#0c0c0f]/90 backdrop-blur border border-foreground/10 rounded-lg p-2 text-[8px] font-mono text-foreground/40 flex flex-col gap-1 pointer-events-none select-none max-w-[150px]">
             <span className="font-bold uppercase text-foreground mb-0.5">Telemetry Instructions</span>
             <div>• Drag nodes to reorganize</div>
-            <div>• Scroll / pinch to zoom</div>
+            <div>• Zoom with the buttons above</div>
             <div>• Drag canvas background to pan</div>
           </div>
         </div>

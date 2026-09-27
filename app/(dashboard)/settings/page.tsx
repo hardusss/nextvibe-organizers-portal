@@ -152,7 +152,7 @@ export default function SettingsPage() {
               <span className="text-[10px] tracking-widest text-red-500 font-mono font-bold uppercase">access restricted</span>
               <h2 className="text-xl font-display font-extrabold uppercase text-foreground tracking-tight">Organizer Role Required</h2>
               <p className="text-xs text-foreground/50 leading-relaxed font-mono">
-                Sponsors do not have access to global Portal Settings.
+                Sponsors do not have access to global portal settings.
               </p>
             </div>
           </div>
@@ -275,7 +275,7 @@ export default function SettingsPage() {
                     >
                       <option value="18" className="bg-[#0d0d12] text-foreground">18 (Near)</option>
                       <option value="19" className="bg-[#0d0d12] text-foreground">19 (Medium)</option>
-                      <option value="20" className="bg-[#0d0d12] text-foreground">20 (Close-Up)</option>
+                      <option value="20" className="bg-[#0d0d12] text-foreground">20 (Close-up)</option>
                     </select>
                   </div>
 

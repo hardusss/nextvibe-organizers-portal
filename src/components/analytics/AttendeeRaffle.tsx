@@ -343,7 +343,7 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
           <Trophy className="w-5 h-5 animate-bounce" />
         </div>
         <div>
-          <h3 className="text-foreground/40 text-[10px] font-mono tracking-widest font-bold uppercase">Event Engagement Tools</h3>
+          <h3 className="text-foreground/40 text-[10px] font-mono tracking-widest font-bold uppercase">Event tools</h3>
           <h4 className="text-base font-display font-extrabold uppercase tracking-tight text-foreground mt-0.5">Attendee Raffle & Solana Giveaway</h4>
         </div>
       </div>
@@ -360,7 +360,7 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
               <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-foreground/30" />
               <input
                 type="text"
-                placeholder="Search username..."
+                placeholder="Search username…"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 className="w-full text-xs pl-8.5 pr-3 py-1.5 bg-foreground/[0.02] border border-foreground/10 rounded-lg outline-none text-foreground placeholder-white/20 focus:border-[var(--accent-primary)]/50 focus:bg-[var(--accent-primary)]/[0.01]"
@@ -371,7 +371,7 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
           <div className="flex-1 overflow-y-auto max-h-[380px] pr-1.5 custom-scrollbar border border-foreground/5 bg-foreground/[0.01] rounded-xl p-3 space-y-2">
             {isLoading ? (
               <div className="flex items-center justify-center h-full text-xs text-foreground/35 font-mono">
-                <Loader2 className="w-5 h-5 animate-spin mr-2 text-[var(--accent-primary)]" /> Loading directory...
+                <Loader2 className="w-5 h-5 animate-spin mr-2 text-[var(--accent-primary)]" /> Loading directory…
               </div>
             ) : filteredAttendees.length === 0 ? (
               <div className="flex flex-col items-center justify-center text-foreground/30 py-16">
@@ -381,7 +381,7 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
             ) : (
               filteredAttendees.map((user, idx) => {
                 const walletShort = user.wallet_address
-                  ? `${user.wallet_address.slice(0, 8)}...${user.wallet_address.slice(-8)}`
+                  ? `${user.wallet_address.slice(0, 8)}…${user.wallet_address.slice(-8)}`
                   : "—";
 
                 return (
@@ -412,8 +412,8 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
                     </div>
 
                     <div className="text-right">
-                      <div className="font-mono text-xs text-foreground/80 font-bold">{user.total_taps} T</div>
-                      <div className="font-mono text-[9px] text-foreground/40 font-bold uppercase">{user.total_reputation} rep</div>
+                      <div className="font-mono text-xs text-foreground/80 font-bold">{user.total_taps} taps</div>
+                      <div className="font-mono text-[9px] text-foreground/40 font-bold uppercase">{user.total_reputation} REP</div>
                     </div>
                   </div>
                 );
@@ -505,7 +505,7 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
                   <span className="font-mono text-foreground/40">
                     {connected && publicKey
                       ? `Wallet: ${publicKey.toBase58().slice(0, 6)}…${publicKey.toBase58().slice(-6)}`
-                      : "Wallet: Not Connected"}
+                      : "Wallet: not connected"}
                   </span>
                 </div>
                 {!connected ? (
@@ -532,7 +532,7 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
               {isDrawing ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin text-foreground" />
-                  Drawing...
+                  Drawing…
                 </>
               ) : (
                 <>
@@ -618,20 +618,20 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
 
                         {/* Status descriptions */}
                         {txStatus === "building" && (
-                          <div className="text-xs font-mono text-foreground/70">Connecting to Solana RPC and building Instructions...</div>
+                          <div className="text-xs font-mono text-foreground/70">Connecting to Solana RPC and building instructions…</div>
                         )}
                         {txStatus === "signing" && (
                           <div className="text-xs font-mono text-[var(--accent-primary)] animate-pulse">
-                            Awaiting transaction signature in wallet...
+                            Awaiting transaction signature in wallet…
                           </div>
                         )}
                         {txStatus === "broadcasting" && (
-                          <div className="text-xs font-mono text-foreground/70">Broadcasting transaction and waiting for confirmation...</div>
+                          <div className="text-xs font-mono text-foreground/70">Broadcasting transaction and waiting for confirmation…</div>
                         )}
                         {txStatus === "confirmed" && (
                           <div className="space-y-2">
                             <div className="text-xs font-mono text-emerald-400 font-bold flex items-center gap-1.5">
-                              <CheckCircle className="w-4 h-4 text-emerald-400" /> Transaction confirmed successfully!
+                              <CheckCircle className="w-4 h-4 text-emerald-400" /> Transaction confirmed successfully.
                             </div>
                             {txSignature && (
                               <a
@@ -648,7 +648,7 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
                         {txStatus === "failed" && (
                           <div className="space-y-1 text-xs font-mono text-red-400">
                             <div className="font-bold flex items-center gap-1.5">
-                              <AlertTriangle className="w-4 h-4 text-red-400" /> Transaction failed
+                              <AlertTriangle className="w-4 h-4 text-red-400" /> Transaction failed.
                             </div>
                             <div className="text-[10px] text-foreground/50">{txError}</div>
                           </div>

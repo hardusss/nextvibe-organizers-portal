@@ -427,7 +427,7 @@ export default function AnalyticsPage() {
                   const rank = i + 1;
                   const isTop3 = rank <= 3;
                   const walletShort = user.wallet_address
-                    ? `${user.wallet_address.slice(0, 6)}...${user.wallet_address.slice(-6)}`
+                    ? `${user.wallet_address.slice(0, 6)}…${user.wallet_address.slice(-6)}`
                     : "—";
                   const rankColors = [
                     "border-yellow-500/35 bg-yellow-500/5 text-yellow-400",
@@ -460,10 +460,10 @@ export default function AnalyticsPage() {
 
                       <div className="text-right">
                         <div className="text-sm font-bold text-foreground">
-                          {user.total_taps} T
+                          {user.total_taps} taps
                         </div>
                         <div className="text-[9px] text-foreground/40">
-                          {user.total_reputation} R
+                          {user.total_reputation} REP
                         </div>
                       </div>
                     </div>
@@ -511,7 +511,7 @@ export default function AnalyticsPage() {
 
             <div className="flex items-center gap-4 sm:text-right">
               <p className="text-foreground/50 text-xs font-medium max-w-xs hidden sm:block">
-                Live statistics and connection heatmaps synced with the Solana ledger.
+                Live statistics and connection heatmaps synced with the Solana ledger
               </p>
               {selectedEventId && (
                 <button
@@ -550,7 +550,7 @@ export default function AnalyticsPage() {
                   <p className="text-[9px] text-foreground/40 font-mono uppercase tracking-wide leading-normal">
                     {role === "sponsor"
                       ? "Peer connections made by attendees after visiting your booth/event"
-                      : "Attendee ↔ attendee networking taps (earns reputation)"}
+                      : "Attendee ↔ attendee networking taps (adds REP)"}
                   </p>
                 </div>
                 <div className="p-2 bg-black/5 dark:bg-foreground/5 rounded-lg border border-black/5 dark:border-foreground/5 shrink-0 ml-4">
@@ -680,7 +680,7 @@ export default function AnalyticsPage() {
               >
                 <div className="absolute top-0 right-0 w-20 h-20 bg-[var(--accent-glow)] rounded-full blur-[30px] opacity-40 pointer-events-none" />
                 <div className="flex justify-between items-start relative z-10">
-                  <h3 className="text-foreground/40 text-[10px] font-mono tracking-widest font-bold uppercase">rep earned</h3>
+                  <h3 className="text-foreground/40 text-[10px] font-mono tracking-widest font-bold uppercase">REP given</h3>
                   <div className="p-1.5 bg-foreground/5 rounded-lg border border-foreground/5"><Award className="w-3.5 h-3.5 text-[var(--accent-primary)]" /></div>
                 </div>
 
@@ -693,7 +693,7 @@ export default function AnalyticsPage() {
                     <div className="text-3xl font-mono font-bold text-foreground tracking-tight">
                       <CountUp to={analytics.total_reputation_earned || 0} format="k" />
                     </div>
-                    <p className="text-[9px] font-mono uppercase font-bold text-[var(--accent-primary)]">Points Issued</p>
+                    <p className="text-[9px] font-mono uppercase font-bold text-[var(--accent-primary)]">Total REP</p>
                   </div>
                 ) : (
                   <div className="flex-1 flex items-center justify-center text-xs text-foreground/30 relative z-10">No data</div>
@@ -706,7 +706,7 @@ export default function AnalyticsPage() {
                 className="premium-card p-5 flex flex-col justify-between cursor-default min-h-[160px]"
               >
                 <div className="flex justify-between items-start">
-                  <h3 className="text-foreground/40 text-[10px] font-mono tracking-widest font-bold uppercase">poap claims</h3>
+                  <h3 className="text-foreground/40 text-[10px] font-mono tracking-widest font-bold uppercase">POAP claims</h3>
                   <div className="p-1.5 bg-foreground/5 rounded-lg border border-foreground/5"><Award className="w-3.5 h-3.5 text-[var(--accent-primary)]" /></div>
                 </div>
 
@@ -830,7 +830,7 @@ export default function AnalyticsPage() {
                   <button
                     onClick={() => setIsFullscreenLeaderboardOpen(true)}
                     className="p-1.5 bg-black/10 dark:bg-foreground/5 hover:bg-black/20 dark:hover:bg-foreground/10 rounded-lg border border-black/5 dark:border-foreground/5 transition-colors cursor-pointer text-black/60 dark:text-foreground/60 hover:text-[var(--accent-primary)]"
-                    title="Launch Fullscreen Public Leaderboard"
+                    title="Launch fullscreen public leaderboard"
                   >
                     <Tv className="w-3.5 h-3.5" />
                   </button>
@@ -862,7 +862,7 @@ export default function AnalyticsPage() {
                     const rank = i + 1;
                     const isTop3 = rank <= 3;
                     const walletShort = user.wallet_address
-                      ? `${user.wallet_address.slice(0, 4)}...${user.wallet_address.slice(-4)}`
+                      ? `${user.wallet_address.slice(0, 4)}…${user.wallet_address.slice(-4)}`
                       : "—";
 
                     // Public Mode strips wallet and rep data
@@ -899,7 +899,7 @@ export default function AnalyticsPage() {
 
                           <div className="text-right">
                             <div className={`font-mono text-xs font-bold ${isTop3 ? "text-[var(--accent-primary)]" : "text-foreground/80"}`}>
-                              {user.total_taps} T
+                              {user.total_taps} taps
                             </div>
                             <div className="text-foreground/30 font-mono uppercase tracking-wider">connections</div>
                           </div>
@@ -943,7 +943,7 @@ export default function AnalyticsPage() {
                             {user.total_taps} T
                           </div>
                           <div className="text-foreground/40 text-[10px] font-mono">
-                            {user.total_reputation >= 1000 ? (user.total_reputation / 1000).toFixed(1) + "k" : user.total_reputation} R
+                            {user.total_reputation >= 1000 ? (user.total_reputation / 1000).toFixed(1) + "k" : user.total_reputation} REP
                           </div>
                         </div>
                       </motion.div>

@@ -47,7 +47,7 @@ export default function EcosystemDonutChart({
     <div className="premium-card p-5 md:p-6 flex flex-col justify-between relative overflow-hidden min-h-[300px]">
       <div>
         <h3 className="text-foreground/45 text-[10px] font-mono tracking-widest font-bold uppercase">ecosystem split</h3>
-        <h4 className="text-sm font-semibold text-foreground mt-1">Auth Provider Distribution</h4>
+        <h4 className="text-sm font-semibold text-foreground mt-1">Auth provider distribution</h4>
       </div>
 
       {!hasUsers ? (
@@ -134,13 +134,13 @@ export default function EcosystemDonutChart({
                 <>
                   <span className="text-[10px] tracking-widest text-[#c084fc] font-mono font-bold uppercase">MWA WALLET</span>
                   <span className="text-2xl font-mono font-bold text-foreground">{cleanMwa}%</span>
-                  <span className="text-[10px] text-foreground/40 font-mono">{mwaUsers} Users</span>
+                  <span className="text-[10px] text-foreground/40 font-mono">{mwaUsers} users</span>
                 </>
               ) : hoveredSlice === "web2" ? (
                 <>
                   <span className="text-[10px] tracking-widest text-fuchsia-400 font-mono font-bold uppercase">WEB2 SIGN-IN</span>
                   <span className="text-2xl font-mono font-bold text-foreground">{cleanWeb2}%</span>
-                  <span className="text-[10px] text-foreground/40 font-mono">{web2Users} Users</span>
+                  <span className="text-[10px] text-foreground/40 font-mono">{web2Users} users</span>
                 </>
               ) : (
                 <>
@@ -179,7 +179,7 @@ export default function EcosystemDonutChart({
             >
               <div className="w-3 h-3 rounded bg-[#581c87] shrink-0" />
               <div className="flex flex-col">
-                <span className="text-xs font-semibold text-foreground">Web2 Login</span>
+                <span className="text-xs font-semibold text-foreground">Web2 login</span>
                 <span className="text-[10px] font-mono text-foreground/40">
                   {cleanWeb2}% • {web2Users} users
                 </span>

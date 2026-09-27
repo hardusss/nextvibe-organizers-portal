@@ -94,7 +94,7 @@ export default function TapHeatmap({ postId }: Props) {
         }
       } catch (err: any) {
         if (active) {
-          setError(err.response?.data?.error || err.message || "Failed to load tap data");
+          setError(err.response?.data?.error || err.message || "Failed to load tap data.");
         }
       } finally {
         if (active) {
@@ -161,7 +161,7 @@ export default function TapHeatmap({ postId }: Props) {
     }
     if (tapsData.center) {
       markerRef.current = L.marker(mapCenter)
-        .bindPopup("<b>Event Location</b>")
+        .bindPopup("<b>Event location</b>")
         .addTo(mapRef.current);
     }
 
@@ -204,7 +204,7 @@ export default function TapHeatmap({ postId }: Props) {
             ? (isDark ? "#a855f7" : "#3b82f6") // Purple or Blue
             : (isDark ? "#c084fc" : "#ef4444"); // Lavender or Red
 
-          const pointsText = tap.points ? `+${tap.points} Rep` : "";
+          const pointsText = tap.points ? `+${tap.points} REP` : "";
 
           // Clear and clean inline-styled HTML structure with absolute fallback colors
           const popupContent = `
@@ -393,7 +393,7 @@ export default function TapHeatmap({ postId }: Props) {
         <div className="absolute inset-0 bg-foreground/50 dark:bg-black/50 backdrop-blur-sm z-30 flex flex-col items-center justify-center gap-3">
           <Loader2 className="w-8 h-8 animate-spin text-purple-600 dark:text-purple-400" />
           <span className="text-xs font-semibold text-black/60 dark:text-foreground/60">
-            {!scriptsLoaded ? "Initializing Map View..." : "Loading Tap Analytics..."}
+            {!scriptsLoaded ? "Initializing map view…" : "Loading tap analytics…"}
           </span>
         </div>
       )}
@@ -402,7 +402,7 @@ export default function TapHeatmap({ postId }: Props) {
       {error && !isLoading && (
         <div className="absolute inset-0 bg-white dark:bg-[#0d0d12] z-30 p-6 flex flex-col items-center justify-center text-center gap-3">
           <AlertCircle className="w-10 h-10 text-red-500" />
-          <h4 className="font-bold text-sm text-black dark:text-foreground">Could Not Load Heatmap</h4>
+          <h4 className="font-bold text-sm text-black dark:text-foreground">Could not load heatmap</h4>
           <p className="text-xs text-black/50 dark:text-foreground/40 max-w-xs">{error}</p>
         </div>
       )}
@@ -411,7 +411,7 @@ export default function TapHeatmap({ postId }: Props) {
       {tapsData && tapsData.taps.length === 0 && !isLoading && (
         <div className="absolute top-4 right-4 bg-foreground/90 dark:bg-black/85 backdrop-blur border border-black/10 dark:border-foreground/10 px-3 py-1.5 rounded-lg text-[10px] text-black/60 dark:text-foreground/60 z-20 flex items-center gap-1.5 font-medium shadow-sm">
           <RefreshCw className="w-3 h-3 text-purple-500 animate-spin" />
-          Waiting for check-ins...
+          Waiting for check-ins…
         </div>
       )}
 
@@ -425,7 +425,7 @@ export default function TapHeatmap({ postId }: Props) {
                 : "text-black/60 dark:text-foreground/60 hover:bg-black/5 dark:hover:bg-foreground/5"
               }`}
           >
-            2D Flat
+            2D flat
           </button>
           <button
             onClick={() => setIs3DMode(true)}
@@ -435,7 +435,7 @@ export default function TapHeatmap({ postId }: Props) {
               }`}
           >
             <Layers className="w-3 h-3" />
-            3D Tilt
+            3D tilt
           </button>
         </div>
       )}
@@ -487,7 +487,7 @@ export default function TapHeatmap({ postId }: Props) {
           </div>
           <div className="flex items-center gap-2">
             <div className="w-2.5 h-2.5 rounded-full bg-red-500 dark:bg-[#c084fc]"></div>
-            <span className="text-black/60 dark:text-foreground/60 text-[10px] font-semibold">Networking Tap</span>
+            <span className="text-black/60 dark:text-foreground/60 text-[10px] font-semibold">Networking tap</span>
           </div>
         </div>
       )}
@@ -500,7 +500,7 @@ export default function TapHeatmap({ postId }: Props) {
             <div className="p-5 border-b border-foreground/5 flex items-center justify-between bg-foreground/[0.02]">
               <div className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-purple-600 dark:text-[#a855f7]" />
-                <h3 className="font-bold text-base text-foreground">Clustered Taps ({selectedGroup.length})</h3>
+                <h3 className="font-bold text-base text-foreground">Clustered taps ({selectedGroup.length})</h3>
               </div>
               <button
                 onClick={() => setSelectedGroup(null)}
@@ -545,7 +545,7 @@ export default function TapHeatmap({ postId }: Props) {
                           @{tap.user?.username || "anonymous"}
                         </span>
                         <span className="shrink-0 px-2 py-0.5 rounded-full bg-[#a855f7]/10 text-[#c084fc] text-xs font-bold flex items-center gap-0.5">
-                          <Award className="w-3 h-3" /> +{tap.points || 5} Rep
+                          <Award className="w-3 h-3" /> +{tap.points || 5} REP
                         </span>
                       </div>
 
@@ -573,7 +573,7 @@ export default function TapHeatmap({ postId }: Props) {
                 onClick={() => setSelectedGroup(null)}
                 className="px-4 py-2 bg-[#a855f7] hover:bg-[#c084fc] text-foreground font-semibold rounded-xl text-xs transition-colors shadow-md"
               >
-                Close Details
+                Close details
               </button>
             </div>
           </div>

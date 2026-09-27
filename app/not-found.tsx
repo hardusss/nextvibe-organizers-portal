@@ -34,7 +34,7 @@ export default function NotFound() {
         </h1>
 
         <h2 className="text-2xl font-bold text-foreground mb-4">
-          Page Not Found
+          Page not found
         </h2>
 
         <p className="text-foreground/60 text-sm leading-relaxed mb-8 max-w-sm mx-auto">
@@ -49,7 +49,7 @@ export default function NotFound() {
               className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-black dark:bg-white text-white dark:text-black font-semibold rounded-xl hover:bg-black/90 dark:hover:bg-white/90 transition-colors shadow-lg shadow-black/10 dark:shadow-white/5 cursor-pointer"
             >
               <Home className="w-4 h-4" />
-              Back to Dashboard
+              Back to dashboard
             </Link>
           </motion.div>
 
@@ -59,7 +59,7 @@ export default function NotFound() {
               className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-black/5 dark:bg-white/5 text-foreground/80 border border-black/10 dark:border-white/10 font-semibold rounded-xl hover:bg-black/10 dark:hover:bg-white/10 transition-colors cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4" />
-              Go Back
+              Go back
             </button>
           </motion.div>
         </div>

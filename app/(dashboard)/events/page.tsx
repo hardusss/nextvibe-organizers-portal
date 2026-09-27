@@ -244,7 +244,7 @@ export default function EventsPage() {
                             </div>
                             <div className="flex items-center gap-2.5 text-foreground/50 text-xs font-mono">
                               <MapPin className="w-3.5 h-3.5 text-foreground/30" />
-                              <span className="truncate">{evt.location ? evt.location : (evt.is_luma_event ? "Online Luma Event" : "Location TBA")}</span>
+                              <span className="truncate">{evt.location ? evt.location : (evt.is_luma_event ? "Online Luma event" : "Location TBA")}</span>
                             </div>
                           </div>
                         </div>
@@ -260,7 +260,7 @@ export default function EventsPage() {
                           <button
                             onClick={() => { setPostsEventId(evt.post_id); setPostsEventTitle(evt.about); }}
                             className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-transparent border border-black/10 dark:border-foreground/10 hover:border-[var(--accent-primary)] hover:bg-[var(--accent-primary)]/5 text-[var(--accent-primary)] text-xs font-display font-extrabold uppercase tracking-wider transition-colors cursor-pointer"
-                            title="View Posts"
+                            title="View posts"
                           >
                             <ImageIcon className="w-3.5 h-3.5" /> Posts
                           </button>
@@ -268,7 +268,7 @@ export default function EventsPage() {
                           <button
                             onClick={() => { setEditingEvent(evt); setShowEditModal(true); }}
                             className="flex items-center justify-center p-2.5 rounded-xl border border-black/10 dark:border-foreground/10 hover:bg-black/5 dark:hover:bg-foreground/5 text-foreground/60 hover:text-[var(--accent-primary)] transition-colors cursor-pointer"
-                            title="Edit Event"
+                            title="Edit event"
                           >
                             <Edit3 className="w-4 h-4" />
                           </button>
@@ -276,7 +276,7 @@ export default function EventsPage() {
                           <button
                             onClick={() => setEventToDeleteId(evt.post_id)}
                             className="flex items-center justify-center p-2.5 rounded-xl border border-red-500/20 hover:bg-red-500/10 text-red-500 transition-colors cursor-pointer"
-                            title="Delete Event"
+                            title="Delete event"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -329,7 +329,7 @@ export default function EventsPage() {
                   </div>
                 ) : attendees.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-40 text-foreground/30 text-xs font-mono uppercase tracking-wider">
-                    No approved attendees yet.
+                    No approved attendees yet
                   </div>
                 ) : (
                   <div className="space-y-1 p-2">
@@ -429,7 +429,7 @@ export default function EventsPage() {
                   {isDeleting ? (
                     <>
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      Deleting...
+                      Deleting…
                     </>
                   ) : (
                     "Delete"

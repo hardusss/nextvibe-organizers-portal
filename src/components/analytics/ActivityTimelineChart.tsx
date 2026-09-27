@@ -116,7 +116,7 @@ export default function ActivityTimelineChart({ hourlyActivity = [] }: Props) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <div>
           <h3 className="text-foreground/45 text-[10px] font-mono tracking-widest font-bold uppercase">peak activity timeline</h3>
-          <h4 className="text-sm font-semibold text-foreground mt-1">Hourly Connections Feed</h4>
+          <h4 className="text-sm font-semibold text-foreground mt-1">Hourly connections feed</h4>
         </div>
 
         {/* Live Legend */}
@@ -134,7 +134,7 @@ export default function ActivityTimelineChart({ hourlyActivity = [] }: Props) {
 
       {!hasData ? (
         <div className="flex-1 flex flex-col items-center justify-center py-12 text-foreground/30 text-xs">
-          <span className="font-mono">Waiting for session timelines...</span>
+          <span className="font-mono">Waiting for session timelines…</span>
         </div>
       ) : (
         <div className="flex-1 relative flex flex-col justify-end">

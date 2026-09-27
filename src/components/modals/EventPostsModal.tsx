@@ -54,7 +54,7 @@ export default function EventPostsModal({
       setLikedPosts(data.liked_posts || []);
     } catch (err) {
       console.error("Failed to fetch event posts:", err);
-      setError(err instanceof Error ? err.message : "Failed to load posts");
+      setError(err instanceof Error ? err.message : "Failed to load posts.");
     } finally {
       setIsLoading(false);
       setLoadingMore(false);
@@ -149,7 +149,7 @@ export default function EventPostsModal({
                 <div className="flex flex-col items-center justify-center h-64 gap-3">
                   <Loader2 className="w-8 h-8 animate-spin text-[var(--accent-primary)]" />
                   <span className="text-xs font-mono uppercase tracking-wider text-foreground/30">
-                    Loading posts...
+                    Loading posts…
                   </span>
                 </div>
               ) : error ? (
@@ -288,7 +288,7 @@ export default function EventPostsModal({
                               {post.is_nft && (
                                 <span className="flex items-center gap-1 text-[#8b5cf6]/70 ml-auto">
                                   <Award className="w-3 h-3" />
-                                  {post.minted_count}/{post.total_supply}
+                                  {post.total_supply - post.minted_count} left
                                 </span>
                               )}
                             </div>
@@ -309,12 +309,12 @@ export default function EventPostsModal({
                         {loadingMore ? (
                           <>
                             <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                            Loading...
+                            Loading…
                           </>
                         ) : (
                           <>
                             <ChevronDown className="w-3.5 h-3.5" />
-                            Load More ({total - posts.length} remaining)
+                            Load more ({total - posts.length} more)
                           </>
                         )}
                       </button>
@@ -456,17 +456,17 @@ export default function EventPostsModal({
                           +{selectedPost.reputation_earned}
                         </div>
                         <div className="text-[9px] font-mono uppercase tracking-wider text-foreground/30 mt-0.5">
-                          Rep Earned
+                          REP
                         </div>
                       </div>
                       {selectedPost.is_nft && (
                         <>
                           <div className="bg-foreground/[0.03] border border-foreground/[0.06] rounded-xl p-3 text-center">
                             <div className="text-lg font-mono font-bold text-[#8b5cf6]">
-                              {selectedPost.minted_count}/{selectedPost.total_supply}
+                              {selectedPost.total_supply - selectedPost.minted_count} left
                             </div>
                             <div className="text-[9px] font-mono uppercase tracking-wider text-foreground/30 mt-0.5">
-                              Minted
+                              Editions
                             </div>
                           </div>
                           <div className="bg-foreground/[0.03] border border-foreground/[0.06] rounded-xl p-3 text-center">
@@ -502,7 +502,7 @@ export default function EventPostsModal({
                       )}
                       {selectedPost.owner_wallet && (
                         <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-foreground/5 border border-foreground/10 text-[9px] font-mono text-foreground/40 uppercase tracking-wider">
-                          {selectedPost.owner_wallet.slice(0, 4)}...{selectedPost.owner_wallet.slice(-4)}
+                          {selectedPost.owner_wallet.slice(0, 4)}…{selectedPost.owner_wallet.slice(-4)}
                         </span>
                       )}
                       {selectedPost.owner__invited_count > 0 && (

@@ -28,7 +28,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NextVibe — Organizer Portal",
+  title: "NextVibe — Organizer portal",
   description: "Manage your events, analyze real-time statistics, and connect with your attendees.",
 };
 

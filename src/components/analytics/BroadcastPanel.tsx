@@ -110,7 +110,7 @@ export default function BroadcastPanel({ eventId, recipientCount }: Props) {
 
       <div>
         <h3 className="text-foreground/40 text-[10px] font-mono tracking-widest font-bold uppercase">broadcast communications</h3>
-        <h4 className="text-sm font-semibold text-foreground mt-1">Direct Push Notifications</h4>
+        <h4 className="text-sm font-semibold text-foreground mt-1">Direct push notifications</h4>
       </div>
 
       {!eventId ? (
@@ -171,7 +171,7 @@ export default function BroadcastPanel({ eventId, recipientCount }: Props) {
             {isSending ? (
               <>
                 <RefreshCw className="w-4 h-4 animate-spin" />
-                Sending Broadcast...
+                Sending Broadcast…
               </>
             ) : (
               <>

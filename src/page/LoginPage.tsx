@@ -259,7 +259,7 @@ export default function LoginPage() {
 
         {/* Bottom copyright */}
         <div className="z-10 flex items-center justify-between text-[10px] text-white/30 tracking-wider font-mono uppercase">
-          <span>Version 1.0.1 (BETA)</span>
+          <span>Version 1.0.1</span>
           <span>© NextVibe 2026</span>
         </div>
       </div>
@@ -281,7 +281,7 @@ export default function LoginPage() {
               Organizer Login
             </h1>
             <p className="text-sm text-white/50">
-              Access your events database and real-time attendees logs.
+              Access your events database and real-time attendee logs
             </p>
           </div>
 
@@ -319,7 +319,7 @@ export default function LoginPage() {
               ) : (
                 <SolanaIcon />
               )}
-              <span>{publicKey ? "Wallet Signed In" : "Sign In with Solana"}</span>
+              <span>{publicKey ? "Wallet signed in" : "Sign in with Solana"}</span>
             </button>
 
             {/* Google button wrapper */}

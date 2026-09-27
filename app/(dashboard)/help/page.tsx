@@ -66,15 +66,15 @@ export default function HelpPage() {
     },
     {
       q: "What is H3 Geocoding and how is it used?",
-      a: "We use Uber's H3 spatial index at resolution level 7. Taps that occur outside the geofence area or are spoofed are caught by this filter. This ensures only genuine, physical check-ins and attendee exchanges receive reputation points."
+      a: "We use Uber's H3 spatial index at resolution level 7. Taps that occur outside the geofence area or are spoofed are caught by this filter. This ensures only genuine, physical check-ins and attendee exchanges receive REP."
     },
     {
-      q: "How does automated Solana POAP minting execute?",
-      a: "When an attendee is successfully checked in at the door, the backend triggers an automated transaction using nextvibe nft-service. A POAP is minted to the attendee's Solana wallet representing their attendance proof."
+      q: "How do attendees get their POAP?",
+      a: "At check-in every attendee gets a POAP. If they have a wallet connected, it goes on Solana right away; otherwise it's saved to their NextVibe profile and they can claim it anytime."
     },
     {
       q: "Can I edit or delete events once they are created?",
-      a: "Yes! Navigate to the Events tab, click on any of your hosted events, and select the 'Edit Details' button to update locations, dates, or banners, or select 'Delete Event' to permanently remove it."
+      a: "Yes. In the Events tab, use the 'Edit event' button on an event card to change its description, location, dates or POAP supply, or 'Delete event' to remove it permanently."
     }
   ];
 
@@ -99,7 +99,7 @@ export default function HelpPage() {
     },
     {
       title: "2. NFC Check-In",
-      description: "When attendees arrive, the door host scans their NFC badges. NextVibe records the location coordinate, verifies validity, and awards +5 reputation points.",
+      description: "When attendees arrive, the door host scans their NFC badges. NextVibe records the location coordinate, verifies validity, and gives a random 5–20 REP.",
       icon: Layers,
       visual: () => (
         <div className="flex flex-col items-center justify-center p-4 h-full bg-black/[0.01] dark:bg-foreground/[0.01] border border-black/10 dark:border-foreground/5 rounded-xl gap-2 text-center">
@@ -107,13 +107,13 @@ export default function HelpPage() {
             <Layers className="w-5 h-5 text-[var(--accent-primary)]" />
           </div>
           <span className="text-[10px] font-mono uppercase font-bold text-foreground tracking-wide">Badge Scanned</span>
-          <span className="px-2 py-0.5 bg-emerald-500/20 border border-emerald-500/30 text-emerald-500 text-[9px] font-mono uppercase tracking-wide rounded-lg">+5 Rep Awarded</span>
+          <span className="px-2 py-0.5 bg-emerald-500/20 border border-emerald-500/30 text-emerald-500 text-[9px] font-mono uppercase tracking-wide rounded-lg">+5–20 REP</span>
         </div>
       )
     },
     {
       title: "3. IRL Networking Taps",
-      description: "Attendees tap their badges together to connect. NextVibe tracks IRL interactions, exchanges profiles, and allocates +10 reputation points for new contacts.",
+      description: "Attendees connect with Tap to Meet. NextVibe tracks IRL interactions, exchanges profiles, and gives each person 2–20 REP; whoever has less REP gets more.",
       icon: Fingerprint,
       visual: () => (
         <div className="flex items-center justify-center gap-4 p-4 h-full bg-black/[0.01] dark:bg-foreground/[0.01] border border-black/10 dark:border-foreground/5 rounded-xl">
@@ -130,16 +130,16 @@ export default function HelpPage() {
       )
     },
     {
-      title: "4. Automated Minting",
-      description: "Once checked in, the NextVibe backend automatically mints a Solana POAP containing the event details directly to their wallet address.",
+      title: "4. POAP at check-in",
+      description: "Every attendee gets a POAP at check-in: on Solana right away with a wallet connected, or saved to their profile to claim anytime.",
       icon: Sparkles,
       visual: () => (
         <div className="flex flex-col items-center justify-center p-4 h-full bg-black/[0.01] dark:bg-foreground/[0.01] border border-black/10 dark:border-foreground/5 rounded-xl gap-2 text-center">
           <div className="w-8 h-8 bg-[var(--accent-primary)]/10 border border-[var(--accent-primary)]/20 rounded-lg flex items-center justify-center">
             <Sparkles className="w-4 h-4 text-[var(--accent-primary)]" />
           </div>
-          <span className="text-[9px] font-mono text-foreground/40 uppercase tracking-wide">Minting POAP...</span>
-          <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-500 flex items-center gap-1 justify-center"><CheckCircle2 className="w-3.5 h-3.5" /> Minted</span>
+          <span className="text-[9px] font-mono text-foreground/40 uppercase tracking-wide">Issuing POAP…</span>
+          <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-500 flex items-center gap-1 justify-center"><CheckCircle2 className="w-3.5 h-3.5" /> Issued</span>
         </div>
       )
     }
@@ -200,7 +200,7 @@ export default function HelpPage() {
               <Sparkles className="w-5 h-5 text-[var(--accent-primary)] animate-pulse" /> Support Portal
             </h3>
             <p className="text-xs text-foreground/70 leading-relaxed">
-              Explore how the NextVibe hardware-software ecosystem performs on-site check-ins, networking coordinates tracking, and NFT rewards minting.
+              Explore how the NextVibe hardware-software ecosystem performs on-site check-ins, networking coordinates tracking, and POAP minting.
             </p>
           </div>
           <div className="shrink-0 flex items-center gap-2 px-4 py-2.5 bg-black/5 dark:bg-foreground/5 backdrop-blur-md rounded-xl border border-black/10 dark:border-foreground/10 text-[10px] text-foreground/60 font-mono uppercase tracking-wider shadow-sm">
@@ -344,7 +344,7 @@ export default function HelpPage() {
                     <div>
                       <h4 className="font-display font-bold uppercase text-xs text-foreground tracking-wide">Feedback Submitted</h4>
                       <p className="text-[10px] font-mono text-foreground/50 mt-1 max-w-xs mx-auto">
-                        Thank you! Your simulated request was received. We will get back to you shortly.
+                        Thank you. Your request was received. We will get back to you shortly.
                       </p>
                     </div>
                     <button
@@ -387,7 +387,7 @@ export default function HelpPage() {
                         rows={5}
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
-                        placeholder="Write your suggestions or details..."
+                        placeholder="Write your suggestions or details…"
                         className="w-full text-sm bg-black/[0.02] dark:bg-foreground/[0.02] border border-black/10 dark:border-foreground/10 rounded-xl px-4 py-2.5 text-foreground placeholder-foreground/30 focus:outline-none focus:border-[var(--accent-primary)]/50 focus:bg-black/[0.03] dark:focus:bg-foreground/[0.03] transition-all resize-none"
                       />
                     </div>
@@ -400,7 +400,7 @@ export default function HelpPage() {
                       {isSubmitting ? (
                         <span className="flex items-center gap-2">
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          Submitting...
+                          Submitting…
                         </span>
                       ) : (
                         <>
