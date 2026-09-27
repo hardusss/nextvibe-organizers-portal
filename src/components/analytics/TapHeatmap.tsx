@@ -75,7 +75,7 @@ export default function TapHeatmap({ postId }: Props) {
     loadLeafletJS();
   }, []);
 
-  // 2. Fetch event taps coordinates + generate high-fidelity mock data representing a real event layout
+  // 2. Fetch the event's real check-in and networking taps from the API
   useEffect(() => {
     let active = true;
     const fetchTaps = async () => {
