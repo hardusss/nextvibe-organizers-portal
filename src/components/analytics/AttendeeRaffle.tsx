@@ -22,9 +22,10 @@ import {
   Check,
   Wallet
 } from "lucide-react";
-import { type TopUser } from "@/src/api/events";
+import { isDemoModeActive, type TopUser } from "@/src/api/events";
 
-// Deterministic valid Solana public keys mapped to mock users
+// Stand-in wallets for the demo event's mock attendees. Demo mode only: a
+// real attendee without a wallet must never get a made-up payout address.
 const MOCK_WALLETS: Record<string, string> = {
   vitalik_fan: "HN7cWZ4S4yYn6FTrh4Eq2uP6bJp2s5n8Hk27a819b10m",
   alex_sol: "5W34s5T3yYn6FTkbF3X2uP6bJp2s5n8Hk27a819b10m",
@@ -56,9 +57,10 @@ const isValidSolanaAddress = (addr: string): boolean => {
   }
 };
 
-const getCleanAddress = (username: string, addr?: string): string => {
+/** The attendee's payout wallet, or null when they have no valid one. */
+const getCleanAddress = (username: string, addr: string | null | undefined, isDemo: boolean): string | null => {
   if (addr && isValidSolanaAddress(addr)) return addr;
-  return MOCK_WALLETS[username] || "4k3DyjzvzpEs41D6y289as71bM4rD8z9zKk27a819b10";
+  return isDemo ? MOCK_WALLETS[username] ?? null : null;
 };
 
 // Pure helper function defined outside the component body to satisfy strict ESLint rules
@@ -112,9 +114,12 @@ interface Props {
 type PrizeType = "crypto" | "merch" | "vip" | "nft" | "other";
 type CryptoToken = "SOL" | "USDC" | "USDT";
 
+type RaffleAttendee = Omit<TopUser, "wallet_address"> & { wallet_address: string | null };
+
 interface WinnerInfo {
-  user: TopUser;
-  wallet: string;
+  user: RaffleAttendee;
+  /** null = no wallet: the prize is handed out in person */
+  wallet: string | null;
 }
 
 export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
@@ -132,6 +137,9 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
   const [prizeAmount, setPrizeAmount] = useState<number>(0.1);
   const [prizeName, setPrizeName] = useState("");
   const [winnersCount, setWinnersCount] = useState<number>(3);
+  // With wallet-optional check-in many guests have no wallet; a token draw
+  // leaves them out unless the organizer hands their prize out in person.
+  const [includeNoWallet, setIncludeNoWallet] = useState(false);
 
   // Raffle execution states
   const [isDrawing, setIsDrawing] = useState(false);
@@ -144,13 +152,22 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
   const [txSignature, setTxSignature] = useState<string | null>(null);
   const [txError, setTxError] = useState<string | null>(null);
 
-  // Clean and prepare attendee list with valid Solana addresses
-  const cleanAttendees = useMemo(() => {
+  // Clean and prepare attendee list: a valid Solana address or null
+  const cleanAttendees = useMemo<RaffleAttendee[]>(() => {
+    const isDemo = isDemoModeActive();
     return attendees.map(u => ({
       ...u,
-      wallet_address: getCleanAddress(u.username, u.wallet_address)
+      wallet_address: getCleanAddress(u.username, u.wallet_address, isDemo)
     }));
   }, [attendees]);
+
+  const noWalletCount = cleanAttendees.filter(u => !u.wallet_address).length;
+
+  // Who can win: a token draw only includes people with a wallet by default
+  const drawPool = useMemo(() => {
+    if (prizeType !== "crypto" || includeNoWallet) return cleanAttendees;
+    return cleanAttendees.filter(u => u.wallet_address);
+  }, [cleanAttendees, prizeType, includeNoWallet]);
 
   // Filtered attendees based on search query
   const filteredAttendees = useMemo(() => {
@@ -158,6 +175,8 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
       u.username.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [cleanAttendees, searchQuery]);
+
+  const walletWinners = winners.filter((w): w is WinnerInfo & { wallet: string } => !!w.wallet);
 
   const handleCopyWallet = (address: string, idx: number) => {
     navigator.clipboard.writeText(address);
@@ -167,19 +186,19 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
 
   // Perform raffle drawing with quick cycling animation
   const handleDrawWinners = () => {
-    if (cleanAttendees.length === 0) return;
+    if (drawPool.length === 0) return;
     setIsDrawing(true);
     setDrawCompleted(false);
     setTxStatus("idle");
     setTxSignature(null);
     setTxError(null);
 
-    const actualWinnersCount = Math.min(winnersCount, cleanAttendees.length);
+    const actualWinnersCount = Math.min(winnersCount, drawPool.length);
 
     // Fast cycling username lottery effect
     let cycles = 0;
     const interval = setInterval(() => {
-      const randomUser = getRandomArrayElement(cleanAttendees);
+      const randomUser = getRandomArrayElement(drawPool);
       setCyclerName(randomUser.username);
       cycles++;
 
@@ -187,10 +206,10 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
         clearInterval(interval);
 
         // Select distinct winners randomly
-        const shuffled = [...cleanAttendees].sort(() => 0.5 - Math.random());
+        const shuffled = [...drawPool].sort(() => 0.5 - Math.random());
         const selected = shuffled.slice(0, actualWinnersCount).map(u => ({
           user: u,
-          wallet: u.wallet_address || "4k3DyjzvzpEs41D6y289as71bM4rD8z9zKk27a819b10"
+          wallet: u.wallet_address
         }));
 
         setWinners(selected);
@@ -202,10 +221,10 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
 
   // Reroll single winner spot
   const handleRerollWinner = (indexToReroll: number) => {
-    if (cleanAttendees.length <= winners.length) return; // Pool too small to redraw distinct
+    if (drawPool.length <= winners.length) return; // Pool too small to redraw distinct
 
     const currentWinnerIds = new Set(winners.map(w => w.user.user_id));
-    const eligiblePool = cleanAttendees.filter(u => !currentWinnerIds.has(u.user_id));
+    const eligiblePool = drawPool.filter(u => !currentWinnerIds.has(u.user_id));
 
     if (eligiblePool.length === 0) return;
 
@@ -213,7 +232,7 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
     const updatedWinners = [...winners];
     updatedWinners[indexToReroll] = {
       user: newWinner,
-      wallet: newWinner.wallet_address || "4k3DyjzvzpEs41D6y289as71bM4rD8z9zKk27a819b10"
+      wallet: newWinner.wallet_address
     };
 
     setWinners(updatedWinners);
@@ -224,8 +243,9 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
   };
 
   // Distribute crypto to winners (Solana wallet transaction)
+  // Winners without a wallet get their prize in person and are skipped here
   const handleSendPrizes = async () => {
-    if (winners.length === 0) return;
+    if (walletWinners.length === 0) return;
     setTxError(null);
 
     const isRealWallet = connected && publicKey;
@@ -234,7 +254,7 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
       return;
     }
 
-    const allWalletsValid = winners.every(w => isValidSolanaAddress(w.wallet));
+    const allWalletsValid = walletWinners.every(w => isValidSolanaAddress(w.wallet));
     if (!allWalletsValid) {
       setTxError("Some winner wallets are not valid Solana addresses.");
       setTxStatus("failed");
@@ -246,7 +266,7 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
       const transaction = new Transaction();
 
       if (cryptoToken === "SOL") {
-        winners.forEach(w => {
+        walletWinners.forEach(w => {
           transaction.add(
             SystemProgram.transfer({
               fromPubkey: publicKey!,
@@ -261,7 +281,7 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
         const decimals = 6;
         const baseAmount = Math.round(prizeAmount * Math.pow(10, decimals));
 
-        for (const w of winners) {
+        for (const w of walletWinners) {
           const recipientPubKey = new PublicKey(w.wallet);
           const sourceATA = getAssociatedTokenAddress(mintAddress, publicKey!);
           const destinationATA = getAssociatedTokenAddress(mintAddress, recipientPubKey);
@@ -382,7 +402,7 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
               filteredAttendees.map((user, idx) => {
                 const walletShort = user.wallet_address
                   ? `${user.wallet_address.slice(0, 8)}…${user.wallet_address.slice(-8)}`
-                  : "—";
+                  : null;
 
                 return (
                   <div
@@ -399,15 +419,22 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
                       </div>
                       <div>
                         <div className="text-foreground font-semibold text-xs tracking-tight">{user.username}</div>
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                          <span className="text-[10px] text-foreground/40 font-mono tracking-tight">{walletShort}</span>
-                          <button
-                            onClick={() => handleCopyWallet(user.wallet_address || "", idx)}
-                            className="p-1 rounded hover:bg-foreground/5 text-foreground/30 hover:text-[var(--accent-primary)] transition-colors cursor-pointer"
-                          >
-                            {copiedIndex === idx ? <Check className="w-3 h-3 text-[var(--accent-primary)]" /> : <Copy className="w-3 h-3" />}
-                          </button>
-                        </div>
+                        {walletShort ? (
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="text-[10px] text-foreground/40 font-mono tracking-tight">{walletShort}</span>
+                            <button
+                              onClick={() => handleCopyWallet(user.wallet_address || "", idx)}
+                              className="p-1 rounded hover:bg-foreground/5 text-foreground/30 hover:text-[var(--accent-primary)] transition-colors cursor-pointer"
+                              aria-label="Copy wallet address"
+                            >
+                              {copiedIndex === idx ? <Check className="w-3 h-3 text-[var(--accent-primary)]" /> : <Copy className="w-3 h-3" />}
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="inline-block mt-1 px-1.5 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-[10px] font-semibold text-amber-500">
+                            No wallet
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -490,12 +517,30 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
               <input
                 type="number"
                 min="1"
-                max={Math.max(1, cleanAttendees.length)}
+                max={Math.max(1, drawPool.length)}
                 value={winnersCount}
                 onChange={e => setWinnersCount(parseInt(e.target.value) || 1)}
                 className="w-full text-xs bg-foreground/[0.02] border border-foreground/10 rounded-xl px-4 py-2 text-foreground font-mono focus:outline-none focus:border-[var(--accent-primary)]"
               />
             </div>
+
+            {/* Token prizes need a wallet; people without one only by choice */}
+            {prizeType === "crypto" && noWalletCount > 0 && (
+              <label className="flex items-start gap-2.5 text-xs text-foreground/70 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={includeNoWallet}
+                  onChange={e => setIncludeNoWallet(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 accent-[var(--accent-primary)] cursor-pointer"
+                />
+                <span>
+                  Include people without a wallet (prize handed out in person)
+                  <span className="block text-[10px] text-foreground/40 mt-0.5">
+                    {noWalletCount} of {cleanAttendees.length} attendees have no wallet
+                  </span>
+                </span>
+              </label>
+            )}
 
             {/* Wallet status */}
             {prizeType === "crypto" && (
@@ -526,7 +571,7 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
             {/* Draw CTA Button */}
             <button
               onClick={handleDrawWinners}
-              disabled={isDrawing || cleanAttendees.length === 0}
+              disabled={isDrawing || drawPool.length === 0}
               className="w-full h-11 bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] hover:opacity-95 disabled:opacity-50 text-foreground font-display font-extrabold uppercase text-xs tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
             >
               {isDrawing ? (
@@ -575,9 +620,13 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
                             <span className="w-4 text-center font-mono font-bold text-yellow-500">#{idx + 1}</span>
                             <span>{w.user.username}</span>
                           </div>
-                          <div className="text-[9px] text-foreground/40 font-mono mt-0.5">
-                            {w.wallet.slice(0, 6)}…{w.wallet.slice(-6)}
-                          </div>
+                          {w.wallet ? (
+                            <div className="text-[9px] text-foreground/40 font-mono mt-0.5">
+                              {w.wallet.slice(0, 6)}…{w.wallet.slice(-6)}
+                            </div>
+                          ) : (
+                            <div className="text-[10px] text-amber-500 mt-0.5">No wallet · hand the prize out in person</div>
+                          )}
                         </div>
                       </div>
 
@@ -597,13 +646,16 @@ export default function AttendeeRaffle({ attendees = [], isLoading }: Props) {
                 {/* Crypto Prize Distribute Panel */}
                 {prizeType === "crypto" && (
                   <div className="pt-2">
-                    {txStatus === "idle" && (
+                    {txStatus === "idle" && walletWinners.length === 0 && (
+                      <p className="text-xs text-amber-500">No winner has a wallet. Hand the prizes out in person.</p>
+                    )}
+                    {txStatus === "idle" && walletWinners.length > 0 && (
                       <button
                         onClick={handleSendPrizes}
                         className="w-full h-10 bg-emerald-500 hover:bg-emerald-600 hover:scale-[1.01] active:scale-[0.99] text-foreground font-display font-extrabold uppercase text-xs tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
                       >
                         <Coins className="w-4 h-4 text-foreground" />
-                        Send {prizeAmount} {cryptoToken} to Winners
+                        Send {prizeAmount} {cryptoToken} to {walletWinners.length} {walletWinners.length === 1 ? "winner" : "winners"}
                       </button>
                     )}
 

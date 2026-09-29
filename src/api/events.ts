@@ -288,7 +288,7 @@ export async function createEventFull(params: FullCreateEventParams): Promise<nu
 
 // ─── Demo Mode Utilities & Mock Data ────────────────────────────────────────
 
-function isDemoModeActive(): boolean {
+export function isDemoModeActive(): boolean {
   if (typeof window === "undefined") return false;
   const userId = storage.getItem("id");
   if (userId !== "39") return false;
