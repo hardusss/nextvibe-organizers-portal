@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import TopNav from "@/src/components/layout/TopNav";
 import { getUserDetail } from "@/src/api/user.detail";
 import {
@@ -25,6 +25,8 @@ import BroadcastPanel from "@/src/components/analytics/BroadcastPanel";
 import AttendeeRaffle from "@/src/components/analytics/AttendeeRaffle";
 import EventPostsSection from "@/src/components/analytics/EventPostsSection";
 import { useRole } from "@/src/contexts/RoleContext";
+import { useEventTaps } from "@/src/utils/useEventTaps";
+import { dayLabel, eventDays, peopleMetLeaderboard, safeTimeZone } from "@/src/utils/eventTaps";
 
 const container = {
   hidden: { opacity: 0 },
@@ -108,6 +110,21 @@ export default function AnalyticsPage() {
   const [isFullscreenLeaderboardOpen, setIsFullscreenLeaderboardOpen] = useState<boolean>(false);
   const [isFullLeaderboardModalOpen, setIsFullLeaderboardModalOpen] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number>(5);
+  // Event day the people-met ranking is filtered to ("YYYY-MM-DD" in event time), null = all days
+  const [leaderboardDay, setLeaderboardDay] = useState<string | null>(null);
+
+  const { data: tapsData, isLoading: isLoadingTaps, error: tapsError, refresh: refreshTaps } = useEventTaps(selectedEventId);
+  const eventTimeZone = safeTimeZone(tapsData?.timezone);
+  const eventDayKeys = useMemo(
+    () => eventDays(tapsData?.taps ?? [], eventTimeZone, tapsData?.start_time, tapsData?.end_time),
+    [tapsData, eventTimeZone]
+  );
+  const activeDay = leaderboardDay && eventDayKeys.includes(leaderboardDay) ? leaderboardDay : null;
+  const leaders = useMemo(
+    () => peopleMetLeaderboard(tapsData?.taps ?? [], topUsers, activeDay, eventTimeZone),
+    [tapsData, topUsers, activeDay, eventTimeZone]
+  );
+  const isLoadingLeaders = (isLoadingTaps && !tapsData) || (isLoadingTopUsers && topUsers.length === 0);
 
   const { role, isSponsorEvent } = useRole();
 
@@ -159,7 +176,7 @@ export default function AnalyticsPage() {
 
     const interval = setInterval(async () => {
       try {
-        const data = await getEventTopUsers(selectedEventId);
+        const [data] = await Promise.all([getEventTopUsers(selectedEventId), refreshTaps()]);
         setTopUsers(data);
         setCountdown(5);
       } catch (error) {
@@ -175,7 +192,7 @@ export default function AnalyticsPage() {
       clearInterval(interval);
       clearInterval(countdownInterval);
     };
-  }, [isFullscreenLeaderboardOpen, selectedEventId]);
+  }, [isFullscreenLeaderboardOpen, selectedEventId, refreshTaps]);
 
   useEffect(() => {
     if (!selectedEventId) return;
@@ -243,7 +260,8 @@ export default function AnalyticsPage() {
       const [analyticsData, topUsersData, socialGraphData] = await Promise.all([
         getEventAnalytics(selectedEventId),
         getEventTopUsers(selectedEventId),
-        getEventSocialGraph(selectedEventId)
+        getEventSocialGraph(selectedEventId),
+        refreshTaps()
       ]);
       setAnalytics(analyticsData);
       setTopUsers(topUsersData);
@@ -319,6 +337,9 @@ export default function AnalyticsPage() {
                 <h1 className="text-2xl md:text-3xl font-display font-extrabold uppercase tracking-tight text-foreground">
                   {selectedEvent?.about || "Event Leaderboard"}
                 </h1>
+                <p className="text-sm md:text-base text-foreground/60 font-semibold">
+                  Most people met · {activeDay ? dayLabel(activeDay) : "All days"}
+                </p>
               </div>
 
               <div className="flex items-center gap-6">
@@ -337,7 +358,10 @@ export default function AnalyticsPage() {
 
             <div className="flex-1 my-8 max-w-5xl mx-auto w-full flex flex-col justify-center">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
-                {topUsers.slice(0, 10).map((user, i) => {
+                {leaders.length === 0 && (
+                  <p className="md:col-span-2 text-center text-foreground/40 text-lg">No one has met anyone yet{activeDay ? " on this day" : ""}.</p>
+                )}
+                {leaders.slice(0, 10).map((user, i) => {
                   const rank = i + 1;
                   const isTop3 = rank <= 3;
                   const rankColors = [
@@ -373,9 +397,9 @@ export default function AnalyticsPage() {
 
                       <div className="text-right">
                         <span className="text-xl font-bold font-mono tracking-tight text-foreground block">
-                          {user.total_taps}
+                          {user.people_met}
                         </span>
-                        <span className="text-[9px] text-foreground/40 uppercase tracking-wider block">connections</span>
+                        <span className="text-[9px] text-foreground/40 uppercase tracking-wider block">people met</span>
                       </div>
                     </motion.div>
                   );
@@ -412,7 +436,7 @@ export default function AnalyticsPage() {
               <div className="p-4 md:p-5 border-b border-foreground/5 flex items-center justify-between bg-foreground/[0.02]">
                 <h3 className="text-base font-display font-extrabold uppercase tracking-tight text-foreground flex items-center gap-2.5">
                   <Award className="w-5 h-5 text-[var(--accent-primary,#a855f7)]" />
-                  Event Leaderboard
+                  People met · {activeDay ? dayLabel(activeDay) : "All days"}
                 </h3>
                 <button
                   onClick={() => setIsFullLeaderboardModalOpen(false)}
@@ -423,12 +447,12 @@ export default function AnalyticsPage() {
               </div>
 
               <div className="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-2">
-                {topUsers.map((user, i) => {
+                {leaders.map((user, i) => {
                   const rank = i + 1;
                   const isTop3 = rank <= 3;
                   const walletShort = user.wallet_address
                     ? `${user.wallet_address.slice(0, 6)}…${user.wallet_address.slice(-6)}`
-                    : "—";
+                    : "No wallet";
                   const rankColors = [
                     "border-yellow-500/35 bg-yellow-500/5 text-yellow-400",
                     "border-[#c084fc]/35 bg-[#c084fc]/5 text-[#c084fc]",
@@ -460,7 +484,7 @@ export default function AnalyticsPage() {
 
                       <div className="text-right">
                         <div className="text-sm font-bold text-foreground">
-                          {user.total_taps} taps
+                          {user.people_met} met
                         </div>
                         <div className="text-[9px] text-foreground/40">
                           {user.total_reputation} REP
@@ -781,7 +805,7 @@ export default function AnalyticsPage() {
               </div>
 
               {selectedEventId ? (
-                <TapHeatmap postId={selectedEventId} />
+                <TapHeatmap postId={selectedEventId} data={tapsData} isLoading={isLoadingTaps} error={tapsError} />
               ) : (
                 <div className="flex-1 flex items-center justify-center min-h-[350px] rounded-xl bg-black/10 border border-foreground/5 text-xs text-foreground/30">
                   Select an event to view telemetry heatmap
@@ -794,14 +818,14 @@ export default function AnalyticsPage() {
               variants={item}
               className="lg:col-span-4 premium-card p-5 md:p-6 flex flex-col"
             >
-              <div className="flex justify-between items-start mb-6">
+              <div className="flex flex-wrap justify-between items-start gap-3 mb-4">
                 <div>
                   <h2 className="text-lg font-display font-extrabold uppercase text-foreground tracking-tight flex items-center gap-2">
                     <Award className="w-5 h-5 text-[var(--accent-primary)]" />
                     Top Attendees
                   </h2>
                   <p className="text-foreground/45 text-xs">
-                    {leaderboardMode === "public" ? "Projected scoreboard telemetry" : "Ranked leaderboard by connection volume"}
+                    Ranked by different people met with Tap to Meet
                   </p>
                 </div>
 
@@ -837,8 +861,26 @@ export default function AnalyticsPage() {
                 </div>
               </div>
 
+              {eventDayKeys.length > 1 && (
+                <div className="flex flex-wrap gap-1 mb-4" role="group" aria-label="Event day">
+                  {[null, ...eventDayKeys].map((day) => (
+                    <button
+                      key={day ?? "all"}
+                      onClick={() => setLeaderboardDay(day)}
+                      aria-pressed={activeDay === day}
+                      className={`px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer border ${activeDay === day
+                        ? "bg-[var(--accent-primary)] border-transparent text-white"
+                        : "border-foreground/10 text-foreground/60 hover:text-foreground hover:bg-foreground/5"
+                        }`}
+                    >
+                      {day ? dayLabel(day) : "All days"}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               <div className="flex-1 flex flex-col gap-4">
-                {isLoadingTopUsers ? (
+                {isLoadingLeaders ? (
                   Array.from({ length: 5 }).map((_, i) => (
                     <div key={i} className="flex items-center justify-between p-2 animate-pulse border-b border-foreground/5">
                       <div className="flex items-center gap-3">
@@ -852,18 +894,18 @@ export default function AnalyticsPage() {
                       <div className="h-3 w-10 bg-foreground/5 rounded" />
                     </div>
                   ))
-                ) : topUsers.length === 0 ? (
+                ) : leaders.length === 0 ? (
                   <div className="flex-1 flex flex-col items-center justify-center text-foreground/30 py-10">
                     <Users className="w-8 h-8 mb-2 opacity-30" />
-                    <p className="text-xs">No scan activity recorded</p>
+                    <p className="text-xs">{activeDay ? "No one met anyone on this day yet" : "No Proof of Meets yet"}</p>
                   </div>
                 ) : (
-                  topUsers.slice(0, 5).map((user, i) => {
+                  leaders.slice(0, 5).map((user, i) => {
                     const rank = i + 1;
                     const isTop3 = rank <= 3;
                     const walletShort = user.wallet_address
                       ? `${user.wallet_address.slice(0, 4)}…${user.wallet_address.slice(-4)}`
-                      : "—";
+                      : "No wallet";
 
                     // Public Mode strips wallet and rep data
                     if (leaderboardMode === "public") {
@@ -899,9 +941,9 @@ export default function AnalyticsPage() {
 
                           <div className="text-right">
                             <div className={`font-mono text-xs font-bold ${isTop3 ? "text-[var(--accent-primary)]" : "text-foreground/80"}`}>
-                              {user.total_taps} taps
+                              {user.people_met}
                             </div>
-                            <div className="text-foreground/30 font-mono uppercase tracking-wider">connections</div>
+                            <div className="text-foreground/40 text-[10px]">people met</div>
                           </div>
                         </motion.div>
                       );
@@ -940,7 +982,7 @@ export default function AnalyticsPage() {
 
                         <div className="text-right">
                           <div className={`font-mono text-xs font-bold ${isTop3 ? "text-[var(--accent-primary)]" : "text-foreground/80"}`}>
-                            {user.total_taps} T
+                            {user.people_met} met
                           </div>
                           <div className="text-foreground/40 text-[10px] font-mono">
                             {user.total_reputation >= 1000 ? (user.total_reputation / 1000).toFixed(1) + "k" : user.total_reputation} REP
@@ -952,7 +994,7 @@ export default function AnalyticsPage() {
                 )}
               </div>
 
-              {topUsers.length > 0 && (
+              {leaders.length > 0 && (
                 <button
                   onClick={() => setIsFullLeaderboardModalOpen(true)}
                   className="w-full mt-6 py-3 border-t border-foreground/5 text-xs font-display font-extrabold uppercase tracking-wider text-foreground/60 hover:text-[var(--accent-primary)] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"

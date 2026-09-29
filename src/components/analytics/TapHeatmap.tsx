@@ -1,33 +1,61 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader2, AlertCircle, RefreshCw, X, Users, CheckCircle2, Fingerprint, MapPin, Award, Layers } from "lucide-react";
-import { getEventTaps, type EventTap } from "@/src/api/events";
+import { cellsToMultiPolygon, gridDisk, isValidCell } from "h3-js";
+import type { EventTap, EventTapsResult } from "@/src/api/events";
+import { boundsOf, tapFocusBounds, type Bounds } from "@/src/utils/eventTaps";
 
 const CARTO_API_KEY = process.env.NEXT_PUBLIC_CARTO_API_KEY ?? "";
+const ZONE_COLOR = "#8B5CF6";
+
+type Focus = "taps" | "zone" | "venue";
 
 interface Props {
   postId: number;
+  data: EventTapsResult | null;
+  isLoading: boolean;
+  error: string | null;
 }
 
-export default function TapHeatmap({ postId }: Props) {
+/**
+ * The check-in zone as the backend geofence sees it: gridDisk(h3_geo, rings)
+ * merged into one outline. [lat, lng] loops per polygon; null for events
+ * without a cell (older events) or a malformed one.
+ */
+function zoneOutline(h3Geo?: string | null, rings?: number | null): number[][][][] | null {
+  if (!h3Geo || !isValidCell(h3Geo)) return null;
+  try {
+    return cellsToMultiPolygon(gridDisk(h3Geo, rings ?? 2), false);
+  } catch {
+    return null;
+  }
+}
+
+export default function TapHeatmap({ postId, data: tapsData, isLoading, error }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const heatLayerRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
   const markersGroupRef = useRef<any>(null);
+  const zoneGroupRef = useRef<any>(null);
   const tileLayerRef = useRef<any>(null);
+  const heatZoomHandlerRef = useRef<(() => void) | undefined>(undefined);
+  // Event the map was last auto-fitted for: refreshes must not move the view
+  const fittedForRef = useRef<number | null>(null);
 
-  const [tapsData, setTapsData] = useState<{ center: { lat: number; lng: number } | null; taps: EventTap[] } | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [scriptsLoaded, setScriptsLoaded] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<EventTap[] | null>(null);
   const [is3DMode, setIs3DMode] = useState(false);
+  const [focus, setFocus] = useState<Focus>("taps");
 
   // Layer visibility toggles
   const [showHeatmap, setShowHeatmap] = useState(true);
   const [showMarkers, setShowMarkers] = useState(true);
+
+  const taps = useMemo(() => tapsData?.taps ?? [], [tapsData]);
+  const venue = tapsData?.center ?? null;
+  const zone = useMemo(() => zoneOutline(tapsData?.h3_geo, tapsData?.zone_rings), [tapsData?.h3_geo, tapsData?.zone_rings]);
 
   // 1. Load Leaflet and Leaflet.heat dynamically on client side
   useEffect(() => {
@@ -78,44 +106,9 @@ export default function TapHeatmap({ postId }: Props) {
     loadLeafletJS();
   }, []);
 
-  // 2. Fetch the event's real check-in and networking taps from the API
+  // 2. Create the map and its base tiles once the scripts are in
   useEffect(() => {
-    let active = true;
-    const fetchTaps = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const data = await getEventTaps(postId);
-        if (active) {
-          const cleanTaps = (data.taps || []).filter(
-            (t) => t.type === "checkin" || t.type === "networking"
-          );
-          setTapsData({
-            center: data.center,
-            taps: cleanTaps,
-          });
-        }
-      } catch (err: any) {
-        if (active) {
-          setError(err.response?.data?.error || err.message || "Failed to load tap data.");
-        }
-      } finally {
-        if (active) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    fetchTaps();
-
-    return () => {
-      active = false;
-    };
-  }, [postId]);
-
-  // 3. Initialize/Update Leaflet map when scripts are loaded and data is fetched
-  useEffect(() => {
-    if (!scriptsLoaded || !tapsData || !containerRef.current) return;
+    if (!scriptsLoaded || !containerRef.current) return;
 
     const L = (window as any).L;
     if (!L) return;
@@ -140,22 +133,14 @@ export default function TapHeatmap({ postId }: Props) {
         }
       : null;
 
-    // Center map
-    const defaultCenter = [50.4501, 30.5234]; // Kyiv default
-    const mapCenter = tapsData.center
-      ? [tapsData.center.lat, tapsData.center.lng]
-      : defaultCenter;
-
-    // A. Create Map Instance if it doesn't exist
+    // A. Create the map once; where it looks is decided by fitTo() below
     if (!mapRef.current) {
       mapRef.current = L.map(containerRef.current, {
-        zoomControl: true,
+        zoomControl: false,
         scrollWheelZoom: true,
-      }).setView(mapCenter, 19);
-
-    } else {
-      // B. If Map exists, update view and tile layer
-      mapRef.current.setView(mapCenter, 19);
+      }).setView([50.4501, 30.5234], 16); // Kyiv until the event loads
+      // Bottom-right keeps the top edge free for the overlay controls
+      L.control.zoom({ position: "bottomright" }).addTo(mapRef.current);
     }
 
     // Recreate the tile layer so url and native zoom match the dark/light theme
@@ -178,13 +163,59 @@ export default function TapHeatmap({ postId }: Props) {
       });
     }
 
-    // C. Add or Update Event Center Marker
+    // Keep Leaflet's size in sync when the card resizes (sidebar, rotation)
+    const observer = new ResizeObserver(() => mapRef.current?.invalidateSize());
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [scriptsLoaded]);
+
+  // 3. Draw zone, venue, taps and heat whenever the data or toggles change
+  useEffect(() => {
+    if (!scriptsLoaded || !mapRef.current || !tapsData) return;
+
+    const L = (window as any).L;
+    if (!L) return;
+    const isDark = document.documentElement.classList.contains("dark");
+
+    // B. Check-in zone: one merged dashed outline, very light fill
+    if (zoneGroupRef.current) {
+      zoneGroupRef.current.clearLayers();
+    } else {
+      zoneGroupRef.current = L.layerGroup().addTo(mapRef.current);
+    }
+    if (zone) {
+      L.polygon(zone, {
+        color: ZONE_COLOR,
+        weight: 2,
+        dashArray: "6 6",
+        fillColor: ZONE_COLOR,
+        fillOpacity: 0.06,
+        interactive: false,
+      }).addTo(zoneGroupRef.current);
+      // Label on the zone's north edge so it doesn't sit on top of the taps
+      const b = boundsOf(zone.flat(2).map(([lat, lng]) => ({ lat, lng })));
+      if (b) {
+        L.tooltip({ permanent: true, direction: "top", className: "zone-label", offset: [0, -2] })
+          .setLatLng([b[1][0], (b[0][1] + b[1][1]) / 2])
+          .setContent("Check-in zone")
+          .addTo(zoneGroupRef.current);
+      }
+    }
+
+    // C. Venue pin from the Luma address: small and secondary to the taps
     if (markerRef.current) {
       mapRef.current.removeLayer(markerRef.current);
+      markerRef.current = null;
     }
-    if (tapsData.center) {
-      markerRef.current = L.marker(mapCenter)
-        .bindPopup("<b>Event location</b>")
+    if (venue) {
+      markerRef.current = L.circleMarker([venue.lat, venue.lng], {
+        radius: 5,
+        color: isDark ? "#f1edf7" : "#1f1f24",
+        weight: 2,
+        fillColor: isDark ? "#1f1f24" : "#ffffff",
+        fillOpacity: 1,
+      })
+        .bindTooltip("Venue (Luma address)", { direction: "right", offset: [6, 0] })
         .addTo(mapRef.current);
     }
 
@@ -201,7 +232,7 @@ export default function TapHeatmap({ postId }: Props) {
 
       // Custom clustering algorithm (groups items within ~2 meters)
       const groups: { center: { lat: number; lng: number }; taps: EventTap[] }[] = [];
-      tapsData.taps.forEach((tap) => {
+      taps.forEach((tap) => {
         const group = groups.find((g) => {
           const dLat = Math.abs(g.center.lat - tap.lat);
           const dLng = Math.abs(g.center.lng - tap.lng);
@@ -307,7 +338,7 @@ export default function TapHeatmap({ postId }: Props) {
 
     if (showHeatmap) {
       // Map intensities down: 0.05 for checkins, 0.03 for networking
-      const heatPoints = tapsData.taps.map((tap) => {
+      const heatPoints = taps.map((tap) => {
         const intensity = tap.type === "checkin" ? 0.05 : 0.03;
         return [tap.lat, tap.lng, intensity];
       });
@@ -359,11 +390,46 @@ export default function TapHeatmap({ postId }: Props) {
           });
         };
 
-        mapRef.current.off("zoomend", handleZoomEnd);
+        mapRef.current.off("zoomend", heatZoomHandlerRef.current);
+        heatZoomHandlerRef.current = handleZoomEnd;
         mapRef.current.on("zoomend", handleZoomEnd);
       }
     }
-  }, [scriptsLoaded, tapsData, showHeatmap, showMarkers]);
+  }, [scriptsLoaded, tapsData, taps, zone, venue, showHeatmap, showMarkers]);
+
+  // 4. Where the map looks: fitted once per event, then only on the toggle
+  const fitTo = (mode: Focus) => {
+    const map = mapRef.current;
+    if (!map) return;
+    let bounds: Bounds | null = null;
+    if (mode === "taps") bounds = tapFocusBounds(taps);
+    if (mode === "zone" && zone) bounds = boundsOf(zone.flat(2).map(([lat, lng]) => ({ lat, lng })));
+    if (bounds) {
+      // Keep clear of the overlay controls (top) and the legend (bottom)
+      map.invalidateSize();
+      map.fitBounds(bounds, { paddingTopLeft: [24, 64], paddingBottomRight: [24, 56], maxZoom: 19 });
+    } else if (venue) {
+      map.setView([venue.lat, venue.lng], 18);
+    }
+  };
+  const fitToRef = useRef(fitTo);
+  useEffect(() => {
+    fitToRef.current = fitTo;
+  });
+
+  useEffect(() => {
+    if (!scriptsLoaded || !mapRef.current || !tapsData) return;
+    if (fittedForRef.current === postId) return;
+    fittedForRef.current = postId;
+    const initial: Focus = taps.length > 0 ? "taps" : zone ? "zone" : "venue";
+    setFocus(initial);
+    fitToRef.current(initial);
+  }, [scriptsLoaded, tapsData, postId, taps.length, zone]);
+
+  const chooseFocus = (mode: Focus) => {
+    setFocus(mode);
+    fitTo(mode);
+  };
 
   // Clean up map when component completely unmounts
   useEffect(() => {
@@ -372,6 +438,8 @@ export default function TapHeatmap({ postId }: Props) {
         mapRef.current.remove();
         mapRef.current = null;
         tileLayerRef.current = null;
+        zoneGroupRef.current = null;
+        fittedForRef.current = null;
         heatLayerRef.current = null;
         markerRef.current = null;
         markersGroupRef.current = null;
@@ -380,7 +448,7 @@ export default function TapHeatmap({ postId }: Props) {
   }, []);
 
   return (
-    <div className="flex-1 min-h-[350px] relative rounded-xl overflow-hidden border border-black/5 dark:border-foreground/5 bg-gray-100 dark:bg-black flex items-center justify-center">
+    <div className="flex-1 min-h-[420px] sm:min-h-[350px] relative rounded-xl overflow-hidden border border-black/5 dark:border-foreground/5 bg-gray-100 dark:bg-black flex items-center justify-center">
       {/* Global CSS Overrides for Leaflet Popups to match portal's theme */}
       <style>{`
         .leaflet-popup-content-wrapper {
@@ -404,6 +472,23 @@ export default function TapHeatmap({ postId }: Props) {
           border: 1px solid rgba(0, 0, 0, 0.12) !important;
           border-radius: 12px !important;
           box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important;
+        }
+        .leaflet-control-attribution {
+          font-size: 9px !important;
+          line-height: 1.3 !important;
+        }
+        .zone-label {
+          background: ${ZONE_COLOR} !important;
+          color: #ffffff !important;
+          border: none !important;
+          border-radius: 6px !important;
+          padding: 2px 6px !important;
+          font-size: 10px !important;
+          font-weight: 700 !important;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+        }
+        .zone-label::before {
+          border-top-color: ${ZONE_COLOR} !important;
         }
         .light-leaflet-popup .leaflet-popup-tip {
           background: #ffffff !important;
@@ -431,60 +516,71 @@ export default function TapHeatmap({ postId }: Props) {
         </div>
       )}
 
-      {/* No Taps empty state */}
-      {tapsData && tapsData.taps.length === 0 && !isLoading && (
-        <div className="absolute top-4 right-4 bg-foreground/90 dark:bg-black/85 backdrop-blur border border-black/10 dark:border-foreground/10 px-3 py-1.5 rounded-lg text-[10px] text-black/60 dark:text-foreground/60 z-20 flex items-center gap-1.5 font-medium shadow-sm">
+      {/* Overlay controls: recenter on the left, layers + tilt on the right; wraps on phones */}
+      {tapsData && !isLoading && (
+        <div className="absolute top-3 left-3 right-3 z-20 flex flex-wrap items-start justify-between gap-2 pointer-events-none">
+          <div className="pointer-events-auto bg-white/90 dark:bg-[#0d0d12]/90 backdrop-blur border border-black/10 dark:border-foreground/10 rounded-lg p-1 flex gap-1 shadow-md" role="group" aria-label="Recenter map">
+            {([
+              ["taps", "Taps", taps.length === 0],
+              ["zone", "Zone", !zone],
+              ["venue", "Venue", !venue],
+            ] as const).map(([mode, label, disabled]) => (
+              <button
+                key={mode}
+                onClick={() => chooseFocus(mode)}
+                disabled={disabled}
+                aria-pressed={focus === mode}
+                className={`px-2 py-1 text-[10px] font-bold rounded-md flex items-center gap-1 transition-all disabled:opacity-35 disabled:cursor-not-allowed ${focus === mode
+                  ? "bg-purple-600 dark:bg-[#a855f7] text-white shadow-sm"
+                  : "text-black/60 dark:text-foreground/60 hover:bg-black/5 dark:hover:bg-foreground/5"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <div className="pointer-events-auto flex flex-wrap justify-end gap-2">
+            {taps.length > 0 && (
+              <div className="bg-white/90 dark:bg-[#0d0d12]/90 backdrop-blur border border-black/10 dark:border-foreground/10 rounded-lg p-1 flex gap-1 shadow-md">
+                <button onClick={() => setShowHeatmap(!showHeatmap)} aria-pressed={showHeatmap} className={`px-2 py-1 text-[10px] font-bold rounded-md flex items-center gap-1 transition-all disabled:opacity-35 disabled:cursor-not-allowed ${showHeatmap
+                  ? "bg-purple-600 dark:bg-[#a855f7] text-white shadow-sm"
+                  : "text-black/60 dark:text-foreground/60 hover:bg-black/5 dark:hover:bg-foreground/5"
+                }`}>
+                  Heatmap
+                </button>
+                <button onClick={() => setShowMarkers(!showMarkers)} aria-pressed={showMarkers} className={`px-2 py-1 text-[10px] font-bold rounded-md flex items-center gap-1 transition-all disabled:opacity-35 disabled:cursor-not-allowed ${showMarkers
+                  ? "bg-purple-600 dark:bg-[#a855f7] text-white shadow-sm"
+                  : "text-black/60 dark:text-foreground/60 hover:bg-black/5 dark:hover:bg-foreground/5"
+                }`}>
+                  Markers
+                </button>
+              </div>
+            )}
+            <div className="hidden sm:flex bg-white/90 dark:bg-[#0d0d12]/90 backdrop-blur border border-black/10 dark:border-foreground/10 rounded-lg p-1 gap-1 shadow-md">
+              <button onClick={() => setIs3DMode(false)} aria-pressed={!is3DMode} className={`px-2 py-1 text-[10px] font-bold rounded-md flex items-center gap-1 transition-all disabled:opacity-35 disabled:cursor-not-allowed ${!is3DMode
+                  ? "bg-purple-600 dark:bg-[#a855f7] text-white shadow-sm"
+                  : "text-black/60 dark:text-foreground/60 hover:bg-black/5 dark:hover:bg-foreground/5"
+                }`}>
+                2D
+              </button>
+              <button onClick={() => setIs3DMode(true)} aria-pressed={is3DMode} className={`px-2 py-1 text-[10px] font-bold rounded-md flex items-center gap-1 transition-all disabled:opacity-35 disabled:cursor-not-allowed ${is3DMode
+                  ? "bg-purple-600 dark:bg-[#a855f7] text-white shadow-sm"
+                  : "text-black/60 dark:text-foreground/60 hover:bg-black/5 dark:hover:bg-foreground/5"
+                }`}>
+                <Layers className="w-3 h-3" />
+                3D
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* No taps yet */}
+      {tapsData && taps.length === 0 && !isLoading && (
+        <div className="absolute bottom-14 left-1/2 -translate-x-1/2 bg-white/90 dark:bg-black/85 backdrop-blur border border-black/10 dark:border-foreground/10 px-3 py-1.5 rounded-lg text-[11px] text-black/60 dark:text-foreground/60 z-20 flex items-center gap-1.5 font-medium shadow-sm whitespace-nowrap">
           <RefreshCw className="w-3 h-3 text-purple-500 animate-spin" />
-          Waiting for check-ins…
-        </div>
-      )}
-
-      {/* 2D / 3D Toggle Controller Overlay (Left-Side) */}
-      {tapsData && tapsData.taps.length > 0 && !isLoading && (
-        <div className="absolute top-4 left-4 bg-foreground/90 dark:bg-[#0d0d12]/90 backdrop-blur border border-black/10 dark:border-foreground/10 rounded-lg p-1 flex gap-1 shadow-md z-20">
-          <button
-            onClick={() => setIs3DMode(false)}
-            className={`px-2 py-1 text-[10px] font-bold rounded-md flex items-center gap-1 transition-all ${!is3DMode
-                ? "bg-purple-600 dark:bg-[#a855f7] text-foreground shadow-sm"
-                : "text-black/60 dark:text-foreground/60 hover:bg-black/5 dark:hover:bg-foreground/5"
-              }`}
-          >
-            2D flat
-          </button>
-          <button
-            onClick={() => setIs3DMode(true)}
-            className={`px-2 py-1 text-[10px] font-bold rounded-md flex items-center gap-1 transition-all ${is3DMode
-                ? "bg-purple-600 dark:bg-[#a855f7] text-foreground shadow-sm"
-                : "text-black/60 dark:text-foreground/60 hover:bg-black/5 dark:hover:bg-foreground/5"
-              }`}
-          >
-            <Layers className="w-3 h-3" />
-            3D tilt
-          </button>
-        </div>
-      )}
-
-      {/* Visibility Toggle Settings Overlay (Right-Side) */}
-      {tapsData && tapsData.taps.length > 0 && !isLoading && (
-        <div className="absolute top-4 right-4 bg-foreground/90 dark:bg-[#0d0d12]/90 backdrop-blur border border-black/10 dark:border-foreground/10 rounded-lg p-1 flex gap-1 shadow-md z-20">
-          <button
-            onClick={() => setShowHeatmap(!showHeatmap)}
-            className={`px-2 py-1 text-[10px] font-bold rounded-md transition-all ${showHeatmap
-                ? "bg-purple-600 dark:bg-[#a855f7] text-foreground shadow-sm"
-                : "text-black/60 dark:text-foreground/60 hover:bg-black/5 dark:hover:bg-foreground/5"
-              }`}
-          >
-            Heatmap
-          </button>
-          <button
-            onClick={() => setShowMarkers(!showMarkers)}
-            className={`px-2 py-1 text-[10px] font-bold rounded-md transition-all ${showMarkers
-                ? "bg-purple-600 dark:bg-[#a855f7] text-foreground shadow-sm"
-                : "text-black/60 dark:text-foreground/60 hover:bg-black/5 dark:hover:bg-foreground/5"
-              }`}
-          >
-            Markers
-          </button>
+          No taps yet
         </div>
       )}
 
@@ -499,20 +595,36 @@ export default function TapHeatmap({ postId }: Props) {
             ? "0 35px 65px rgba(0,0,0,0.5), 0 15px 25px rgba(0,0,0,0.35)"
             : "none",
         }}
-        className="w-full h-full min-h-[350px] z-10 transition-all duration-700 cubic-bezier(0.4, 0, 0.2, 1) origin-center"
+        className="w-full h-full min-h-[420px] sm:min-h-[350px] z-10 transition-all duration-700 cubic-bezier(0.4, 0, 0.2, 1) origin-center"
       />
 
       {/* Map legend */}
-      {tapsData && tapsData.taps.length > 0 && (
-        <div className="absolute bottom-4 left-4 bg-foreground/90 dark:bg-[#050409]/95 backdrop-blur border border-black/10 dark:border-[#a855f7]/15 rounded-lg px-3 py-2 flex gap-4 shadow-md z-20">
-          <div className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-blue-500 dark:bg-[#a855f7]"></div>
-            <span className="text-black/60 dark:text-foreground/60 text-[10px] font-semibold">Check-in</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-red-500 dark:bg-[#c084fc]"></div>
-            <span className="text-black/60 dark:text-foreground/60 text-[10px] font-semibold">Networking tap</span>
-          </div>
+      {tapsData && !isLoading && (
+        <div className="absolute bottom-9 sm:bottom-3 left-2 sm:left-3 right-12 sm:right-auto bg-white/90 dark:bg-[#050409]/95 backdrop-blur border border-black/10 dark:border-[#a855f7]/15 rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-2 flex flex-wrap gap-x-3 sm:gap-x-4 gap-y-1 shadow-md z-20">
+          {taps.length > 0 && (
+            <>
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-blue-500 dark:bg-[#a855f7]"></div>
+                <span className="text-black/60 dark:text-foreground/60 text-[10px] font-semibold">Check-in</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-red-500 dark:bg-[#c084fc]"></div>
+                <span className="text-black/60 dark:text-foreground/60 text-[10px] font-semibold">Networking tap</span>
+              </div>
+            </>
+          )}
+          {zone && (
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-2.5 rounded-sm border-2 border-dashed border-[#8B5CF6] bg-[#8B5CF6]/10"></div>
+              <span className="text-black/60 dark:text-foreground/60 text-[10px] font-semibold">Check-in zone</span>
+            </div>
+          )}
+          {venue && (
+            <div className="flex items-center gap-2">
+              <div className="w-2.5 h-2.5 rounded-full border-2 border-black/70 dark:border-foreground/80 bg-white dark:bg-[#1f1f24]"></div>
+              <span className="text-black/60 dark:text-foreground/60 text-[10px] font-semibold">Venue (Luma address)</span>
+            </div>
+          )}
         </div>
       )}
 

@@ -1,6 +1,7 @@
 import axios, { AxiosError } from "axios";
 import { storage } from "../utils/storage";
 import getApiUrl from "../utils/url_api";
+import { latLngToCell } from "h3-js";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -386,6 +387,8 @@ function randomNormal(seed1: number, seed2: number): number {
   return Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
 }
 
+const MOCK_EVENT_START = "2026-06-11T09:00:00Z";
+
 function generateMockTaps(postId: number, center: { lat: number; lng: number }): EventTap[] {
   const taps: EventTap[] = [];
   const users = [
@@ -429,6 +432,11 @@ function generateMockTaps(postId: number, center: { lat: number; lng: number }):
       const latOffset = randomNormal(seedBase + 1, seedBase + 2) * cluster.spread;
       const lngOffset = randomNormal(seedBase + 3, seedBase + 4) * cluster.spread;
       
+      // Spread over a two-day event: 10:00–20:00 on day 1 and day 2
+      const day = getSeededRandom(seedBase + 6) < 0.6 ? 0 : 1;
+      const minutes = Math.floor(getSeededRandom(seedBase + 7) * 600);
+      const createdAt = Date.parse(MOCK_EVENT_START) + (day * 24 * 60 + minutes) * 60 * 1000;
+
       taps.push({
         lat: cluster.lat + latOffset,
         lng: cluster.lng + lngOffset,
@@ -437,6 +445,7 @@ function generateMockTaps(postId: number, center: { lat: number; lng: number }):
         given_by,
         points: type === "checkin" ? 10 : 15,
         points_given_by: type === "checkin" ? 0 : 15,
+        created_at: new Date(createdAt).toISOString(),
       });
       tapIndex++;
     }
@@ -814,12 +823,21 @@ export interface EventTap {
   given_by?: EventTapUser;
   points?: number;
   points_given_by?: number;
+  /** ISO time of the check-in / when the pair met (older backends omit it) */
+  created_at?: string | null;
 }
 
 export interface EventTapsResult {
   event_id: number;
   title: string;
   center: { lat: number; lng: number } | null;
+  /** Event H3 cell; the check-in zone is gridDisk(h3_geo, zone_rings) */
+  h3_geo?: string | null;
+  zone_rings?: number | null;
+  start_time?: string | null;
+  end_time?: string | null;
+  /** IANA zone of the event venue, e.g. "Asia/Bangkok" */
+  timezone?: string | null;
   taps: EventTap[];
 }
 
@@ -840,6 +858,11 @@ export async function getEventTaps(postId: number): Promise<EventTapsResult> {
       event_id: postId,
       title,
       center,
+      h3_geo: latLngToCell(center.lat, center.lng, 11),
+      zone_rings: 2,
+      start_time: MOCK_EVENT_START,
+      end_time: new Date(Date.parse(MOCK_EVENT_START) + 30 * 3600 * 1000).toISOString(),
+      timezone: "Europe/Lisbon",
       taps: generateMockTaps(postId, center),
     };
   }
