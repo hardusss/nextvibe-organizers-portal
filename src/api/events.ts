@@ -84,6 +84,11 @@ export interface EventAnalyticsData {
   cnft_claim_rate: number;
   ecosystem_stats: EcosystemStats;
   hourly_activity: HourlyActivityItem[];
+  // Newer backends only
+  proof_of_meets?: number;
+  meets_with_selfie?: number;
+  seeker_verified_guests?: number;
+  poap_status?: { onchain: number; saved: number; pending: number; failed: number };
 }
 
 export interface SocialNode {
@@ -614,7 +619,7 @@ export const getEventAnalytics = async (postId: number): Promise<EventAnalyticsD
         total_irl_taps: 1840,
         total_reputation_earned: 64800,
         cnft_claims_count: 340,
-        cnft_claim_rate: 87,
+        cnft_claim_rate: 87, proof_of_meets: 920, meets_with_selfie: 310, seeker_verified_guests: 120, poap_status: { onchain: 250, saved: 90, pending: 0, failed: 0 },
         ecosystem_stats: {
           total_users: 480,
           mwa_wallet_users: 360,
@@ -642,7 +647,7 @@ export const getEventAnalytics = async (postId: number): Promise<EventAnalyticsD
         total_irl_taps: 950,
         total_reputation_earned: 31200,
         cnft_claims_count: 195,
-        cnft_claim_rate: 93,
+        cnft_claim_rate: 93, proof_of_meets: 610, meets_with_selfie: 240, seeker_verified_guests: 70, poap_status: { onchain: 150, saved: 40, pending: 0, failed: 0 },
         ecosystem_stats: {
           total_users: 240,
           mwa_wallet_users: 144,
@@ -670,7 +675,7 @@ export const getEventAnalytics = async (postId: number): Promise<EventAnalyticsD
       total_irl_taps: 3420,
       total_reputation_earned: 128500,
       cnft_claims_count: 662,
-      cnft_claim_rate: 92,
+      cnft_claim_rate: 92, proof_of_meets: 1710, meets_with_selfie: 620, seeker_verified_guests: 260, poap_status: { onchain: 480, saved: 182, pending: 0, failed: 0 },
       ecosystem_stats: {
         total_users: 942,
         mwa_wallet_users: 640,

@@ -24,6 +24,7 @@ import SocialForceGraph from "@/src/components/analytics/SocialForceGraph";
 import BroadcastPanel from "@/src/components/analytics/BroadcastPanel";
 import AttendeeRaffle from "@/src/components/analytics/AttendeeRaffle";
 import EventPostsSection from "@/src/components/analytics/EventPostsSection";
+import NetworkingInsights from "@/src/components/analytics/NetworkingInsights";
 import { useRole } from "@/src/contexts/RoleContext";
 import { useEventTaps } from "@/src/utils/useEventTaps";
 import { dayLabel, eventDays, peopleMetLeaderboard, safeTimeZone } from "@/src/utils/eventTaps";
@@ -784,6 +785,9 @@ export default function AnalyticsPage() {
 
             </div>
           </div>
+
+          {/* Guest networking numbers for the organizer at the door */}
+          {selectedEventId && <NetworkingInsights analytics={analytics} taps={tapsData} />}
 
           {/* SECTION 2: MAP & LEADERBOARD SPLIT */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
