@@ -1,13 +1,7 @@
 import type { Metadata } from "next";
-import { Italiana, Pinyon_Script, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
+import { Inter, Pinyon_Script, JetBrains_Mono } from "next/font/google";
 import Providers from "@/src/components/providers/Providers";
 import "./globals.css";
-
-const italiana = Italiana({
-  variable: "--font-italiana",
-  subsets: ["latin"],
-  weight: ["400"],
-});
 
 const pinyonScript = Pinyon_Script({
   variable: "--font-pinyon-script",
@@ -15,10 +9,9 @@ const pinyonScript = Pinyon_Script({
   weight: ["400"],
 });
 
-const plusJakartaSans = Plus_Jakarta_Sans({
-  variable: "--font-plus-jakarta-sans",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin", "cyrillic"],
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -40,7 +33,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${italiana.variable} ${pinyonScript.variable} ${plusJakartaSans.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${pinyonScript.variable} ${jetbrainsMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">

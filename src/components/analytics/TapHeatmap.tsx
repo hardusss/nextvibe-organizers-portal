@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { Loader2, AlertCircle, RefreshCw, X, Users, CheckCircle2, Fingerprint, MapPin, Award, Layers } from "lucide-react";
 import { getEventTaps, type EventTap } from "@/src/api/events";
 
+const CARTO_API_KEY = process.env.NEXT_PUBLIC_CARTO_API_KEY ?? "";
+
 interface Props {
   postId: number;
 }
@@ -14,6 +16,7 @@ export default function TapHeatmap({ postId }: Props) {
   const heatLayerRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
   const markersGroupRef = useRef<any>(null);
+  const tileLayerRef = useRef<any>(null);
 
   const [tapsData, setTapsData] = useState<{ center: { lat: number; lng: number } | null; taps: EventTap[] } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -120,11 +123,22 @@ export default function TapHeatmap({ postId }: Props) {
     // Detect if portal is in dark mode
     const isDark = document.documentElement.classList.contains("dark");
 
-    // Choose appropriate tiles
-    const tileUrl = isDark
-      ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-      : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
-    const attribution = '© OpenStreetMap contributors © CARTO';
+    // Choose appropriate tiles: CARTO when an API key is configured, otherwise
+    // Esri (no key needed). Beyond maxNativeZoom Leaflet upscales the last tiles.
+    const esriTiles = {
+      url: isDark
+        ? "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+        : "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+      maxNativeZoom: isDark ? 16 : 19,
+      attribution: "Tiles © Esri — Esri, HERE, Garmin, © OpenStreetMap contributors",
+    };
+    const cartoTiles = CARTO_API_KEY
+      ? {
+          url: `https://basemaps.cartocdn.com/${isDark ? "dark_all" : "rastertiles/voyager"}/{z}/{x}/{y}{r}.png?key=${CARTO_API_KEY}`,
+          maxNativeZoom: 20,
+          attribution: "© OpenStreetMap contributors © CARTO",
+        }
+      : null;
 
     // Center map
     const defaultCenter = [50.4501, 30.5234]; // Kyiv default
@@ -139,19 +153,28 @@ export default function TapHeatmap({ postId }: Props) {
         scrollWheelZoom: true,
       }).setView(mapCenter, 19);
 
-      L.tileLayer(tileUrl, {
-        maxZoom: 20,
-        attribution,
-      }).addTo(mapRef.current);
     } else {
       // B. If Map exists, update view and tile layer
       mapRef.current.setView(mapCenter, 19);
+    }
 
-      // Update tile layer url to match dark/light theme
-      mapRef.current.eachLayer((layer: any) => {
-        if (layer._url) {
-          layer.setUrl(tileUrl);
-        }
+    // Recreate the tile layer so url and native zoom match the dark/light theme
+    const map = mapRef.current;
+    const addTiles = (tiles: typeof esriTiles) => {
+      if (tileLayerRef.current) {
+        map.removeLayer(tileLayerRef.current);
+      }
+      tileLayerRef.current = L.tileLayer(tiles.url, {
+        maxZoom: 20,
+        maxNativeZoom: tiles.maxNativeZoom,
+        attribution: tiles.attribution,
+      }).addTo(map);
+    };
+    addTiles(cartoTiles ?? esriTiles);
+    if (cartoTiles) {
+      // A rejected/over-quota key makes CARTO answer 403 — fall back to Esri
+      tileLayerRef.current.once("tileerror", () => {
+        if (mapRef.current === map) addTiles(esriTiles);
       });
     }
 
@@ -348,6 +371,7 @@ export default function TapHeatmap({ postId }: Props) {
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
+        tileLayerRef.current = null;
         heatLayerRef.current = null;
         markerRef.current = null;
         markersGroupRef.current = null;
