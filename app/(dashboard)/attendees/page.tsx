@@ -147,7 +147,7 @@ export default function AttendeesPage() {
                   <div className="flex items-center gap-3.5 w-full sm:w-auto">
 
                     {/* Styled Avatar Placeholder */}
-                    <div className="w-11 h-11 rounded-full overflow-hidden border border-black/10 dark:border-foreground/10 bg-black/5 dark:bg-foreground/5 flex items-center justify-center font-display font-extrabold text-sm text-[var(--accent-primary)] uppercase tracking-wide">
+                    <div className="w-11 h-11 shrink-0 rounded-full overflow-hidden border border-black/10 dark:border-foreground/10 bg-black/5 dark:bg-foreground/5 flex items-center justify-center font-display font-extrabold text-sm text-[var(--accent-primary)] uppercase tracking-wide">
                       {request.avatar ? (
                         <Image src={request.avatar} alt={request.username} width={44} height={44} className="object-cover w-full h-full" />
                       ) : (

@@ -418,7 +418,8 @@ export default function TapHeatmap({ postId, data: tapsData, isLoading, error }:
   });
 
   useEffect(() => {
-    if (!scriptsLoaded || !mapRef.current || !tapsData) return;
+    // Right after switching events the previous event's data is still around
+    if (!scriptsLoaded || !mapRef.current || !tapsData || tapsData.event_id !== postId) return;
     if (fittedForRef.current === postId) return;
     fittedForRef.current = postId;
     const initial: Focus = taps.length > 0 ? "taps" : zone ? "zone" : "venue";
