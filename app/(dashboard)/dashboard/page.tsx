@@ -5,6 +5,8 @@ import TopNav from "@/src/components/layout/TopNav";
 import { getUserDetail } from "@/src/api/user.detail";
 import {
   getHostedEvents,
+  getAllEvents,
+  isOwnEvent,
   getEventAnalytics,
   getEventTopUsers,
   getEventSocialGraph,
@@ -142,13 +144,15 @@ export default function AnalyticsPage() {
 
     const initData = async () => {
       try {
-        const [profileData, eventsResponse] = await Promise.all([
+        const [profileData, hostedEvents] = await Promise.all([
           getUserDetail(undefined, true),
           getHostedEvents()
         ]);
 
         setUserProfile(profileData);
 
+        // An admin (User.is_admin) can open any event, not only their own
+        const eventsResponse = profileData?.is_admin ? await getAllEvents() : hostedEvents;
         const evts = eventsResponse.data || [];
         evts.sort((a: any, b: any) => new Date(b.create_at).getTime() - new Date(a.create_at).getTime());
 
@@ -164,7 +168,8 @@ export default function AnalyticsPage() {
   useEffect(() => {
     if (visibleEvents.length > 0) {
       if (!selectedEventId || !visibleEvents.some((e) => e.post_id === selectedEventId)) {
-        setSelectedEventId(visibleEvents[0].post_id);
+        // An admin's list has everyone's events: open their own newest one first
+        setSelectedEventId((visibleEvents.find(isOwnEvent) ?? visibleEvents[0]).post_id);
       }
     } else {
       setSelectedEventId(null);
@@ -277,6 +282,8 @@ export default function AnalyticsPage() {
   };
 
   const selectedEvent = visibleEvents.find(e => e.post_id === selectedEventId);
+  // An admin looking at someone else's event: read-only, no broadcast or raffle
+  const isOthersEvent = !!selectedEvent && !isOwnEvent(selectedEvent);
 
   const getLastHourNetworking = () => {
     if (!analytics?.hourly_activity || analytics.hourly_activity.length === 0) return 0;
@@ -525,7 +532,7 @@ export default function AnalyticsPage() {
                 >
                   {visibleEvents.map(evt => (
                     <option key={evt.post_id} value={evt.post_id} className="text-base text-black bg-white dark:bg-[#0c0c0f]">
-                      {evt.about}
+                      {evt.about}{!isOwnEvent(evt) && evt.owner ? ` · @${evt.owner.username}` : ""}
                     </option>
                   ))}
                 </select>
@@ -550,6 +557,11 @@ export default function AnalyticsPage() {
               )}
             </div>
           </div>
+          {isOthersEvent && (
+            <p className="text-foreground/50 text-xs font-medium">
+              Hosted by {selectedEvent.owner ? `@${selectedEvent.owner.username}` : "another organizer"} · admin view, read-only
+            </p>
+          )}
         </div>
 
         <motion.div
@@ -1031,33 +1043,37 @@ export default function AnalyticsPage() {
 
           {/* SECTION 4: SOCIAL GRAPH & BROADCAST SPLIT */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Social Force Graph (col-span-8) */}
-            <div className="lg:col-span-8">
+            {/* Social Force Graph (col-span-8, full width without the broadcast panel) */}
+            <div className={isOthersEvent ? "lg:col-span-12" : "lg:col-span-8"}>
               <SocialForceGraph
                 nodes={socialGraph.nodes}
                 edges={socialGraph.edges}
               />
             </div>
 
-            {/* Broadcast Panel (col-span-4) */}
-            <div className="lg:col-span-4">
-              <BroadcastPanel
-                eventId={selectedEventId}
-                recipientCount={analytics?.accepted_requests || 0}
-              />
-            </div>
+            {/* Broadcast Panel (col-span-4): only the event's owner can send one */}
+            {!isOthersEvent && (
+              <div className="lg:col-span-4">
+                <BroadcastPanel
+                  eventId={selectedEventId}
+                  recipientCount={analytics?.accepted_requests || 0}
+                />
+              </div>
+            )}
           </div>
 
           {/* SECTION 5: EVENT POSTS FROM ATTENDEES */}
           <EventPostsSection postId={selectedEventId} />
 
-          {/* SECTION 6: ATTENDEE RAFFLE & GIVEAWAY SECTION */}
-          <AttendeeRaffle
-            key={selectedEventId ?? "no-event"}
-            attendees={topUsers}
-            isLoading={isLoadingTopUsers}
-            selectedEventId={selectedEventId}
-          />
+          {/* SECTION 6: ATTENDEE RAFFLE & GIVEAWAY SECTION (the event's owner runs it) */}
+          {!isOthersEvent && (
+            <AttendeeRaffle
+              key={selectedEventId ?? "no-event"}
+              attendees={topUsers}
+              isLoading={isLoadingTopUsers}
+              selectedEventId={selectedEventId}
+            />
+          )}
 
         </motion.div>
       </main>
