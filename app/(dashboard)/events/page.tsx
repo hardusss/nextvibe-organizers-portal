@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import TopNav from "@/src/components/layout/TopNav";
 import { getUserDetail } from "@/src/api/user.detail";
-import { getHostedEvents, getEventAttendees, deleteEventPost } from "@/src/api/events";
+import { getHostedEvents, getAllEvents, isOwnEvent, getEventAttendees, deleteEventPost, type EventOwner } from "@/src/api/events";
 import {
   Calendar, Users, CheckCircle, XCircle, Clock,
   MapPin, Loader2, User, ShieldCheck, Plus, Edit3, Trash2, Image as ImageIcon
@@ -25,6 +25,8 @@ interface HostedEvent {
   is_luma_event: boolean;
   luma_event_start_time: string;
   location?: string;
+  /** Only on the admin list (every event) */
+  owner?: EventOwner;
 }
 
 interface Attendee {
@@ -46,6 +48,7 @@ const item = {
 
 export default function EventsPage() {
   const [userProfile, setUserProfile] = useState<any>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Data states
   const [events, setEvents] = useState<HostedEvent[]>([]);
@@ -81,18 +84,23 @@ export default function EventsPage() {
       try {
         const data = await getUserDetail(undefined, true);
         setUserProfile(data);
+        return !!data?.is_admin;
       } catch (error) {
         console.error("Failed to fetch user profile:", error);
+        return false;
       }
     };
-    fetchUser();
-    fetchEvents();
+    // An admin (User.is_admin) sees every event, so the list waits for the profile
+    fetchUser().then((admin) => {
+      setIsAdmin(admin);
+      fetchEvents(admin);
+    });
   }, [role]);
 
-  const fetchEvents = async () => {
+  const fetchEvents = async (admin = isAdmin) => {
     setIsLoadingEvents(true);
     try {
-      const data = await getHostedEvents();
+      const data = admin ? await getAllEvents() : await getHostedEvents();
       const allEvents = data.data || [];
       if (role === "sponsor") {
         setEvents(allEvents.filter((evt: any) => isSponsorEvent(evt.post_id)));
@@ -157,7 +165,7 @@ export default function EventsPage() {
           <div className="space-y-1">
             <span className="text-[10px] tracking-widest text-[var(--accent-primary)] font-mono font-bold uppercase">event directory</span>
             <h2 className="text-2xl font-display font-extrabold uppercase text-foreground tracking-tight">
-              Hosted Campaigns
+              {isAdmin ? "All Events" : "Hosted Campaigns"}
             </h2>
           </div>
 
@@ -226,9 +234,13 @@ export default function EventsPage() {
                           return <Calendar className="w-10 h-10 text-foreground/10 relative z-10" />;
                         })()}
 
-                        {/* Static Host Tag */}
+                        {/* Host Tag: yours, or who hosts it (admin list) */}
                         <div className="absolute top-3 right-3 bg-black/80 backdrop-blur-md text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg border border-foreground/10 text-foreground flex items-center gap-1.5 shadow-md z-20">
-                          <ShieldCheck className="w-3.5 h-3.5 text-[var(--accent-primary)]" /> Host
+                          {isOwnEvent(evt) ? (
+                            <><ShieldCheck className="w-3.5 h-3.5 text-[var(--accent-primary)]" /> Host</>
+                          ) : (
+                            <><User className="w-3.5 h-3.5 text-[var(--accent-primary)]" /> @{evt.owner?.username ?? "organizer"}</>
+                          )}
                         </div>
                       </div>
 
@@ -265,21 +277,26 @@ export default function EventsPage() {
                             <ImageIcon className="w-3.5 h-3.5" /> Posts
                           </button>
 
-                          <button
-                            onClick={() => { setEditingEvent(evt); setShowEditModal(true); }}
-                            className="flex items-center justify-center p-2.5 rounded-xl border border-black/10 dark:border-foreground/10 hover:bg-black/5 dark:hover:bg-foreground/5 text-foreground/60 hover:text-[var(--accent-primary)] transition-colors cursor-pointer"
-                            title="Edit event"
-                          >
-                            <Edit3 className="w-4 h-4" />
-                          </button>
+                          {/* Editing and deleting stay with the event's owner */}
+                          {isOwnEvent(evt) && (
+                            <>
+                              <button
+                                onClick={() => { setEditingEvent(evt); setShowEditModal(true); }}
+                                className="flex items-center justify-center p-2.5 rounded-xl border border-black/10 dark:border-foreground/10 hover:bg-black/5 dark:hover:bg-foreground/5 text-foreground/60 hover:text-[var(--accent-primary)] transition-colors cursor-pointer"
+                                title="Edit event"
+                              >
+                                <Edit3 className="w-4 h-4" />
+                              </button>
 
-                          <button
-                            onClick={() => setEventToDeleteId(evt.post_id)}
-                            className="flex items-center justify-center p-2.5 rounded-xl border border-red-500/20 hover:bg-red-500/10 text-red-500 transition-colors cursor-pointer"
-                            title="Delete event"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                              <button
+                                onClick={() => setEventToDeleteId(evt.post_id)}
+                                className="flex items-center justify-center p-2.5 rounded-xl border border-red-500/20 hover:bg-red-500/10 text-red-500 transition-colors cursor-pointer"
+                                title="Delete event"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </>
+                          )}
                         </div>
                       </div>
                     </motion.div>
