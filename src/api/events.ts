@@ -526,6 +526,42 @@ export const getHostedEvents = async (userId?: number) => {
   return response.data;
 };
 
+// Get Every Event, for admins (User.is_admin); items also carry the event's owner
+export const getAllEvents = async () => {
+  if (isDemoModeActive()) {
+    return { data: MOCK_EVENTS };
+  }
+
+  const token = storage.getItem("access");
+
+  if (!token) {
+    throw new Error("No access token found");
+  }
+
+  const response = await axios.get(`${getApiUrl()}/posts/all-events/`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    params: {
+      limit: 500,
+    },
+  });
+
+  return response.data;
+};
+
+export interface EventOwner {
+  user_id: number;
+  username: string;
+  avatar: string | null;
+}
+
+/** Whether the signed-in user hosts this event (an admin also opens other people's). Demo events are theirs. */
+export function isOwnEvent(evt: { user_id?: number }): boolean {
+  if (isDemoModeActive()) return true;
+  return String(evt.user_id) === storage.getItem("id");
+}
+
 // Get Event Requests
 export const getEventRequests = async () => {
   const token = storage.getItem("access");
