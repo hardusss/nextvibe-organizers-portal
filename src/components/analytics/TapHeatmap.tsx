@@ -5,8 +5,8 @@ import { Loader2, AlertCircle, RefreshCw, X, Users, CheckCircle2, Fingerprint, M
 import { cellsToMultiPolygon, gridDisk, isValidCell } from "h3-js";
 import type { EventTap, EventTapsResult } from "@/src/api/events";
 import { boundsOf, tapFocusBounds, type Bounds } from "@/src/utils/eventTaps";
+import { baseTiles, loadLeaflet, type BaseTiles } from "@/src/utils/leaflet";
 
-const CARTO_API_KEY = process.env.NEXT_PUBLIC_CARTO_API_KEY ?? "";
 const ZONE_COLOR = "#8B5CF6";
 
 type Focus = "taps" | "zone" | "venue";
@@ -59,51 +59,11 @@ export default function TapHeatmap({ postId, data: tapsData, isLoading, error }:
 
   // 1. Load Leaflet and Leaflet.heat dynamically on client side
   useEffect(() => {
-    if ((window as any).L && (window as any).L.heatLayer) {
-      setScriptsLoaded(true);
-      return;
-    }
-
-    // Load Leaflet CSS
-    if (!document.getElementById("leaflet-css")) {
-      const link = document.createElement("link");
-      link.id = "leaflet-css";
-      link.rel = "stylesheet";
-      link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-      document.head.appendChild(link);
-    }
-
-    // Load Leaflet JS
-    const loadLeafletJS = () => {
-      if ((window as any).L) {
-        loadHeatmapJS();
-        return;
-      }
-      const script = document.createElement("script");
-      script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-      script.async = true;
-      script.onload = () => {
-        loadHeatmapJS();
-      };
-      document.body.appendChild(script);
+    let alive = true;
+    loadLeaflet().then(() => alive && setScriptsLoaded(true)).catch(() => {});
+    return () => {
+      alive = false;
     };
-
-    // Load Leaflet Heatmap Plugin JS
-    const loadHeatmapJS = () => {
-      if ((window as any).L?.heatLayer) {
-        setScriptsLoaded(true);
-        return;
-      }
-      const script = document.createElement("script");
-      script.src = "https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js";
-      script.async = true;
-      script.onload = () => {
-        setScriptsLoaded(true);
-      };
-      document.body.appendChild(script);
-    };
-
-    loadLeafletJS();
   }, []);
 
   // 2. Create the map and its base tiles once the scripts are in
@@ -116,22 +76,7 @@ export default function TapHeatmap({ postId, data: tapsData, isLoading, error }:
     // Detect if portal is in dark mode
     const isDark = document.documentElement.classList.contains("dark");
 
-    // Choose appropriate tiles: CARTO when an API key is configured, otherwise
-    // Esri (no key needed). Beyond maxNativeZoom Leaflet upscales the last tiles.
-    const esriTiles = {
-      url: isDark
-        ? "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
-        : "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
-      maxNativeZoom: isDark ? 16 : 19,
-      attribution: "Tiles © Esri — Esri, HERE, Garmin, © OpenStreetMap contributors",
-    };
-    const cartoTiles = CARTO_API_KEY
-      ? {
-          url: `https://basemaps.cartocdn.com/${isDark ? "dark_all" : "rastertiles/voyager"}/{z}/{x}/{y}{r}.png?key=${CARTO_API_KEY}`,
-          maxNativeZoom: 20,
-          attribution: "© OpenStreetMap contributors © CARTO",
-        }
-      : null;
+    const { carto: cartoTiles, esri: esriTiles } = baseTiles(isDark);
 
     // A. Create the map once; where it looks is decided by fitTo() below
     if (!mapRef.current) {
@@ -145,7 +90,7 @@ export default function TapHeatmap({ postId, data: tapsData, isLoading, error }:
 
     // Recreate the tile layer so url and native zoom match the dark/light theme
     const map = mapRef.current;
-    const addTiles = (tiles: typeof esriTiles) => {
+    const addTiles = (tiles: BaseTiles) => {
       if (tileLayerRef.current) {
         map.removeLayer(tileLayerRef.current);
       }
