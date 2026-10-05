@@ -16,7 +16,7 @@ import {
 } from "@/src/api/events";
 import {
   FileText, Radio, Fingerprint, Award, ChevronRight, Activity, Star, ChevronDown, Users,
-  Tv, X, ShieldAlert, AlertCircle, Volume2, TrendingUp, Calendar, RotateCw
+  Tv, X, ShieldAlert, AlertCircle, Volume2, TrendingUp, Calendar, RotateCw, Play
 } from "lucide-react";
 import { motion, useMotionValue, useTransform, animate, AnimatePresence } from "framer-motion";
 import TapHeatmap from "@/src/components/analytics/TapHeatmap";
@@ -27,6 +27,7 @@ import BroadcastPanel from "@/src/components/analytics/BroadcastPanel";
 import AttendeeRaffle from "@/src/components/analytics/AttendeeRaffle";
 import EventPostsSection from "@/src/components/analytics/EventPostsSection";
 import NetworkingInsights from "@/src/components/analytics/NetworkingInsights";
+import EventReplay from "@/src/components/analytics/EventReplay";
 import { useRole } from "@/src/contexts/RoleContext";
 import { useEventTaps } from "@/src/utils/useEventTaps";
 import { dayLabel, eventDays, peopleMetLeaderboard, safeTimeZone } from "@/src/utils/eventTaps";
@@ -107,6 +108,8 @@ export default function AnalyticsPage() {
   const [isLoadingTopUsers, setIsLoadingTopUsers] = useState<boolean>(false);
   const [socialGraph, setSocialGraph] = useState<SocialGraphData>({ nodes: [], edges: [] });
   const [isLoadingSocialGraph, setIsLoadingSocialGraph] = useState<boolean>(false);
+  // Event the replay is playing (it takes the dashboard's place until it ends)
+  const [replayEventId, setReplayEventId] = useState<number | null>(null);
 
   // Leaderboard states
   const [leaderboardMode, setLeaderboardMode] = useState<"private" | "public">("private");
@@ -545,6 +548,20 @@ export default function AnalyticsPage() {
               <p className="text-foreground/50 text-xs font-medium max-w-xs hidden sm:block">
                 Live statistics and connection heatmaps synced with the Solana ledger
               </p>
+              {selectedEventId && socialGraph.taps !== undefined && (
+                <button
+                  onClick={() => {
+                    setReplayEventId(selectedEventId);
+                    window.scrollTo({ top: 0 });
+                  }}
+                  disabled={isLoadingSocialGraph}
+                  className="px-4 py-2.5 rounded-xl border border-[var(--accent-primary)]/30 bg-[var(--accent-primary)]/5 hover:bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2 text-xs font-display font-bold uppercase tracking-wider"
+                  title="Play the event back: check-ins, then every tap in real time"
+                >
+                  <Play className="w-3.5 h-3.5" />
+                  Replay
+                </button>
+              )}
               {selectedEventId && (
                 <button
                   onClick={refreshTelemetryData}
@@ -564,6 +581,14 @@ export default function AnalyticsPage() {
           )}
         </div>
 
+        {replayEventId !== null && replayEventId === selectedEventId ? (
+          <EventReplay
+            title={selectedEvent?.about || "Event"}
+            graph={socialGraph}
+            taps={tapsData?.event_id === selectedEventId ? tapsData : null}
+            onClose={() => setReplayEventId(null)}
+          />
+        ) : (
         <motion.div
           variants={container}
           initial="hidden"
@@ -1076,6 +1101,7 @@ export default function AnalyticsPage() {
           )}
 
         </motion.div>
+        )}
       </main>
     </div>
   );

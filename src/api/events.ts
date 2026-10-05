@@ -107,9 +107,24 @@ export interface SocialEdge {
   weight: number;
 }
 
+/** One event tap as the dashboard replay plays it back */
+export interface ReplayTap {
+  /** ISO time the tap was written */
+  time: string;
+  /** H3 cell it was tapped in; null when the phone sent no location */
+  h3: string | null;
+  /** user_id of the person who confirmed the tap */
+  user_a: number;
+  user_b: number;
+}
+
 export interface SocialGraphData {
   nodes: SocialNode[];
   edges: SocialEdge[];
+  /** Verified check-ins (older backends omit it and taps) */
+  total_checkins?: number;
+  /** Every event tap, one per meet, oldest first */
+  taps?: ReplayTap[];
 }
 
 export interface BroadcastResult {
@@ -394,6 +409,35 @@ function randomNormal(seed1: number, seed2: number): number {
 
 const MOCK_EVENT_START = "2026-06-11T09:00:00Z";
 
+function mockEvent(postId: number): { center: { lat: number; lng: number }; title: string } {
+  if (postId === 9992) return { center: { lat: 50.4687, lng: 30.4623 }, title: "NextVibe Founders Summit" }; // UNIT.City, Kyiv
+  if (postId === 9993) return { center: { lat: 50.4398, lng: 30.5457 }, title: "Kyiv Web3 Hackathon Night" }; // Creative States Arsenal
+  return { center: { lat: 38.7369, lng: -9.1128 }, title: "Solana Breakpoint VIP Afterparty" }; // Convento do Beato, Lisbon
+}
+
+/** Demo replay: each mock edge tapped once or twice over the first event day, in bursts. */
+function generateMockReplayTaps(postId: number, edges: SocialEdge[]): ReplayTap[] {
+  const { center } = mockEvent(postId);
+  const spots = [[-0.0001, 0.00015], [0.00022, 0.00005], [-0.00018, -0.0001], [0.00015, -0.00015]];
+  const taps: { at: number; tap: ReplayTap }[] = [];
+  edges.forEach((edge, i) => {
+    const seed = postId + i * 31;
+    // Mostly the afternoon session, a few in the evening after a long break
+    const evening = getSeededRandom(seed + 1) < 0.25;
+    const minutes = evening ? 480 + getSeededRandom(seed + 2) * 90 : 60 + getSeededRandom(seed + 3) * 150;
+    const [dLat, dLng] = spots[i % spots.length];
+    const lat = center.lat + dLat + randomNormal(seed + 4, seed + 5) * 0.00003;
+    const lng = center.lng + dLng + randomNormal(seed + 6, seed + 7) * 0.00003;
+    taps.push({
+      at: Date.parse(MOCK_EVENT_START) + Math.round(minutes * 60_000),
+      tap: { time: "", h3: latLngToCell(lat, lng, 15), user_a: edge.source, user_b: edge.target },
+    });
+  });
+  return taps
+    .sort((a, b) => a.at - b.at)
+    .map(({ at, tap }) => ({ ...tap, time: new Date(at).toISOString() }));
+}
+
 function generateMockTaps(postId: number, center: { lat: number; lng: number }): EventTap[] {
   const taps: EventTap[] = [];
   const users = [
@@ -491,7 +535,7 @@ function generateMockSocialGraph(postId: number): SocialGraphData {
     { source: 107, target: 108, weight: 3 },
   ];
 
-  return { nodes, edges };
+  return { nodes, edges, total_checkins: nodes.length + 24, taps: generateMockReplayTaps(postId, edges) };
 }
 
 // ─── Existing Endpoints (unchanged) ─────────────────────────────────────────
@@ -884,16 +928,7 @@ export interface EventTapsResult {
 
 export async function getEventTaps(postId: number): Promise<EventTapsResult> {
   if (isDemoModeActive()) {
-    let center = { lat: 38.7369, lng: -9.1128 }; // Convento do Beato, Lisbon
-    let title = "Solana Breakpoint VIP Afterparty";
-
-    if (postId === 9992) {
-      center = { lat: 50.4687, lng: 30.4623 }; // UNIT.City, Kyiv
-      title = "NextVibe Founders Summit";
-    } else if (postId === 9993) {
-      center = { lat: 50.4398, lng: 30.5457 }; // Creative States Arsenal, Kyiv
-      title = "Kyiv Web3 Hackathon Night";
-    }
+    const { center, title } = mockEvent(postId);
 
     return {
       event_id: postId,
